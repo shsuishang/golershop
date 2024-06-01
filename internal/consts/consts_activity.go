@@ -1,0 +1,54 @@
+package consts
+
+const (
+	ACTIVITY_TYPE_BARGAIN          uint = 1101 //加价购
+	ACTIVITY_TYPE_GIFT             uint = 1102 //店铺满赠-小礼品
+	ACTIVITY_TYPE_LIMITED_DISCOUNT uint = 1103 //限时折扣
+	ACTIVITY_TYPE_PACKAGE_DISCOUNT uint = 1104 //优惠套装
+	ACTIVITY_TYPE_VOUCHER          uint = 1105 //店铺优惠券  coupon 优惠券
+	ACTIVITY_TYPE_LOTTERY          uint = 1106 //砸金蛋/幸运大抽奖
+	ACTIVITY_TYPE_REDUCTION        uint = 1107 //满减
+	ACTIVITY_TYPE_FULL_RETURN      uint = 1108 //满返
+	ACTIVITY_TYPE_POINT_SHOPPING   uint = 1109 //积分换购
+
+	ACTIVITY_TYPE_FLASHSALE         uint = 1122 //秒杀
+	ACTIVITY_TYPE_GROUPBOOKING      uint = 1123 //拼团
+	ACTIVITY_TYPE_CUTPRICE          uint = 1124 //砍价
+	ACTIVITY_TYPE_YIYUAN            uint = 1125 //一元购
+	ACTIVITY_TYPE_GROUPBUY_STORE    uint = 1126 //团购
+	ACTIVITY_TYPE_PF_GROUPBUY_STORE uint = 1127 //批发团购
+
+	ACTIVITY_TYPE_MARKETING          uint = 1131 //市场活动
+	ACTIVITY_TYPE_GIFTBAG            uint = 1132 //礼包活动
+	ACTIVITY_TYPE_MULTIPLEDISCOUNT   uint = 1133 //多件折
+	ACTIVITY_TYPE_BATDISCOUNT        uint = 1135 //阶梯价
+	ACTIVITY_TYPE_MULTIPLE_POINTS    uint = 1136 //多倍积分
+	ACTIVITY_TYPE_POP                uint = 1137 //弹窗活动
+	ACTIVITY_TYPE_REDUCTION_AGAIN    uint = 1140 //折上折
+	ACTIVITY_TYPE_REDEMPTION_VOUCHER uint = 1141 //提货券
+
+	ACTIVITY_TYPE_TODAYHOT     uint = 5001 //今日爆款
+	ACTIVITY_TYPE_DAILYGOOD    uint = 5002 //每日好店
+	ACTIVITY_TYPE_SECONDSKILL  uint = 5003 //限时秒杀
+	ACTIVITY_TYPE_SECONDSEVERY uint = 5004 //天天秒淘
+	ACTIVITY_TYPE_ZEROBUY      uint = 5005 //零元购
+	ACTIVITY_TYPE_HIGHRETURN   uint = 5006 //高额返区
+
+	ACTIVITY_GROUPBOOKING_SALE_PRICE     uint = 1 //以固定折扣购买
+	ACTIVITY_GROUPBOOKING_FIXED_AMOUNT   uint = 2 //以固定价格购买
+	ACTIVITY_GROUPBOOKING_FIXED_DISCOUNT uint = 3 //优惠固定金额
+
+	VOUCHER_STATE_UNUSED   uint = 1501 //未用
+	VOUCHER_STATE_USED     uint = 1502 //已用
+	VOUCHER_STATE_TIMEOUT  uint = 1503 //过期
+	VOUCHER_STATE_DEL      uint = 1504 //收回
+	VOUCHER_STATE_UNTIMELY uint = 1505 //未到使用时间
+
+	MARKRTING_ACTIVITY_JOIN_BY_DEFAULT uint = 1 //参加活动
+	MARKRTING_ACTIVITY_JOIN_BY_QRCODE  uint = 2 //通过二维码参加
+
+	ACTIVITY_GROUPBOOKING_FAIL        uint = 0 //拼团状态:0-失败
+	ACTIVITY_GROUPBOOKING_SUCCESS     uint = 1 //拼团状态:1-成功
+	ACTIVITY_GROUPBOOKING_UNDERWAY    uint = 2 //拼团状态:2-进行中
+	ACTIVITY_GROUPBOOKING_INEFFECTIVE uint = 3 //拼团状态:3-未生效, 待团长付款
+)
