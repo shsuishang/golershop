@@ -63,6 +63,7 @@ type UserMessageAddInput struct {
 }
 
 type ChatMessageVo struct {
+	entity.UserMessage
 	MsgType string         `json:"type"` //
 	Msg     *UserMessageVo `json:"msg"`  //
 }

@@ -54,3 +54,17 @@ type UserFavoritesItemListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+type UserFavoritesItemListsReq struct {
+	g.Meta `path:"/front/shop/userFavoritesItem/lists" tags:"收藏列表" method:"get" summary:"收藏列表接口"`
+	ml.BaseList
+
+	UserId uint `json:"user_id" `
+}
+
+type UserFavoritesItemListsRes struct {
+	Items   interface{} `json:"items"    dc:"分页数据内容"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}

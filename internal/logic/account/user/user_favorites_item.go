@@ -22,10 +22,15 @@ package user
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"golershop.cn/api/shop"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 type sUserFavoritesItem struct{}
@@ -114,4 +119,64 @@ func (s *sUserFavoritesItem) Remove(ctx context.Context, id any) (affected int64
 	}
 
 	return affected, err
+}
+
+// GetList 读取用户收藏列表
+func (s *sUserFavoritesItem) GetList(ctx context.Context, req *do.UserFavoritesItemListInput) (res *shop.UserFavoritesItemListsRes, err error) {
+	userId := service.BizCtx().GetUserId(ctx)
+
+	// 获取收藏项目列表
+	favoritesItemPage, err := dao.UserFavoritesItem.List(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	if !g.IsEmpty(favoritesItemPage.Items) {
+		res = &shop.UserFavoritesItemListsRes{}
+		gconv.Scan(favoritesItemPage, res)
+		favoritesItems := favoritesItemPage.Items
+		itemIdsInterface := array.Column(favoritesItems, "ItemId")
+		itemIds := make([]uint64, len(itemIdsInterface))
+		for i, v := range itemIdsInterface {
+			switch id := v.(type) {
+			case uint64:
+				itemIds[i] = id
+			case int64:
+				itemIds[i] = uint64(id)
+			}
+		}
+
+		// 获取商品项目信息
+		productItemVos, err := service.ProductBase().GetItems(ctx, itemIds, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		if !g.IsEmpty(productItemVos) {
+			productItemVoMap := make(map[uint64]*model.ProductItemVo)
+			for _, productItemVo := range productItemVos {
+				productItemVoMap[productItemVo.ItemId] = productItemVo
+			}
+
+			itemRes := make([]map[string]interface{}, 0)
+			// 遍历收藏夹商品，合并商品详细信息
+			for _, favoritesItem := range favoritesItems {
+				userFavoritesItemRes := make(map[string]interface{})
+				gconv.Struct(favoritesItem, &userFavoritesItemRes)
+
+				if productItemVo, found := productItemVoMap[favoritesItem.ItemId]; found {
+
+					userFavoritesItemRes["product_item_name"] = productItemVo.ProductName
+					userFavoritesItemRes["item_unit_price"] = productItemVo.ItemUnitPrice
+					userFavoritesItemRes["product_image"] = productItemVo.ProductImage
+				}
+
+				itemRes = append(itemRes, userFavoritesItemRes)
+			}
+
+			res.Items = itemRes
+		}
+	}
+
+	return res, err
 }

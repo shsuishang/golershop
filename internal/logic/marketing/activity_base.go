@@ -244,9 +244,7 @@ func (s *sActivityBase) ListVoucher(ctx context.Context, input *do.ActivityBaseL
 			// 解析活动规则JSON
 			var ruleVo model.ActivityRuleVo
 			if activity.ActivityRule != "" {
-				if err := json.Unmarshal([]byte(activity.ActivityRule), &ruleVo); err != nil {
-					return nil, err
-				}
+				json.Unmarshal([]byte(activity.ActivityRule), &ruleVo)
 				activityRes.ActivityRuleJson = &ruleVo
 			}
 

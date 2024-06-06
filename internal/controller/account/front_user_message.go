@@ -191,7 +191,7 @@ func (c *cUser) ListChatMsg(ctx context.Context, req *account.ChatMsgListReq) (r
 
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
-	if !g.IsEmpty(req.SourceType) && req.SourceType != 2311 {
+	if !g.IsEmpty(req.SourceType) && req.SourceType != 2312 {
 		input.Sidx = dao.UserMessage.Columns().MessageTime
 		input.Sort = ml.ORDER_BY_ASC
 	} else {

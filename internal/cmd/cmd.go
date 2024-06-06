@@ -106,6 +106,7 @@ var (
 					shop.StoreShippingAddress,
 					shop.StoreTransportType,
 					shop.StoreTransportItem,
+					shop.UserProductBrowse,
 					sys.Config,
 					sys.Dict,
 					sys.ExpressBase,

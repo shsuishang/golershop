@@ -24,6 +24,7 @@ import (
 	"context"
 
 	"golershop.cn/api/pt"
+	"golershop.cn/api/shop"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -192,7 +193,9 @@ type (
 		// AddBrowser 添加浏览记录
 		AddBrowser(ctx context.Context, itemId uint64, userId uint) (productBrowses []*entity.UserProductBrowse, err error)
 		// RemoveBrowser 删除浏览记录
-		RemoveBrowser(ctx context.Context, userProductBrowseListReq *pt.UserProductBrowseListReq) (success bool, err error)
+		RemoveBrowser(ctx context.Context, userProductBrowseListReq *shop.UserProductBrowseRemoveReq) (success bool, err error)
+		// GetList
+		GetList(ctx context.Context, userId uint) ([]*shop.UserProductBrowseListRes, error)
 	}
 	IUserSearchHistory interface {
 		// Find 查询数据
@@ -257,6 +260,7 @@ type (
 		Edit(ctx context.Context, in *do.UserFavoritesItem) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		GetList(ctx context.Context, req *do.UserFavoritesItemListInput) (res *shop.UserFavoritesItemListsRes, err error)
 	}
 	IUserLevel interface {
 		// Find 查询数据

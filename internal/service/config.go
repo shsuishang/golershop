@@ -64,6 +64,7 @@ type (
 		GetNextReturnStateId(ctx context.Context, returnStateId uint) (uint, error)
 		// GetPaymentChannelList 取得支付渠道
 		GetPaymentChannelList(ctx context.Context) (optionsList []*model.SelectVo, err error)
+		GetPaymentChannelCode(ctx context.Context, paymentChannelId uint) (string, error)
 		// GetReturnStateList 读取订单状态选项
 		GetReturnStateList(ctx context.Context) (optionsList []*model.SelectVo, err error)
 		// GetErrStateList 读取错误状态选项

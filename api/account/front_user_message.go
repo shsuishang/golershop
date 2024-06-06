@@ -8,12 +8,18 @@ import (
 )
 
 type ImConfigReq struct {
+	g.Meta `path:"/front/account/userMessage/getImConfig" tags:"用户消息" method:"get" summary:"IM配置"`
+
+	UserOtherId uint `json:"user_other_id"       ` // 相关用户:发送者或者接收者
 }
 
 type ImConfigRes struct {
 }
 
 type KefuConfigReq struct {
+	g.Meta `path:"/front/account/userMessage/getKefuConfig" tags:"用户消息" method:"get" summary:"客服配置"`
+
+	UserOtherId uint `json:"user_other_id"       ` // 相关用户:发送者或者接收者
 }
 
 type KefuConfigRes struct {

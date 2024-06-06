@@ -25,12 +25,117 @@ import (
 
 	"github.com/go-pay/gopay/alipay"
 	"github.com/go-pay/gopay/wechat/v3"
+	"github.com/shopspring/decimal"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 )
 
 type (
+	IConsumeDeposit interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ConsumeDepositListInput) (out []*entity.ConsumeDeposit, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ConsumeDepositListInput) (out *do.ConsumeDepositListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ConsumeDeposit) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// ProcessDeposit 新增
+		ProcessDeposit(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// GetTradeNo 获取交易编号
+		GetTradeNo(ctx context.Context, orderIdList []string) (tradeNo string, err error)
+		// GetOrderId 根据交易编号 获取 订单编号
+		GetOrderId(ctx context.Context, tradeNo string) (orderIds string, err error)
+		// WechatApplet 微信小程序
+		WechatApplet(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// WechatApp App
+		WechatApp(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// WechatJSAPI 微信JSAPI
+		WechatJSAPI(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// OfflinePay 离线支付
+		OfflinePay(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
+		// 获取业务返回数据
+		GetPayResult(ctx context.Context, in *model.PaymentInput) (*model.PaymentOutput, error)
+	}
+	IConsumeTrade interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ConsumeTradeListInput) (out []*entity.ConsumeTrade, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ConsumeTradeListInput) (out *do.ConsumeTradeListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ConsumeTrade) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ConsumeTrade) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// ProcessPay 余额支付
+		ProcessPay(ctx context.Context, ids string, deposit model.PayMetVo) (out model.ProcessPayOutput, err error)
+	}
+	IPaymentAlipay interface {
+		// GetClient 初始化支付宝客户端并做配置
+		GetClient(ctx context.Context, tradeNo string) (client *alipay.Client, err error)
+	}
+	IPaymentWechat interface {
+		// GetClient 初始化微信v3客户端并做配置
+		GetClient(ctx context.Context) (client *wechat.ClientV3, err error)
+	}
+	IUserPointsHistory interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.UserPointsHistoryListInput) (out []*entity.UserPointsHistory, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.UserPointsHistoryListInput) (out *do.UserPointsHistoryListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.UserPointsHistory) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.UserPointsHistory) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IConsumeRecord interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ConsumeRecordListInput) (out []*entity.ConsumeRecord, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ConsumeRecordListInput) (out *do.ConsumeRecordListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ConsumeRecord) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ConsumeRecord) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IConsumeReturn interface {
+		// DoRefund 执行退款操作
+		DoRefund(ctx context.Context, orderReturns []*entity.OrderReturn) bool
+		// SetReturnPaidYes 修改为退款已支付状态
+		SetReturnPaidYes(ctx context.Context, returnIds []string) (bool, error)
+		// DoRefundOrder 操作退款数据
+		DoRefundOrder(ctx context.Context, orderRefundFlag bool, userId, storeId uint, userResource *entity.UserResource, orderId string, buyerUserMoney, buyerUserPoints decimal.Decimal, returnId string) (bool, error)
+		// doOnLineRefund 执行线上支付退款
+		DoOnlineRefund(ctx context.Context, returnId string) error
+	}
+	IUserPay interface {
+		// Get 读取信息
+		Get(ctx context.Context, id any) (out *entity.UserPay, err error)
+		// Gets 读取多条信息
+		Gets(ctx context.Context, id any) (list []*entity.UserPay, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.UserPayListInput) (out []*entity.UserPay, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.UserPayListInput) (out *do.UserPayListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.UserPay) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.UserPay) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetPayPasswd 获取支付密码
+		GetPayPasswd(ctx context.Context, userId uint) (*entity.UserPay, error)
+		// ChangePayPassword 修改支付密码
+		ChangePayPassword(ctx context.Context, oldPayPassword, newPayPassword, payPassword string, userId uint) (bool, error)
+	}
 	IUserResource interface {
 		// Get 读取信息
 		Get(ctx context.Context, id any) (out *entity.UserResource, err error)
@@ -61,122 +166,19 @@ type (
 		// GetSignState 当天是否签到
 		GetSignState(ctx context.Context, userId uint) (flag bool, err error)
 	}
-	IConsumeDeposit interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ConsumeDepositListInput) (out []*entity.ConsumeDeposit, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ConsumeDepositListInput) (out *do.ConsumeDepositListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ConsumeDeposit) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// ProcessDeposit 新增
-		ProcessDeposit(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// GetTradeNo 获取交易编号
-		GetTradeNo(ctx context.Context, orderIdList []string) (tradeNo string, err error)
-		// GetOrderId 根据交易编号 获取 订单编号
-		GetOrderId(ctx context.Context, tradeNo string) (orderIds string, err error)
-		// WechatApplet 微信小程序
-		WechatApplet(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// WechatApp App
-		WechatApp(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// WechatJSAPI 微信JSAPI
-		WechatJSAPI(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// OfflinePay 离线支付
-		OfflinePay(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error)
-		// 获取业务返回数据
-		GetPayResult(ctx context.Context, in *model.PaymentInput) (*model.PaymentOutput, error)
-	}
-	IConsumeRecord interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ConsumeRecordListInput) (out []*entity.ConsumeRecord, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ConsumeRecordListInput) (out *do.ConsumeRecordListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ConsumeRecord) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ConsumeRecord) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IConsumeTrade interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ConsumeTradeListInput) (out []*entity.ConsumeTrade, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ConsumeTradeListInput) (out *do.ConsumeTradeListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ConsumeTrade) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ConsumeTrade) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// ProcessPay 余额支付
-		ProcessPay(ctx context.Context, ids string, deposit model.PayMetVo) (out model.ProcessPayOutput, err error)
-	}
-	IPaymentAlipay interface {
-		// GetClient 初始化支付宝客户端并做配置
-		GetClient(ctx context.Context, tradeNo string) (client *alipay.Client, err error)
-	}
-	IPaymentWechat interface {
-		// GetClient 初始化微信v3客户端并做配置
-		GetClient(ctx context.Context) (client *wechat.ClientV3, err error)
-	}
-	IUserPay interface {
-		// Get 读取信息
-		Get(ctx context.Context, id any) (out *entity.UserPay, err error)
-		// Gets 读取多条信息
-		Gets(ctx context.Context, id any) (list []*entity.UserPay, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.UserPayListInput) (out []*entity.UserPay, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.UserPayListInput) (out *do.UserPayListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.UserPay) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.UserPay) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-
-		GetPayPasswd(ctx context.Context, userId uint) (*entity.UserPay, error)
-		ChangePayPassword(ctx context.Context, oldPayPassword, newPayPassword, payPassword string, userId uint) (bool, error)
-	}
-	IUserPointsHistory interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.UserPointsHistoryListInput) (out []*entity.UserPointsHistory, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.UserPointsHistoryListInput) (out *do.UserPointsHistoryListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.UserPointsHistory) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.UserPointsHistory) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
 )
 
 var (
+	localConsumeReturn     IConsumeReturn
+	localUserPay           IUserPay
+	localUserResource      IUserResource
 	localConsumeRecord     IConsumeRecord
 	localConsumeTrade      IConsumeTrade
 	localPaymentAlipay     IPaymentAlipay
 	localPaymentWechat     IPaymentWechat
-	localUserPay           IUserPay
 	localUserPointsHistory IUserPointsHistory
-	localUserResource      IUserResource
 	localConsumeDeposit    IConsumeDeposit
 )
-
-func ConsumeDeposit() IConsumeDeposit {
-	if localConsumeDeposit == nil {
-		panic("implement not found for interface IConsumeDeposit, forgot register?")
-	}
-	return localConsumeDeposit
-}
-
-func RegisterConsumeDeposit(i IConsumeDeposit) {
-	localConsumeDeposit = i
-}
 
 func ConsumeRecord() IConsumeRecord {
 	if localConsumeRecord == nil {
@@ -187,6 +189,50 @@ func ConsumeRecord() IConsumeRecord {
 
 func RegisterConsumeRecord(i IConsumeRecord) {
 	localConsumeRecord = i
+}
+
+func ConsumeReturn() IConsumeReturn {
+	if localConsumeReturn == nil {
+		panic("implement not found for interface IConsumeReturn, forgot register?")
+	}
+	return localConsumeReturn
+}
+
+func RegisterConsumeReturn(i IConsumeReturn) {
+	localConsumeReturn = i
+}
+
+func UserPay() IUserPay {
+	if localUserPay == nil {
+		panic("implement not found for interface IUserPay, forgot register?")
+	}
+	return localUserPay
+}
+
+func RegisterUserPay(i IUserPay) {
+	localUserPay = i
+}
+
+func UserResource() IUserResource {
+	if localUserResource == nil {
+		panic("implement not found for interface IUserResource, forgot register?")
+	}
+	return localUserResource
+}
+
+func RegisterUserResource(i IUserResource) {
+	localUserResource = i
+}
+
+func ConsumeDeposit() IConsumeDeposit {
+	if localConsumeDeposit == nil {
+		panic("implement not found for interface IConsumeDeposit, forgot register?")
+	}
+	return localConsumeDeposit
+}
+
+func RegisterConsumeDeposit(i IConsumeDeposit) {
+	localConsumeDeposit = i
 }
 
 func ConsumeTrade() IConsumeTrade {
@@ -222,17 +268,6 @@ func RegisterPaymentWechat(i IPaymentWechat) {
 	localPaymentWechat = i
 }
 
-func UserPay() IUserPay {
-	if localUserPay == nil {
-		panic("implement not found for interface IUserPay, forgot register?")
-	}
-	return localUserPay
-}
-
-func RegisterUserPay(i IUserPay) {
-	localUserPay = i
-}
-
 func UserPointsHistory() IUserPointsHistory {
 	if localUserPointsHistory == nil {
 		panic("implement not found for interface IUserPointsHistory, forgot register?")
@@ -242,15 +277,4 @@ func UserPointsHistory() IUserPointsHistory {
 
 func RegisterUserPointsHistory(i IUserPointsHistory) {
 	localUserPointsHistory = i
-}
-
-func UserResource() IUserResource {
-	if localUserResource == nil {
-		panic("implement not found for interface IUserResource, forgot register?")
-	}
-	return localUserResource
-}
-
-func RegisterUserResource(i IUserResource) {
-	localUserResource = i
 }

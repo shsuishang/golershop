@@ -22,11 +22,16 @@ package user
 
 import (
 	"context"
-	"golershop.cn/api/pt"
+	"fmt"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"golershop.cn/api/shop"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"time"
 )
 
 type sUserProductBrowse struct{}
@@ -83,126 +88,164 @@ func (s *sUserProductBrowse) Remove(ctx context.Context, id any) (affected int64
 	return affected, err
 }
 
-/*
-// GetList 获取用户浏览记录列表
-func (s *sUserProductBrowse) GetList(ctx context.Context, userProductBrowseListReq *pt.UserProductBrowseListReq) ([]*pt.UserProductBrowseRes, error) {
-	userProductBrowseRes := []*pt.UserProductBrowseRes{}
-	userId := userProductBrowseListReq.UserId
-	cacheKey := fmt.Sprintf("user_id|%d", userId)
-	productBrowses := redis.GetVar(ctx, cacheKey).([]*model.UserProductBrowse)
-
-	if len(productBrowses) > 0 {
-		// 提取浏览商品的itemIds
-		var itemIds []uint64
-		visitedItemMap := make(map[uint64]bool)
-		for _, pb := range productBrowses {
-			if _, exists := visitedItemMap[pb.ItemId]; !exists {
-				visitedItemMap[pb.ItemId] = true
-				itemIds = append(itemIds, pb.ItemId)
-			}
-		}
-
-		// 查询商品信息
-		productItemVos, err := service.ProductBase().GetItems(ctx, itemIds, nil)
-		if err != nil {
-			return nil, err
-		}
-
-		// 构建商品ID到商品信息的映射
-		productItemVoMap := make(map[uint64]*entity.ProductItemVo)
-		for _, productItemVo := range productItemVos {
-			productItemVoMap[productItemVo.ItemId] = productItemVo
-		}
-
-		// 构建返回结果
-		for _, pb := range productBrowses {
-			browseRes := &model.UserProductBrowseRes{}
-			gconv.Struct(pb, browseRes)
-
-			if productItemVo, ok := productItemVoMap[pb.ItemId]; ok {
-				browseRes.ProductImage = productItemVo.ProductImage
-				browseRes.ItemSalePrice = productItemVo.ItemSalePrice
-				browseRes.ProductItemName = productItemVo.ProductItemName
-				browseRes.ProductName = productItemVo.ProductName
-				browseRes.ItemName = productItemVo.ItemName
-
-				if activityInfo := productItemVo.ActivityInfo; activityInfo != nil {
-					browseRes.ActivityTypeId = activityInfo.ActivityTypeId
-					browseRes.ActivityTypeName = activityInfo.ActivityTypeName
-				}
-			}
-
-			userProductBrowseRes = append(userProductBrowseRes, browseRes)
-		}
-	}
-
-	return userProductBrowseRes, nil
-}
-
-*/
-
 // AddBrowser 添加浏览记录
 func (s *sUserProductBrowse) AddBrowser(ctx context.Context, itemId uint64, userId uint) (productBrowses []*entity.UserProductBrowse, err error) {
 
-	/*	productBrowse := &entity.UserProductBrowse{
-			ItemId:     itemId,
-			UserId:     userId,
-			BrowseTime: time.Now().Unix(),
+	productBrowse := &entity.UserProductBrowse{
+		ItemId:     itemId,
+		UserId:     userId,
+		BrowseTime: time.Now().Unix(),
+	}
+	cacheKey := fmt.Sprintf("user_id|%d", userId)
+
+	// 从缓存中获取浏览记录
+	cacheValue, err := g.Redis().Get(ctx, cacheKey)
+	if err != nil {
+		return nil, err
+	}
+
+	if cacheValue == nil {
+		productBrowses = []*entity.UserProductBrowse{}
+	} else {
+		err := gconv.Struct(cacheValue, &productBrowses)
+		if err != nil {
+			return nil, err
 		}
-		cacheKey := fmt.Sprintf("user_id|%d", userId)
+	}
 
-			// 从缓存中获取浏览记录
-			productBrowses = gconv.SliceAnyToEntity(dao.UserProductBrowse.Get(ctx, cacheKey), new(entity.UserProductBrowse)).([]*entity.UserProductBrowse)
-			if len(productBrowses) > 0 {
-				// 去除重复记录
-				for i := 0; i < len(productBrowses); i++ {
-					if productBrowses[i].ItemId == itemId {
-						productBrowses = append(productBrowses[:i], productBrowses[i+1:]...)
-						break
-					}
-				}
-				// 如果浏览记录达到上限，删除最后一条记录
-				if len(productBrowses) == 10 {
-					productBrowses = productBrowses[:9]
-				}
-				// 添加新记录到首位
-				productBrowses = append([]*entity.UserProductBrowse{productBrowse}, productBrowses...)
-			} else {
-				productBrowses = []*entity.UserProductBrowse{productBrowse}
+	if len(productBrowses) > 0 {
+		// 去除重复记录
+		for i := 0; i < len(productBrowses); i++ {
+			if productBrowses[i].ItemId == itemId {
+				productBrowses = append(productBrowses[:i], productBrowses[i+1:]...)
+				break
 			}
+		}
+		// 如果浏览记录达到上限，删除最后一条记录
+		if len(productBrowses) == 10 {
+			productBrowses = productBrowses[:9]
+		}
+		// 添加新记录到首位
+		productBrowses = append([]*entity.UserProductBrowse{productBrowse}, productBrowses...)
+	} else {
+		productBrowses = []*entity.UserProductBrowse{productBrowse}
+	}
 
-			// 更新缓存
-			dao.UserProductBrowse.Set(ctx, cacheKey, productBrowses)
-
-	*/
+	// 更新缓存
+	g.Redis().Set(ctx, cacheKey, productBrowses)
 
 	return productBrowses, nil
 }
 
 // RemoveBrowser 删除浏览记录
-func (s *sUserProductBrowse) RemoveBrowser(ctx context.Context, userProductBrowseListReq *pt.UserProductBrowseListReq) (success bool, err error) {
+func (s *sUserProductBrowse) RemoveBrowser(ctx context.Context, userProductBrowseListReq *shop.UserProductBrowseRemoveReq) (success bool, err error) {
 
-	/*	userId := userProductBrowseListReq.UserId
-		itemId := userProductBrowseListReq.ItemId
-		cacheKey := fmt.Sprintf("user_id|%d", userId)
+	userId := userProductBrowseListReq.UserId
+	itemId := userProductBrowseListReq.ItemId
+	cacheKey := fmt.Sprintf("user_id|%d", userId)
 
-			// 从缓存中获取浏览记录
-			productBrowses := gconv.SliceAnyToEntity(dao.UserProductBrowse.Get(ctx, cacheKey), new(entity.UserProductBrowse)).([]*entity.UserProductBrowse)
+	// 从缓存中获取浏览记录
+	cacheValue, err := g.Redis().Get(ctx, cacheKey)
+	if err != nil {
+		return false, err
+	}
 
-			// 删除匹配的浏览记录
-			if len(productBrowses) > 0 {
-				for i := 0; i < len(productBrowses); i++ {
-					if productBrowses[i].ItemId == itemId {
-						productBrowses = append(productBrowses[:i], productBrowses[i+1:]...)
-						break
-					}
-				}
+	var productBrowses []*entity.UserProductBrowse
+	if cacheValue == nil {
+		productBrowses = []*entity.UserProductBrowse{}
+	} else {
+		err := gconv.Struct(cacheValue, &productBrowses)
+		if err != nil {
+			return false, err
+		}
+	}
+	// 删除匹配的浏览记录
+	if len(productBrowses) > 0 {
+		for i := 0; i < len(productBrowses); i++ {
+			if productBrowses[i].ItemId == itemId {
+				productBrowses = append(productBrowses[:i], productBrowses[i+1:]...)
+				break
+			}
+		}
+	}
+
+	// 更新缓存
+	g.Redis().Set(ctx, cacheKey, productBrowses)
+
+	return true, nil
+}
+
+// GetList 获取用户浏览商品列表
+func (s *sUserProductBrowse) GetList(ctx context.Context, userId uint) ([]*shop.UserProductBrowseListRes, error) {
+	var userProductBrowseRes []*shop.UserProductBrowseListRes
+
+	// 获取用户ID
+	cacheKey := fmt.Sprintf("user_id|%d", userId)
+
+	// 从缓存中获取用户浏览记录
+	cacheValue, err := g.Redis().Get(ctx, cacheKey)
+	if err != nil {
+		return nil, err
+	}
+
+	var productBrowses []*entity.UserProductBrowse
+	if cacheValue == nil {
+		productBrowses = []*entity.UserProductBrowse{}
+	} else {
+		err := gconv.Struct(cacheValue, &productBrowses)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if len(productBrowses) > 0 {
+		// 提取商品ID列表
+		itemIds := []uint64{}
+		for _, productBrowse := range productBrowses {
+			itemIds = append(itemIds, productBrowse.ItemId)
+		}
+
+		// 获取商品详情
+		productItemVos, err := service.ProductBase().GetItems(ctx, itemIds, userId)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if len(productItemVos) > 0 {
+			// 构建商品详情Map
+			productItemVoMap := make(map[uint64]*model.ProductItemVo)
+			for _, productItemVo := range productItemVos {
+				productItemVoMap[productItemVo.ItemId] = productItemVo
 			}
 
-			// 更新缓存
-			dao.UserProductBrowse.Set(ctx, cacheKey, productBrowses)
+			for _, productBrowse := range productBrowses {
+				browseRes := &shop.UserProductBrowseListRes{}
+				if err := gconv.Struct(productBrowse, browseRes); err != nil {
+					return nil, err
+				}
 
+				if len(productItemVoMap) > 0 {
+					if productItemVo, ok := productItemVoMap[productBrowse.ItemId]; ok {
+						browseRes.UserId = userId
+						browseRes.ProductImage = productItemVo.ProductImage
+						browseRes.ItemSalePrice = productItemVo.ItemSalePrice
+						browseRes.ProductItemName = productItemVo.ProductItemName
+						browseRes.ProductName = productItemVo.ProductName
+						browseRes.ItemName = productItemVo.ItemName
 
-	*/
-	return true, nil
+						// 设置活动信息
+						if activityInfo := productItemVo.ActivityInfo; activityInfo != nil {
+							browseRes.ActivityTypeId = activityInfo.ActivityTypeId
+							ActivityTypeName, _ := dao.ActivityType.Get(ctx, activityInfo.ActivityTypeId)
+							browseRes.ActivityTypeName = ActivityTypeName.ActivityTypeName
+						}
+					}
+					userProductBrowseRes = append(userProductBrowseRes, browseRes)
+				}
+			}
+		}
+	}
+
+	return userProductBrowseRes, nil
 }

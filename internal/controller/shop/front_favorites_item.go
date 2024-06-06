@@ -90,3 +90,25 @@ func (c *cFavoritesItem) Remove(ctx context.Context, req *shop.UserFavoritesItem
 
 	return
 }
+
+// List 用户收藏列表
+func (c *cFavoritesItem) Lists(ctx context.Context, req *shop.UserFavoritesItemListsReq) (res *shop.UserFavoritesItemListsRes, err error) {
+	userId := service.BizCtx().GetUserId(ctx)
+	req.UserId = userId
+
+	input := do.UserFavoritesItemListInput{}
+	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
+
+	// 调用服务获取列表
+	pageList, err := service.UserFavoritesItem().GetList(ctx, &input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	gconv.Scan(pageList, &res)
+
+	return
+}

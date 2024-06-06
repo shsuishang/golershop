@@ -22,7 +22,7 @@ package service
 
 import (
 	"context"
-
+	"golershop.cn/api/marketing"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -84,6 +84,10 @@ type (
 		SetPaidYes(ctx context.Context, orderId string, userId uint) (flag bool, err error)
 		// CheckGroupbookingSuccess
 		CheckGroupbookingSuccess(ctx context.Context, orderId string) (flag bool, err error)
+		// ListsUserGroupbookingHistory 拼团列表
+		ListsUserGroupbookingHistory(ctx context.Context, in *do.ActivityGroupbookingHistoryListInput) (res *marketing.ActivityGroupbookingHistoryRes, err error)
+		// GetUserGroupbooking 拼团详情
+		GetUserGroupbooking(ctx context.Context, activityGroupbookingReq *marketing.ActivityGroupbookingReq) (activityGroupbookingRes *marketing.ActivityGroupbookingRes, err error)
 	}
 	IActivityGroupbookingHistory interface {
 		// Get 根据编号读取活动信息

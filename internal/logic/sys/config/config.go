@@ -24,6 +24,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -366,6 +367,28 @@ func (s *sConfigBase) GetPaymentChannelList(ctx context.Context) (optionsList []
 	return
 }
 
+// GetPaymentChannelCode 读取配置，根据paymentChannelId读取paymentChannelCode
+func (s *sConfigBase) GetPaymentChannelCode(ctx context.Context, paymentChannelId uint) (string, error) {
+	// 获取支付渠道列表
+	channelList := global.PaymentChannelSelect
+
+	// 创建一个空的map来存储channelList中的数据
+	channelMap := make(map[uint]*model.SelectVo)
+
+	// 将channelList转换成map
+	for _, selectVo := range channelList {
+		channelMap[selectVo.Value] = selectVo
+	}
+
+	// 使用paymentChannelId查询SelectVo对象并获取Ext2字段
+	selectedChannel, exists := channelMap[paymentChannelId]
+	if !exists {
+		return "", gerror.Newf("Payment channel with ID %d not found", paymentChannelId)
+	}
+
+	return selectedChannel.Ext2, nil
+}
+
 // GetReturnStateList 读取订单状态选项
 func (s *sConfigBase) GetReturnStateList(ctx context.Context) (optionsList []*model.SelectVo, err error) {
 	if len(global.ReturnStateSelectList) > 0 {
@@ -688,7 +711,7 @@ func (s *sConfigBase) IfSupplierMarket(ctx context.Context) (res bool) {
 // GetSiteInfo 初始化
 func (s *sConfigBase) GetSiteInfo(ctx context.Context, sourceUccCode string) (res map[string]interface{}, err error) {
 
-	keyStr := "site_name,site_meta_keyword,site_meta_description,site_version,copyright,icp_number,site_company_name,site_address,site_tel,account_login_bg,site_admin_logo,site_mobile_logo,site_pc_logo,date_format,time_format,cache_enable,cache_expire,site_status,advertisement_open,wechat_connect_auto,wechat_app_id,product_spec_edit,default_image,product_salenum_flag,b2b_flag,hall_b2b_enable,product_ziti_flag,plantform_fx_enable,plantform_fx_gift_point,plantform_fx_withdraw_min_amount,plantform_poster_bg,plantform_commission_withdraw_mode,product_poster_bg,live_mode_xcx,kefu_type_id,withdraw_received_day,withdraw_monthday,default_shipping_district,points_enable,voucher_enable,b2b_enable,chain_enable,edu_enable,hall_enable,multilang_enable,sns_enable,subsite_enable,supplier_enable"
+	keyStr := "site_name,site_meta_keyword,site_meta_description,site_version,copyright,icp_number,site_company_name,site_address,site_tel,account_login_bg,site_admin_logo,site_mobile_logo,site_pc_logo,date_format,time_format,cache_enable,cache_expire,site_status,advertisement_open,wechat_connect_auto,wechat_app_id,product_spec_edit,default_image,product_salenum_flag,b2b_flag,hall_b2b_enable,product_ziti_flag,plantform_fx_enable,plantform_fx_gift_point,plantform_fx_withdraw_min_amount,plantform_poster_bg,plantform_commission_withdraw_mode,product_poster_bg,live_mode_xcx,kefu_type_id,withdraw_received_day,withdraw_monthday,default_shipping_district,points_enable,voucher_enable,b2b_enable,chain_enable,edu_enable,hall_enable,multilang_enable,sns_enable,subsite_enable,supplier_enable,im_enable,chat_global"
 	keyIds := gstr.Split(keyStr, ",")
 
 	var list, error = service.ConfigBase().Find(ctx, &do.ConfigBaseListInput{Where: do.ConfigBase{ConfigKey: keyIds}})

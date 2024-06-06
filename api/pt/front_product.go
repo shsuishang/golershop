@@ -5,7 +5,6 @@ import (
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/entity"
-	"time"
 )
 
 type ItemListReq struct {
@@ -196,27 +195,3 @@ type ProductDetailReq struct {
 }
 
 type ProductDetailRes model.ProductDetailOutput
-
-// UserProductBrowseListReq 商品浏览历史表-SPU-不应该直接存数据库分页查询请求参数
-type UserProductBrowseListReq struct {
-	ml.BaseList
-
-	ProductBrowseId uint64     `json:"product_browse_id"` // 浏览编号
-	ItemId          uint64     `json:"item_id"`           // 商品编号
-	UserId          uint       `json:"user_id"`           // 会员编号
-	BrowseDate      *time.Time `json:"browse_date"`       // 浏览日期
-	BrowseTime      uint64     `json:"browse_time"`       // 浏览时间
-	CategoryId      uint       `json:"category_id"`       // 商品分类
-}
-
-// UserProductBrowseRes 我的足迹列表响应
-type UserProductBrowseRes struct {
-	entity.UserProductBrowse
-	ItemSalePrice    float64 `json:"item_sale_price"`    // 商品销售价
-	ProductImage     string  `json:"product_image"`      // 图片信息
-	ProductItemName  string  `json:"product_item_name"`  // Spec名称
-	ProductName      string  `json:"product_name"`       // SPU商品名称
-	ItemName         string  `json:"item_name"`          // 副标题(DOT):SKU名称
-	ActivityTypeId   uint    `json:"activity_type_id"`   // 活动类型编号
-	ActivityTypeName string  `json:"activity_type_name"` // 活动类型名称
-}

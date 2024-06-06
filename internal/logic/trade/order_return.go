@@ -368,9 +368,9 @@ func (s *sOrderReturn) dealWithReturn(ctx context.Context, returnIds []string, s
 		orderReturn.ReturnIsPaid = true
 		orderReturn.ReturnFinishTime = gtime.Now()
 		// 执行退款操作
-		//if !service.ConsumeReturn().DoRefund(ctx, orderReturns) {
-		//	return gerror.New("退款失败")
-		//}
+		if !service.ConsumeReturn().DoRefund(ctx, orderReturns) {
+			return gerror.New("退款失败")
+		}
 	}
 
 	// 修改退单状态
