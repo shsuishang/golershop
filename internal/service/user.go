@@ -64,6 +64,10 @@ type (
 		Save(ctx context.Context, in *do.UserVoucher) (affected int64, err error)
 		// List 分页读取
 		GetList(ctx context.Context, in *do.UserVoucherListInput) (output *model.UserVoucherListOutput, err error)
+		// GetLists 获取用户优惠券列表
+		GetLists(ctx context.Context, voucherListReq *shop.UserVoucherListReq) (voucherResPage *model.UserVoucherListOutput, err error)
+		// GetEachVoucherNum 获取每种状态的优惠券数量
+		GetEachVoucherNum(ctx context.Context, voucherStateId, userId uint) (*shop.GetVoucherNumRes, error)
 	}
 	IUserDistribution interface {
 		// Find 查询数据

@@ -107,6 +107,7 @@ var (
 					shop.StoreTransportType,
 					shop.StoreTransportItem,
 					shop.UserProductBrowse,
+					shop.UserVoucher,
 					sys.Config,
 					sys.Dict,
 					sys.ExpressBase,

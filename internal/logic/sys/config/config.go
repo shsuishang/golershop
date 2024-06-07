@@ -786,15 +786,18 @@ func (s *sConfigBase) CleanCache(ctx context.Context) (res bool, err error) {
 	var keys []string
 
 	keys, err = g.Redis().Keys(ctx, global.Namespace+"*")
-
-	//keys = append(keys, "sssss")
-
-	num, err := g.Redis().Del(ctx, keys...)
 	if err != nil {
 		log.Error(ctx, err)
 	}
 
-	fmt.Println(num)
+	if !g.IsEmpty(keys) {
+		num, err := g.Redis().Del(ctx, keys...)
+		if err != nil {
+			log.Error(ctx, err)
+		}
+
+		fmt.Println(num)
+	}
 
 	//err = g.Redis().FlushDB(ctx)
 	//if err != nil {

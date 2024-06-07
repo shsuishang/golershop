@@ -22,7 +22,10 @@ package user
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
+	"golershop.cn/api/shop"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
@@ -167,4 +170,191 @@ func (s *sUserVoucher) GetList(ctx context.Context, in *do.UserVoucherListInput)
 	}
 
 	return output, nil
+}
+
+// GetList 获取用户优惠券列表
+func (s *sUserVoucher) GetLists(ctx context.Context, voucherListReq *shop.UserVoucherListReq) (voucherResPage *model.UserVoucherListOutput, err error) {
+	voucherResPage = &model.UserVoucherListOutput{}
+
+	// 创建查询条件
+	voucherQueryWrapper := dao.UserVoucher.Ctx(ctx)
+
+	if !g.IsEmpty(voucherListReq.UserId) {
+		voucherQueryWrapper = voucherQueryWrapper.Where("user_id", voucherListReq.UserId)
+	}
+
+	if !g.IsEmpty(voucherListReq.ActivityId) {
+		voucherQueryWrapper = voucherQueryWrapper.Where("activity_id", voucherListReq.ActivityId)
+	}
+
+	if !g.IsEmpty(voucherListReq.StoreId) {
+		voucherQueryWrapper = voucherQueryWrapper.Where("store_id", voucherListReq.StoreId)
+	}
+
+	// 优惠券是否生效
+	times := time.Now().Unix() * 1000
+	if voucherListReq.VoucherEffect {
+		voucherQueryWrapper = voucherQueryWrapper.Where(gdb.Map{
+			"voucher_start_date <=": times,
+			"voucher_end_date >=":   times,
+		})
+	}
+
+	// 处理全部券1、线下券2、线上券3
+	if !g.IsEmpty(voucherListReq) {
+		switch voucherListReq.VoucherUserWay {
+		case 2:
+			voucherQueryWrapper = voucherQueryWrapper.Where("writeoff_code !=", "")
+		case 3:
+			voucherQueryWrapper = voucherQueryWrapper.Where("writeoff_code =", "")
+		}
+	}
+
+	if !g.IsEmpty(voucherListReq.VoucherStateId) {
+		voucherQueryWrapper = voucherQueryWrapper.Where("voucher_state_id", voucherListReq.VoucherStateId)
+	}
+
+	voucherQueryWrapper = voucherQueryWrapper.OrderDesc("user_voucher_time").OrderAsc("voucher_state_id")
+
+	// 查询分页数据
+	voucherPage, err := voucherQueryWrapper.Page(voucherListReq.Page, voucherListReq.Size).All()
+	if err != nil {
+		return nil, err
+	}
+
+	if !voucherPage.IsEmpty() {
+		err := gconv.Struct(voucherPage, &voucherResPage.Items)
+		if err != nil {
+			return nil, err
+		}
+		var userVoucherList []model.UserVoucherRes
+		gconv.Struct(voucherPage, &userVoucherList)
+		userVoucherReList := make([]*model.UserVoucherRes, 0)
+		currentTime := time.Now().Unix() * 1000
+
+		for _, userVoucher := range userVoucherList {
+			var userVoucherRes *model.UserVoucherRes
+			gconv.Struct(userVoucher, &userVoucherRes)
+			userVoucherRes.VoucherEffect = true
+			userVoucherRes.Id = userVoucher.UserVoucherId
+			voucherEndDate := userVoucher.VoucherEndDate
+
+			if userVoucher.VoucherStateId == consts.VOUCHER_STATE_UNUSED {
+				if voucherEndDate < currentTime {
+					userVoucherRes.VoucherStateId = consts.VOUCHER_STATE_TIMEOUT
+					// 更新数据
+					updateData := &do.UserVoucher{
+						UserVoucherId:  userVoucher.UserVoucherId,
+						VoucherStateId: consts.VOUCHER_STATE_TIMEOUT,
+					}
+					dao.UserVoucher.Edit(ctx, userVoucher.UserVoucherId, updateData)
+				}
+
+				// 未生效标记
+				voucherStartDate := userVoucher.VoucherStartDate
+				if voucherStartDate > currentTime {
+					userVoucherRes.VoucherEffect = false
+				}
+			}
+
+			userVoucherReList = append(userVoucherReList, userVoucherRes)
+		}
+
+		voucherResPage.Items = userVoucherReList
+
+	}
+
+	return voucherResPage, nil
+}
+
+// GetEachVoucherNum 获取每种状态的优惠券数量
+func (s *sUserVoucher) GetEachVoucherNum(ctx context.Context, voucherStateId, userId uint) (*shop.GetVoucherNumRes, error) {
+	voucherCountRes := &shop.GetVoucherNumRes{}
+
+	// 全部优惠券数量
+	userVoucherQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId: userId,
+		},
+	}
+	if voucherStateId != 0 {
+		userVoucherQuery.Where.VoucherStateId = voucherStateId
+	}
+	countAll, err := dao.UserVoucher.Count(ctx, userVoucherQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherAllNum = countAll
+
+	// 线下优惠券数量
+	offlineQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId: userId,
+		},
+	}
+	if voucherStateId != 0 {
+		offlineQuery.Where.VoucherStateId = voucherStateId
+	}
+	countOffline, err := dao.UserVoucher.Count(ctx, offlineQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherOfflinedNum = countOffline
+
+	// 线上优惠券数量
+	onlineQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId:       userId,
+			WriteoffCode: "",
+		},
+	}
+	if voucherStateId != 0 {
+		onlineQuery.Where.VoucherStateId = voucherStateId
+	}
+	countOnline, err := dao.UserVoucher.Count(ctx, onlineQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherOnlinedNum = countOnline
+
+	// 未使用优惠券数量
+	unusedQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId:         userId,
+			VoucherStateId: consts.VOUCHER_STATE_UNUSED,
+		},
+	}
+	countUnused, err := dao.UserVoucher.Count(ctx, unusedQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherUnusedNum = countUnused
+
+	// 已使用优惠券数量
+	usedQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId:         userId,
+			VoucherStateId: consts.VOUCHER_STATE_USED,
+		},
+	}
+	countUsed, err := dao.UserVoucher.Count(ctx, usedQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherUsedNum = countUsed
+
+	// 已过期优惠券数量
+	timeoutQuery := &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId:         userId,
+			VoucherStateId: consts.VOUCHER_STATE_TIMEOUT,
+		},
+	}
+	countTimeout, err := dao.UserVoucher.Count(ctx, timeoutQuery)
+	if err != nil {
+		return nil, err
+	}
+	voucherCountRes.VoucherTimeoutNum = countTimeout
+
+	return voucherCountRes, nil
 }
