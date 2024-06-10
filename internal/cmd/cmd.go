@@ -123,6 +123,7 @@ var (
 					sys.Captcha,
 					sys.Upload,
 					sys.Page,
+					sys.Release,
 					trade.Order,
 					trade.Cart,
 					trade.OrderBase,

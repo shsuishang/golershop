@@ -13,8 +13,10 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/farmerx/gorsa"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
+	"log"
 )
 
 func RsaDecrypt(encrypted string, privateKey string) (oriText string, err error) {
@@ -112,4 +114,30 @@ func test() {
 		panic(err)
 	}
 	fmt.Println("decrypted message: ", string(decryptedBytes))
+}
+
+func PubkeyDecrypt(encrypted string, publicKey string) (oriText string, err error) {
+	//2、单行数据格式
+	decodeString, err := base64.StdEncoding.DecodeString(publicKey)
+
+	// 创建一个 PEM 格式的块
+	block := &pem.Block{
+		Type:  "公钥",
+		Bytes: decodeString,
+	}
+
+	// 编码 PEM 块为 PEM 格式的字符串
+	publicStr := pem.EncodeToMemory(block)
+
+	if err := gorsa.RSA.SetPublicKey(gconv.String(publicStr)); err != nil {
+		log.Fatalln(`set public key :`, err)
+	}
+
+	cipherText, _ := base64.StdEncoding.DecodeString(encrypted)
+	pubdecrypt, err := gorsa.RSA.PubKeyDECRYPT(cipherText)
+	if err != nil {
+		return "", err
+	}
+
+	return gconv.String(pubdecrypt), err
 }

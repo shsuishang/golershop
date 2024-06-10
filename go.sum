@@ -11,6 +11,8 @@ github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumC
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f h1:lO4WD4F/rVNCu3HqELle0jiPLLBs70cWOduZpkS1E78=
 github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f/go.mod h1:cuUVRXasLTGF7a8hSLbxyZXjz+1KgoB3wDUb6vlszIc=
+github.com/farmerx/gorsa v0.0.0-20161211100049-3ae06f674f40 h1:OgoboV484kN/ngW4apHvSw8iy9YhhQusAKSLT8nGl94=
+github.com/farmerx/gorsa v0.0.0-20161211100049-3ae06f674f40/go.mod h1:Gdtd77IQrjXqFfiourWpNnE1jDPC4opZPDPxPLWFlr0=
 github.com/fatih/color v1.15.0 h1:kOqh6YHBtK8aywxGerMG2Eq3H6Qgoqeo13Bk2Mv/nBs=
 github.com/fatih/color v1.15.0/go.mod h1:0h5ZqXfHYED7Bhv2ZJamyIOUej9KtShiJESRwBDUSsw=
 github.com/fsnotify/fsnotify v1.7.0 h1:8JEhPFa5W2WU7YfeZzPNqzMP6Lwt7L2715Ggo0nosvA=
@@ -59,8 +61,8 @@ github.com/lihao1988/php2go v1.2.1 h1:ArAl+YD9Tyx2s2ePga/a23j3CfJW2WLIDmnTwqe97r
 github.com/lihao1988/php2go v1.2.1/go.mod h1:F28RYwh3oPsexI1zX7iuiTjbsYYt3ySjGH0b6R388jQ=
 github.com/magiconair/properties v1.8.7 h1:IeQXZAiQcpL9mgcAe1Nu6cX9LLw6ExEHKjN0VQdvPDY=
 github.com/magiconair/properties v1.8.7/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
-github.com/mallsuite/gocore v1.0.0 h1:sImkYipX3Cq+oVy2zHedkwZzdJQ010ELDvUM/4xWtVE=
-github.com/mallsuite/gocore v1.0.0/go.mod h1:YqVn/0IydS2Ar1Z6Tw7XKL4f9XIel0OYzeNV4qbNcHA=
+github.com/mallsuite/gocore v1.0.1 h1:PB7avN/fgD1rdkOww7MQrkrHwOLlj1tdAR94Xbg0WhU=
+github.com/mallsuite/gocore v1.0.1/go.mod h1:YqVn/0IydS2Ar1Z6Tw7XKL4f9XIel0OYzeNV4qbNcHA=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
