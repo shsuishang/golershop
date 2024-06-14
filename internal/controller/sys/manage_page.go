@@ -152,3 +152,38 @@ func (c *cPage) EditBase(ctx context.Context, req *sys.PageBaseEditReq) (res *sy
 
 	return
 }
+
+// Edit 编辑页面项目
+func (c *cPage) EditStateBase(ctx context.Context, req *sys.PageBaseEditStateReq) (res *sys.PageBaseEditStateRes, err error) {
+	input := do.PageBase{}
+	gconv.Scan(req, &input)
+
+	var _, error = service.PageBase().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &sys.PageBaseEditStateRes{
+		PageId: req.PageId,
+	}
+
+	return
+}
+
+// GetDataInfo 装修数据选择
+func (c *cPage) GetDataInfo(ctx context.Context, req *sys.PageBaseGetDataInfoReq) (res *sys.PageBaseGetDataInfoRes, err error) {
+	// 设置分页大小为8
+	req.Size = 8
+
+	// 获取数据
+	result, error := service.PageBase().GetDataInfo(ctx, req)
+	if error != nil {
+		err = error
+		return
+	}
+
+	// 转换结果到响应参数
+	gconv.Scan(result, &res)
+	return
+}

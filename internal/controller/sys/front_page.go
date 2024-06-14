@@ -28,7 +28,9 @@ package sys
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"golershop.cn/api/sys"
 	"golershop.cn/internal/consts"
@@ -171,4 +173,164 @@ func dealWithPopUp(ctx context.Context, activityList []*model.ActivityOutput, us
 	}
 
 	return pagePopUpVos
+}
+
+// GetPcPage 读取PC页面
+func (c *cPage) GetPcPage(ctx context.Context, req *sys.GetPcPageReq) (res *sys.GetPcPageRes, err error) {
+
+	if req.PageId > 0 {
+		// 如果PageId存在
+	} else if req.PageIndex != "" {
+		// 根据类型读取pageId
+		baseQueryWrapper := &do.PageBaseListInput{}
+
+		//baseQueryWrapper.Eq("subsite_id", subsite_id).Eq("store_id", store_id).Eq("app_id", app_id).Eq("page_type", 3);
+		baseQueryWrapper.Where.PageType = 2
+
+		switch req.PageIndex {
+		case "page_index":
+			baseQueryWrapper.Where.PageIndex = true
+		case "page_sns":
+			baseQueryWrapper.Where.PageSns = true
+		case "page_article":
+			baseQueryWrapper.Where.PageArticle = true
+		case "page_point":
+			baseQueryWrapper.Where.PagePoint = true
+		case "page_upgrade":
+			baseQueryWrapper.Where.PageUpgrade = true
+		case "page_zerobuy":
+			baseQueryWrapper.Where.PageZerobuy = true
+		case "page_higharea":
+			baseQueryWrapper.Where.PageHigharea = true
+		case "page_taday":
+			baseQueryWrapper.Where.PageTaday = true
+		case "page_everyday":
+			baseQueryWrapper.Where.PageEveryday = true
+		case "page_secondkill":
+			baseQueryWrapper.Where.PageSecondkill = true
+		case "page_secondday":
+			baseQueryWrapper.Where.PageSecondday = true
+		case "page_rura":
+			baseQueryWrapper.Where.PageRura = true
+		case "page_likeyou":
+			baseQueryWrapper.Where.PageLikeyou = true
+		case "page_exchange":
+			baseQueryWrapper.Where.PageExchange = true
+		case "page_new":
+			baseQueryWrapper.Where.PageNew = true
+		case "page_newperson":
+			baseQueryWrapper.Where.PageNewperson = true
+		}
+
+		pageIds, _ := service.PageBase().FindKey(ctx, baseQueryWrapper)
+
+		if len(pageIds) > 0 {
+			req.PageId = gconv.Int64(pageIds[0])
+		}
+
+	} else if req.CategoryId > 0 {
+		// 根据分类读取pageId
+	} else {
+		panic("请求数据有误！")
+	}
+
+	data := g.Map{}
+
+	if req.PageId > 0 {
+		qw := &do.PageModuleListInput{
+			Where: do.PageModule{
+				PageId:   req.PageId,
+				PmEnable: 1,
+				PmOrder:  "pm_order ASC",
+			},
+		}
+
+		pageData, err := service.PageModule().Find(ctx, qw)
+		if err != nil {
+			return nil, err
+		}
+
+		data["floor"], _ = service.PageModule().FixPcPageModuleData(ctx, pageData)
+	} else {
+		data["floor"] = []interface{}{}
+	}
+
+	/*
+		if req.PageIndex == "page_index" {
+					// 首页弹窗 新人优惠券
+					activityBaseListReq := &marketing.ActivityBaseListReq{
+						ActivityState: consts.ACTIVITY_STATE_NORMAL,
+						ActivityTypeId: consts.ACTIVITY_TYPE_POP,
+					}
+
+					activityBaseResIPage, err := service.ActivityBase().List(ctx, activityBaseListReq)
+					if err != nil {
+						return nil, err
+					}
+
+					if activityBaseResIPage != nil && len(activityBaseResIPage.Items) > 0 {
+						activityList := activityBaseResIPage.Items
+
+						// 未登录
+						if user == nil {
+							pageBaseRes.PopUps = dealWithPopUp(activityList, nil)
+						} else {
+							// 已登录
+							userInfo, err := service.UserInfo().Get(ctx, user.UserId)
+							if err != nil {
+								return nil, err
+							}
+							pageBaseRes.PopUps = dealWithPopUp(activityList, userInfo)
+						}
+					}
+				}
+	*/
+
+	gconv.Scan(data, &res)
+
+	return res, nil
+}
+
+// PcLayout PC头尾数据
+func (c *cPage) PcLayout(ctx context.Context, req *sys.PcLayoutReq) (res *sys.PcLayoutRes, err error) {
+
+	res = &sys.PcLayoutRes{}
+	pcLayout, err := service.PageCategoryNav().GetPcLayout(ctx)
+	if err != nil {
+		return nil, err
+	}
+	res.CategoryNav = pcLayout
+
+	// 底部站内帮助
+	keys := "page_pc_help"
+	pagePcHelpList, _ := service.ConfigBase().Gets(ctx, keys)
+	if len(pagePcHelpList) > 0 {
+		// 选择第一个配置项，并将其转换为字符串
+		pagePcHelp := pagePcHelpList[0].ConfigValue
+		if gstr.Trim(pagePcHelp) != "" {
+			res.FooterArticle = gjson.New(pagePcHelp)
+		}
+	}
+	// 尾部导航
+	pagePcNavs, err := service.PagePcNav().Find(ctx, &do.PagePcNavListInput{
+		Where: do.PagePcNav{NavEnable: 1},
+	})
+	if err != nil {
+		return nil, err
+	}
+	res.PagePcNav = pagePcNavs
+
+	// 获取当前登录用户
+	user := service.BizCtx().GetUser(ctx)
+	if user != nil {
+		res.UserNickname = "Hi," + user.UserNickname + "!"
+		userInfo, err := service.UserInfo().Get(ctx, user.UserId)
+		if err != nil {
+			return nil, err
+		}
+		res.UserAvatar = userInfo.UserAvatar
+	}
+
+	return res, nil
+
 }

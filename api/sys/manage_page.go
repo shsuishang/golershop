@@ -69,3 +69,31 @@ type MobileEditReq struct {
 
 type MobileEditRes struct {
 }
+
+type PageBaseEditStateReq struct {
+	g.Meta `path:"/manage/sys/pageBase/editState" tags:"页面" method:"post" summary:"页面编辑接口"`
+
+	PageId    uint `json:"page_id"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageIndex bool `json:"page_index"   v:"required#请输入页面编号"    dc:"页面编号"     `
+}
+
+type PageBaseEditStateRes struct {
+	PageId interface{} `json:"page_id"   dc:"页面信息"`
+}
+
+type PageBaseGetDataInfoReq struct {
+	g.Meta `path:"/manage/sys/pageBase/getDataInfo" tags:"装修数据选择" method:"get" summary:"装修数据选择接口"`
+	ml.BaseList
+
+	Name    string `json:"name" dc:"页面名称"`                                                                                                // 页面名称
+	Type    int    `json:"type" dc:"类型(ENUM):1-商品;2-店铺分类;3-APP;4-快捷入口;5-资讯分类;6-资讯;8-自定义页面;10-社区版块;11-帖子;12-拼团;14-秒杀;17-代金券;" default:"1"` // 类型(ENUM)
+	StoreId int    `json:"store_id" dc:"店铺编号" default:"0"`                                                                                // 店铺
+}
+
+type PageBaseGetDataInfoRes struct {
+	Items   interface{} `json:"items"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}

@@ -22,7 +22,7 @@ package service
 
 import (
 	"context"
-
+	"golershop.cn/api/sys"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -46,11 +46,56 @@ type (
 		GetUserCenterMenu(ctx context.Context) (out map[string]interface{}, err error)
 		// Detail 获取页面详情
 		Detail(ctx context.Context, pageId any) (out *model.PageDetail, err error)
+		// GetDataInfo
+		GetDataInfo(ctx context.Context, pageDataReq *sys.PageBaseGetDataInfoReq) (*sys.PageBaseGetDataInfoRes, error)
+	}
+	IPageModule interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.PageModuleListInput) (out []*entity.PageModule, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.PageModuleListInput) (out *do.PageModuleListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.PageModule) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.PageModule) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// FixPcPageModuleData
+		FixPcPageModuleData(ctx context.Context, pageData []*entity.PageModule) ([]map[string]interface{}, error)
+	}
+	IPageCategoryNav interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.PageCategoryNavListInput) (out []*entity.PageCategoryNav, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.PageCategoryNavListInput) (out *do.PageCategoryNavListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.PageCategoryNav) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.PageCategoryNav) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetPcLayout
+		GetPcLayout(ctx context.Context) (resultSlice []interface{}, err error)
+	}
+	IPagePcNav interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.PagePcNavListInput) (out []*entity.PagePcNav, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.PagePcNavListInput) (out *do.PagePcNavListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.PagePcNav) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.PagePcNav) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
 )
 
 var (
-	localPageBase IPageBase
+	localPageBase        IPageBase
+	localPageModule      IPageModule
+	localPageCategoryNav IPageCategoryNav
+	localPagePcNav       IPagePcNav
 )
 
 func PageBase() IPageBase {
@@ -62,4 +107,35 @@ func PageBase() IPageBase {
 
 func RegisterPageBase(i IPageBase) {
 	localPageBase = i
+}
+
+func PageModule() IPageModule {
+	if localPageModule == nil {
+		panic("implement not found for interface IPageModule, forgot register?")
+	}
+	return localPageModule
+}
+
+func RegisterPageModule(i IPageModule) {
+	localPageModule = i
+}
+func PageCategoryNav() IPageCategoryNav {
+	if localPageCategoryNav == nil {
+		panic("implement not found for interface IPageCategoryNav, forgot register?")
+	}
+	return localPageCategoryNav
+}
+
+func RegisterPageCategoryNav(i IPageCategoryNav) {
+	localPageCategoryNav = i
+}
+func PagePcNav() IPagePcNav {
+	if localPagePcNav == nil {
+		panic("implement not found for interface IPagePcNav, forgot register?")
+	}
+	return localPagePcNav
+}
+
+func RegisterPagePcNav(i IPagePcNav) {
+	localPagePcNav = i
 }

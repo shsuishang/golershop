@@ -52,6 +52,7 @@ type ProductIndexColumns struct {
 	StoreType                string // 店铺类型(ENUM): 1-卖家店铺; 2-供应商店铺
 	StoreCategoryIds         string // 店铺分类(DOT)
 	CategoryId               string // 商品分类
+	CourseCategoryId         string // 课程分类
 	TypeId                   string // 类型编号:冗余检索
 	ProductQuantity          string // 商品库存:冗余计算
 	ProductWarnQuantity      string // 预警数量
@@ -110,6 +111,7 @@ var productIndexColumns = ProductIndexColumns{
 	StoreType:                "store_type",
 	StoreCategoryIds:         "store_category_ids",
 	CategoryId:               "category_id",
+	CourseCategoryId:         "course_category_id",
 	TypeId:                   "type_id",
 	ProductQuantity:          "product_quantity",
 	ProductWarnQuantity:      "product_warn_quantity",

@@ -185,11 +185,16 @@ func (d *sProductItem) ListItemKey(ctx context.Context, req *pt.ItemListReq) (ou
 		nCls   = dao.ProductIndex.Columns()
 	)
 
-	orm = orm.LeftJoinOnField(nTable, rCls.ProductId)
-	orm = orm.WherePrefix(rTable, do.ProductItem{
-		ItemId:     gconv.SliceUint64(gstr.Split(req.ItemId, ",")),
+	where := do.ProductItem{
 		ItemEnable: req.ItemEnable,
-	})
+	}
+
+	if !g.IsEmpty(req.ItemId) {
+		where.ItemId = gconv.SliceUint64(gstr.Split(req.ItemId, ","))
+	}
+
+	orm = orm.LeftJoinOnField(nTable, rCls.ProductId)
+	orm = orm.WherePrefix(rTable, where)
 
 	orm = orm.WherePrefix(nTable, do.ProductIndex{
 		StoreId:        req.StoreId,

@@ -73,7 +73,7 @@ gfcli:
       - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
         group: "sys"
         removePrefix: "sys_"
-        tables: "sys_ip_ban,sys_config_base,sys_config_type,sys_log_action,sys_log_error,sys_number_seq,sys_dict_base,sys_dict_item,sys_material_base,sys_material_gallery,sys_access_history,sys_express_base,sys_page_user_form,sys_page_base,sys_page_module,sys_district_base,sys_contract_type,sys_feedback_base,sys_feedback_category,sys_feedback_type,sys_message_template,sys_crontab_base"
+        tables: "sys_ip_ban,sys_config_base,sys_config_type,sys_log_action,sys_log_error,sys_number_seq,sys_dict_base,sys_dict_item,sys_material_base,sys_material_gallery,sys_access_history,sys_express_base,sys_page_user_form,sys_page_base,sys_page_module,sys_page_category_nav,sys_page_mobile_nav,sys_page_pc_nav,sys_district_base,sys_contract_type,sys_feedback_base,sys_feedback_category,sys_feedback_type,sys_message_template,sys_crontab_base"
         jsonCase: "Snake"
         gJsonSupport: true
         overwriteDao: true

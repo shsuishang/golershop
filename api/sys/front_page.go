@@ -22,3 +22,25 @@ type PageDetailReq struct {
 type PageDetailRes struct {
 	model.PageDetail
 }
+
+type GetPcPageReq struct {
+	g.Meta `path:"/front/sys/page/getPcPage" tags:"page" method:"get" summary:"读取PC页面"`
+
+	PageId     int64  `json:"page_id,omitempty"  description:"页面编号"`
+	PageIndex  string `json:"page_index,omitempty" description:"主页类型"`
+	CategoryId int    `json:"category_id,omitempty" description:"分类编号"`
+}
+
+type GetPcPageRes struct{}
+
+type PcLayoutReq struct {
+	g.Meta `path:"/front/sys/page/pcLayout" tags:"page" method:"get" summary:"PC头尾数据"`
+}
+
+type PcLayoutRes struct {
+	CategoryNav   interface{} `json:"category_nav"`
+	FooterArticle interface{} `json:"footer_article"`
+	PagePcNav     interface{} `json:"page_pc_nav"`
+	UserAvatar    interface{} `json:"user_avatar"`
+	UserNickname  interface{} `json:"user_nickname"`
+}
