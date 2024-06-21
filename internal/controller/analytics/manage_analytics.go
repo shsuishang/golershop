@@ -19,7 +19,7 @@ func (c *cAnalytics) GetSalesAmount(ctx context.Context, req *analytics.SalesAmo
 
 	//当天
 	startTime, endTime := mtime.Today()
-	amount, err := service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime)
+	amount, err := service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime, 0)
 
 	if err != nil {
 		return
@@ -29,7 +29,7 @@ func (c *cAnalytics) GetSalesAmount(ctx context.Context, req *analytics.SalesAmo
 
 	//昨天
 	startTime, endTime = mtime.Yestoday()
-	amount, err = service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime)
+	amount, err = service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime, 0)
 
 	if err != nil {
 		return
@@ -46,7 +46,7 @@ func (c *cAnalytics) GetSalesAmount(ctx context.Context, req *analytics.SalesAmo
 
 	//本月
 	startTime, endTime = mtime.Month()
-	amount, err = service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime)
+	amount, err = service.AnalyticsTrade().SalesAmount(ctx, startTime, endTime, 0)
 
 	if err != nil {
 		return

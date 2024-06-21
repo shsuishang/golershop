@@ -3,6 +3,7 @@ package pay
 import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -18,6 +19,8 @@ type cUserPointsHistory struct{}
 func (c *cUserPointsHistory) List(ctx context.Context, req *pay.UserPointsHistoryListReq) (res *pay.UserPointsHistoryListRes, err error) {
 	input := do.UserPointsHistoryListInput{}
 	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.BaseList.WhereExt)
 
 	var result, error = service.UserPointsHistory().List(ctx, &input)
 

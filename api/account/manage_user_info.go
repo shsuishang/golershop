@@ -4,6 +4,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/mallsuite/gocore/core/ml"
+	"golershop.cn/internal/model"
 )
 
 // start fo front
@@ -69,4 +70,25 @@ type UserInfoListRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
+}
+
+type GetUserDataReq struct {
+	g.Meta `path:"/manage/account/userInfo/getUserData" tags:"用户详细信息表" method:"get" summary:"用户详细信息表"`
+
+	UserId uint `json:"user_id" v:"required#请输入用户编号"   dc:"用户编号"`
+}
+
+type GetUserDataRes struct {
+	*model.UserInfoOutput
+}
+
+type UserInfoPassWordEditReq struct {
+	g.Meta `path:"/manage/account/userInfo/passWordEdit" tags:"修改密码" method:"post" summary:"修改密码接口"`
+
+	UserId   uint   `json:"user_id"  dc:"用户编号"`
+	Password string `json:"user_password"    dc:"密码"`
+}
+
+type UserInfoPassWordEditRes struct {
+	UserId interface{} `json:"user_id"   dc:"会员信息"`
 }

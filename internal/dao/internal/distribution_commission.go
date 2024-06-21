@@ -23,6 +23,7 @@ package internal
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"math"
 
 	"github.com/mallsuite/gocore/core/ml"
@@ -439,4 +440,61 @@ func (dao *DistributionCommissionDao) Count(ctx context.Context, in *do.Distribu
 	}
 
 	return count, nil
+}
+
+// GetBuyCommissionTotal 获取购买佣金总额
+func (dao *DistributionCommissionDao) CalCommission(ctx context.Context, userId uint, uoLevel int, startTime int64, endTime int64, uoIsPaid int, uoActive int) (float64, error) {
+	whereSet := ""
+
+	if !g.IsEmpty(userId) {
+		whereSet = fmt.Sprintf(" user_id = %d", userId)
+	}
+
+	if !g.IsEmpty(uoLevel) && uoLevel > 0 {
+		if whereSet != "" {
+			whereSet = whereSet + " AND"
+		}
+		whereSet = whereSet + fmt.Sprintf(" uo_level = %d", uoLevel)
+	}
+
+	if !g.IsEmpty(startTime) && !g.IsEmpty(endTime) {
+		if whereSet != "" {
+			whereSet = whereSet + " AND"
+		}
+		whereSet = whereSet + fmt.Sprintf(" uo_time BETWEEN %d AND %d", startTime, endTime)
+	}
+
+	if !g.IsEmpty(uoIsPaid) {
+		if whereSet != "" {
+			whereSet = whereSet + " AND"
+		}
+		whereSet = whereSet + fmt.Sprintf(" uo_is_paid = %d", uoIsPaid)
+	}
+
+	if !g.IsEmpty(uoActive) {
+		if whereSet != "" {
+			whereSet = whereSet + " AND"
+		}
+		whereSet = whereSet + fmt.Sprintf(" uo_active = %d", uoActive)
+	}
+
+	sql := fmt.Sprintf(`
+		SELECT
+			SUM(uo_buy_commission) AS uo_buy_commission
+		FROM
+			trade_distribution_order
+		WHERE %s
+		GROUP BY user_id
+	`, whereSet)
+
+	one, err := dao.DB().GetOne(ctx, sql)
+	if err != nil {
+		return 0, err
+	}
+
+	if one["uo_buy_commission"] != nil {
+		return gconv.Float64(one["uo_buy_commission"]), nil
+	}
+
+	return 0, nil
 }

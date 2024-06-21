@@ -3,6 +3,7 @@ package pay
 import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -18,6 +19,8 @@ type cConsumeRecord struct{}
 func (c *cConsumeRecord) List(ctx context.Context, req *pay.ConsumeRecordListReq) (res *pay.ConsumeRecordListRes, err error) {
 	input := do.ConsumeRecordListInput{}
 	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.BaseList.WhereExt)
 
 	var result, error = service.ConsumeRecord().List(ctx, &input)
 

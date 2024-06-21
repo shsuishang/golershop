@@ -91,6 +91,25 @@ func (c *cUserTagGroup) RemoveAssist(ctx context.Context, req *account.UserTagGr
 	return
 }
 
+// Tree 标签分组表-树形集合
+func (c *cUserTagGroup) Tree(ctx context.Context, req *account.UserTagGroupTreeReq) (res []*account.UserTagGroupTreeRes, err error) {
+	// 将请求参数转换为服务层输入结构
+	input := &do.UserTagGroupListInput{}
+	gconv.Scan(req, input)
+
+	// 调用服务层的树形集合方法
+	result, err := service.UserTagGroup().Tree(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将服务层结果转换为响应结构
+	res = []*account.UserTagGroupTreeRes{}
+	gconv.Scan(result, &res)
+
+	return
+}
+
 // ---------------------------- 用户项 -------------------------------
 
 // List 属性项目列表

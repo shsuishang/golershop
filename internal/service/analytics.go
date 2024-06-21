@@ -90,7 +90,7 @@ type (
 	}
 	IAnalyticsTrade interface {
 		// TradeAmount 交易总额
-		SalesAmount(ctx context.Context, start int64, end int64) (res interface{}, err error)
+		SalesAmount(ctx context.Context, start int64, end int64, buyerId int64) (res interface{}, err error)
 	}
 	IAnalyticsUser interface {
 		// 获取注册用户数量

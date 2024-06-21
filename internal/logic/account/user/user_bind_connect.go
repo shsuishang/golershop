@@ -17,27 +17,67 @@
 // | 附带或衍生的损失等)，本团队不承担任何法律责任，本软件框架只能用于公司和个人内部的
 // | 法律所允许的合法合规的软件产品研发，详细见https://www.golershop.cn/policy
 // +----------------------------------------------------------------------
-package analytics
+
+package user
 
 import (
 	"context"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model/do"
+	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
 )
 
-type sAnalyticsTrade struct{}
+type sUserBindConnect struct{}
 
 func init() {
-	service.RegisterAnalyticsTrade(NewAnalyticsTrade())
+	service.RegisterUserBindConnect(NewUserBindConnect())
 }
 
-func NewAnalyticsTrade() *sAnalyticsTrade {
-	return &sAnalyticsTrade{}
+func NewUserBindConnect() *sUserBindConnect {
+	return &sUserBindConnect{}
 }
 
-// TradeAmount 交易总额
-func (s *sAnalyticsTrade) SalesAmount(ctx context.Context, start int64, end int64, buyerId int64) (res interface{}, err error) {
-	res, err = dao.AnalyticsTrade.SalesAmount(ctx, start, end, buyerId)
+// Find 查询数据
+func (s *sUserBindConnect) Find(ctx context.Context, in *do.UserBindConnectListInput) (out []*entity.UserBindConnect, err error) {
+	out, err = dao.UserBindConnect.Find(ctx, in)
 
+	return out, err
+}
+
+// List 分页读取
+func (s *sUserBindConnect) List(ctx context.Context, in *do.UserBindConnectListInput) (out *do.UserBindConnectListOutput, err error) {
+	out, err = dao.UserBindConnect.List(ctx, in)
+
+	return out, err
+}
+
+// Add 新增
+func (s *sUserBindConnect) Add(ctx context.Context, in *do.UserBindConnect) (lastInsertId int64, err error) {
+	lastInsertId, err = dao.UserBindConnect.Add(ctx, in)
+	if err != nil {
+		return 0, err
+	}
+	return lastInsertId, err
+}
+
+// Edit 编辑
+func (s *sUserBindConnect) Edit(ctx context.Context, in *do.UserBindConnect) (affected int64, err error) {
+	_, err = dao.UserBindConnect.Edit(ctx, in.UserId, in)
+
+	if err != nil {
+		return 0, err
+	}
 	return
+}
+
+// Remove 删除多条记录模式
+func (s *sUserBindConnect) Remove(ctx context.Context, id any) (affected int64, err error) {
+	affected, err = dao.UserBindConnect.Remove(ctx, id)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return affected, err
 }

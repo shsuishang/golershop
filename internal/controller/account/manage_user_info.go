@@ -106,3 +106,39 @@ func (c *cUserInfo) Remove(ctx context.Context, req *account.UserInfoRemoveReq) 
 
 	return
 }
+
+// GetUserData 用户详细信息表-通过user_id查询
+func (c *cUserInfo) GetUserData(ctx context.Context, req *account.GetUserDataReq) (res *account.GetUserDataRes, err error) {
+	// 检查 userId 参数是否为空
+	userId := req.UserId
+	if g.IsEmpty(userId) {
+		// 获取当前登录用户的ID
+		userId = service.BizCtx().GetUserId(ctx)
+	}
+
+	// 调用 service 层方法获取用户详细信息
+	userInfoOutput, err := service.UserInfo().GetUserData(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将结果赋值给返回值
+	gconv.Scan(userInfoOutput, &res)
+	return res, nil
+}
+
+// PassWordEdit 编辑菜单
+func (c *cUserInfo) PassWordEdit(ctx context.Context, req *account.UserInfoPassWordEditReq) (res *account.UserInfoPassWordEditRes, err error) {
+
+	result, err := service.UserInfo().PassWordEdit(ctx, req.UserId, req.Password)
+
+	if err != nil {
+		err = err
+	}
+
+	res = &account.UserInfoPassWordEditRes{
+		UserId: result,
+	}
+
+	return
+}

@@ -11,6 +11,7 @@ type ConsumeTradeListReq struct {
 	g.Meta `path:"/manage/pay/consumeTrade/list" tags:"交易单" method:"get" summary:"交易单列表接口"`
 	ml.BaseList
 
+	BuyerId        uint `json:"buyer_id"   `                  //买家编号
 	ConsumeTradeId uint `json:"consume_trade_id"            ` // 交易订单编号
 }
 

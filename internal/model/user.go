@@ -1,6 +1,8 @@
 package model
 
-import "golershop.cn/internal/model/entity"
+import (
+	"golershop.cn/internal/model/entity"
+)
 
 type UserInfoOutput struct {
 	entity.UserInfo
@@ -30,6 +32,29 @@ type UserInfoOutput struct {
 	StoreId  uint `json:"store_id"    `  // 店铺编号
 	ChainId  uint `json:"chain_id"    `  // 门店编号
 	ClientId uint `json:"client_id"    ` // 后台管理:admin=1;移动端front=0
+
+	//其它信息
+	UdAddress          string      `json:"ud_address"              ` //详细地址
+	UserLevelName      string      `json:"user_level_name"         ` //等级名称
+	UserRegTime        interface{} `json:"user_reg_time"           ` //注册时间
+	UserLoginTime      interface{} `json:"user_login_time"         ` //登录时间
+	TagTitles          string      `json:"tag_titles"              ` //标签标题(DOT)
+	TagTitleList       []string    `json:"tag_title_list"          ` //标签标题(DOT)
+	TagGroupNames      string      `json:"tag_group_names"         ` //分组名称(DOT)
+	TagIds             string      `json:"tag_ids"                 ` //用户标签(DOT)
+	MonthOrder         interface{} `json:"month_order"             ` //本月订单
+	TotalOrder         interface{} `json:"total_order"             ` //总计订单
+	MonthTrade         interface{} `json:"month_trade"             ` //本月消费金额
+	TotalTrade         interface{} `json:"total_trade"             ` //总消费金额
+	Voucher            int64       `json:"voucher"                 ` //优惠券数量
+	WaitPayNum         int64       `json:"wait_pay_num"            ` //待付款数量
+	FavoritesGoodsNum  int64       `json:"favorites_goods_num"     ` //收藏数量
+	ConcernNum         int64       `json:"concern_num"             ` //关注数量
+	UnreadNumber       int         `json:"unread_number"           ` //未读消息数量
+	CommissionAmount   float64     `json:"commission_amount"       ` //佣金总额:历史总额度
+	UserCommissionNow  float64     `json:"user_commission_now"     ` //累计佣金
+	MonthCommissionBuy float64     `json:"month_commission_buy"    ` //本月预估收益
+	UserParentId       interface{} `json:"user_parent_id"          ` //上级用户编号
 }
 
 // UserVoucherRes 优惠券列表结构体

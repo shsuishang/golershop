@@ -181,11 +181,11 @@ func (dao *AnalyticsOrderDao) GetOrderNum(ctx context.Context, stime, etime int6
 		whereSet = whereSet + fmt.Sprintf(" AND user_id = %d", userId)
 	}
 
-	if !g.IsEmpty(userId) {
+	if !g.IsEmpty(kindId) {
 		whereSet = whereSet + fmt.Sprintf(" AND kind_id = %d", kindId)
 	}
 
-	if !g.IsEmpty(orderStateId) {
+	if !g.IsEmpty(orderIsPaid) {
 		whereSet = whereSet + fmt.Sprintf(" AND order_is_paid IN (%s)", gstr.JoinAny(orderIsPaid, ","))
 	}
 

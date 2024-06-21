@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
-	"golershop.cn/internal/consts"
 )
 
 // AnalyticsTradeDao is the data access object for table trade_order_info.
@@ -63,14 +62,47 @@ func (dao *AnalyticsTradeDao) Ctx(ctx context.Context) *gdb.Model {
 }
 
 // TradeAmount 交易总额
-func (dao *AnalyticsTradeDao) SalesAmount(ctx context.Context, start int64, end int64) (res interface{}, err error) {
+func (dao *AnalyticsTradeDao) SalesAmount(ctx context.Context, start int64, end int64, buyerId int64) (res interface{}, err error) {
 
-	sql := fmt.Sprintf("select sum(order_payment_amount) as amount from pay_consume_trade where trade_paid_time BETWEEN ? AND ? AND trade_is_paid IN(%d, %d) AND trade_type_id IN(%d, %d)", consts.ORDER_PAID_STATE_PART, consts.ORDER_PAID_STATE_YES, consts.TRADE_TYPE_SHOPPING, consts.TRADE_TYPE_FAVORABLE)
+	/*sql := fmt.Sprintf("select sum(order_payment_amount) as amount from pay_consume_trade where trade_paid_time BETWEEN ? AND ? AND trade_is_paid IN(%d, %d) AND trade_type_id IN(%d, %d)", consts.ORDER_PAID_STATE_PART, consts.ORDER_PAID_STATE_YES, consts.TRADE_TYPE_SHOPPING, consts.TRADE_TYPE_FAVORABLE)
 
 	one, err := dao.DB().GetOne(ctx, sql, start, end)
 
 	if err != nil {
 		return nil, err
+	}
+
+	if one["amount"] != nil {
+		res = one["amount"]
+	} else {
+		res = 0
+	}*/
+
+	whereSet := ""
+
+	whereSet = fmt.Sprintf(" AND trade_is_paid IN ( 3012, 3013 )")
+
+	if !g.IsEmpty(start) && !g.IsEmpty(end) {
+		whereSet = fmt.Sprintf(" AND trade_paid_time BETWEEN %d AND %d", start, end)
+	}
+
+	whereSet = whereSet + fmt.Sprintf(" AND trade_type_id IN ( 1201, 1214 )")
+
+	if !g.IsEmpty(buyerId) {
+		whereSet = whereSet + fmt.Sprintf(" AND buyer_id = %d", buyerId)
+	}
+
+	sql := fmt.Sprintf(`
+		       SELECT
+		        	sum(order_payment_amount) as amount
+		        FROM
+		        	pay_consume_trade
+		        WHERE 1 %s `, whereSet)
+
+	one, err := dao.DB().GetOne(ctx, sql)
+
+	if err != nil {
+		return res, err
 	}
 
 	if one["amount"] != nil {

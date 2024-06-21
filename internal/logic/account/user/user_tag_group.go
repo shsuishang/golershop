@@ -22,6 +22,7 @@ package user
 
 import (
 	"context"
+	"golershop.cn/api/account"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -80,4 +81,42 @@ func (s *sUserTagGroup) Remove(ctx context.Context, id any) (affected int64, err
 	}
 
 	return affected, err
+}
+
+// Tree 读取用户标签分组树
+func (s *sUserTagGroup) Tree(ctx context.Context, req *do.UserTagGroupListInput) (res []*account.UserTagGroupTreeRes, err error) {
+	res = []*account.UserTagGroupTreeRes{}
+	req.Where.TagGroupEnable = true
+
+	// 获取用户标签分组列表
+	userTagGroups, err := s.List(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(userTagGroups.Items) > 0 {
+		for _, tagGroup := range userTagGroups.Items {
+			tagBaseQuery := &do.UserTagBaseListInput{
+				Where: do.UserTagBase{
+					TagGroupId: tagGroup.TagGroupId,
+					TagEnable:  true,
+				},
+			}
+
+			userTagBases, err := dao.UserTagBase.Find(ctx, tagBaseQuery)
+			if err != nil {
+				return nil, err
+			}
+
+			if len(userTagBases) > 0 {
+				groupRes := &account.UserTagGroupTreeRes{
+					TagTitle: tagGroup.TagGroupName,
+					Children: userTagBases,
+				}
+				res = append(res, groupRes)
+			}
+		}
+	}
+
+	return res, nil
 }

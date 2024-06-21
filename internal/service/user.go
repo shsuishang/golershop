@@ -22,6 +22,7 @@ package service
 
 import (
 	"context"
+	"golershop.cn/api/account"
 
 	"golershop.cn/api/pt"
 	"golershop.cn/api/shop"
@@ -42,6 +43,8 @@ type (
 		Edit(ctx context.Context, in *do.UserTagGroup) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		// Tree
+		Tree(ctx context.Context, req *do.UserTagGroupListInput) (res []*account.UserTagGroupTreeRes, err error)
 	}
 	IUserVoucher interface {
 		// Get 读取用户优惠券
@@ -119,6 +122,10 @@ type (
 		Edit(ctx context.Context, in *do.UserInfo) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		// PassWordEdit 修改密码
+		PassWordEdit(ctx context.Context, userId uint, userPassword string) (bool, error)
+		// GetUserData 用户详细信息表
+		GetUserData(ctx context.Context, userId uint) (userInfoOutput *model.UserInfoOutput, err error)
 	}
 	IUser interface {
 		// 登录用户信息
@@ -277,7 +284,20 @@ type (
 		Edit(ctx context.Context, in *do.UserLevel) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetUserLevelRateMap
 		GetUserLevelRateMap(ctx context.Context) map[uint]float64
+	}
+	IUserBindConnect interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.UserBindConnectListInput) (out []*entity.UserBindConnect, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.UserBindConnectListInput) (out *do.UserBindConnectListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.UserBindConnect) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.UserBindConnect) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
 )
 
@@ -296,6 +316,7 @@ var (
 	localUserProductBrowse   IUserProductBrowse
 	localUserFavoritesItem   IUserFavoritesItem
 	localUserLevel           IUserLevel
+	localUserBindConnect     IUserBindConnect
 )
 
 func UserDeliveryAddress() IUserDeliveryAddress {
@@ -450,4 +471,14 @@ func UserInfo() IUserInfo {
 
 func RegisterUserInfo(i IUserInfo) {
 	localUserInfo = i
+}
+func UserBindConnect() IUserBindConnect {
+	if localUserBindConnect == nil {
+		panic("implement not found for interface IUserBindConnect, forgot register?")
+	}
+	return localUserBindConnect
+}
+
+func RegisterUserBindConnect(i IUserBindConnect) {
+	localUserBindConnect = i
 }

@@ -3,6 +3,8 @@ package account
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/mallsuite/gocore/core/ml"
+	"golershop.cn/internal/model/entity"
 )
 
 // =========================== 管理端使用 =============================
@@ -58,6 +60,19 @@ type UserTagGroupListRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
+}
+
+type UserTagGroupTreeReq struct {
+	g.Meta `path:"/manage/account/userTagGroup/tree" tags:"标签分组表-树形集合" method:"get" summary:"标签分组表-树形集合接口"`
+	ml.BaseList
+
+	TagGroupName   string `json:"tag_group_name"  dc:"分组名称"`                  // 分组名称
+	TagGroupEnable bool   `json:"tag_group_enable" dc:"是否有效(BOOL):0-禁用;1-启用"` // 是否有效(BOOL):0-禁用;1-启用
+}
+
+type UserTagGroupTreeRes struct {
+	TagTitle string                `json:"tag_title" dc:"分组名称"` // 分组名称
+	Children []*entity.UserTagBase `json:"children"  dc:"子集标签"` // 子集标签
 }
 
 // ---------------------------- 标签项 -------------------------------
