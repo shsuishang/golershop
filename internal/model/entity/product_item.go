@@ -47,6 +47,7 @@ type ProductItem struct {
 	ItemRebate         float64 `json:"item_rebate"          ` // 返利额度
 	ItemSrcId          int64   `json:"item_src_id"          ` // 供应商SKU编号
 	CategoryId         uint    `json:"category_id"          ` // 商品分类
+	CourseCategoryId   uint    `json:"course_category_id"   ` // 课程分类
 	StoreId            uint    `json:"store_id"             ` // 所属店铺
 	Version            uint    `json:"version"              ` // 版本
 

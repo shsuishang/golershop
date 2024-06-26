@@ -62,7 +62,8 @@ type ActivityReqVo struct {
 type ActivityBaseListReq struct {
 	g.Meta `path:"/manage/marketing/activityBase/list" tags:"活动管理" method:"get" summary:"活动列表接口"`
 	ml.BaseList
-	ActivityReqVo
+
+	ActivityTypeId uint `json:"activity_type_id"   ` // 活动类型
 }
 
 type ActivityBaseListRes struct {
@@ -71,6 +72,17 @@ type ActivityBaseListRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
+}
+
+type ActivityBaseEditStateReq struct {
+	g.Meta `path:"/manage/marketing/activityBase/editState" tags:"活动管理" method:"post" summary:"活动编辑接口"`
+
+	ActivityId uint `json:"activity_id"        ` // 活动编号
+	ActivityBaseAdd
+}
+
+type ActivityBaseEditStateRes struct {
+	ActivityId interface{} `json:"activity_id"        ` // 活动编号
 }
 
 //front/marketing/activityBase/listVoucher

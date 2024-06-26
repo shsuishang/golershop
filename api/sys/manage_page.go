@@ -97,3 +97,8 @@ type PageBaseGetDataInfoRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+type PageModuleReq struct {
+	g.Meta `path:"/manage/sys/pageModule/listTpl" tags:"PC楼层模板" method:"get" summary:"PC楼层模板接口"`
+}
+type PageModuleRes struct {
+}

@@ -3,7 +3,7 @@
 gfcli:
   gen:
     dao:
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "account"
         removePrefix: "account_"
         tables: "account_user_base,account_user_info,account_user_level,account_user_login_history,account_user_login,account_user_invoice,account_user_message,account_user_tag_group,account_user_tag_base,account_user_delivery_address,account_user_invoice,account_user_distribution,account_user_bind_connect"
@@ -14,7 +14,7 @@ gfcli:
       #        doPath: "model/account/do"
       #        entityPath: "model/account/entity"
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "pay"
         removePrefix: "pay_"
         tables: "pay_user_resource,pay_user_points_history,pay_consume_trade,pay_consume_combine,pay_consume_deposit,pay_consume_record,pay_distribution_commission,pay_user_pay,pay_user_exp_history"
@@ -22,7 +22,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "shop"
         removePrefix: "shop_"
         tables: "shop_store_base,shop_store_info,shop_store_transport_type,shop_store_transport_item,shop_store_shipping_address,shop_store_express_logistics,shop_user_voucher,shop_user_voucher_num,shop_user_search_history,shop_user_product_browse,shop_user_favorites_item"
@@ -30,7 +30,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "marketing"
         removePrefix: "marketing_"
         tables: "marketing_activity_type,marketing_activity_base,marketing_activity_item,marketing_activity_cutprice,marketing_activity_cutprice_history,marketing_activity_groupbooking,marketing_activity_groupbooking_history"
@@ -38,7 +38,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "pt"
         removePrefix: "pt_"
         tables: "pt_product_base,pt_product_index,pt_product_info,pt_product_valid_period,pt_product_log,pt_product_meta,pt_product_item,pt_product_image,pt_product_category, pt_product_assist,pt_product_assist_item,pt_product_assist_index,pt_product_brand,pt_product_tag,pt_product_type,pt_product_spec,pt_product_spec_item,pt_product_item_seq,pt_product_comment"
@@ -46,7 +46,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "trade"
         removePrefix: "trade_"
         tables: "trade_order_base,trade_order_state_log,trade_order_info,trade_order_data,trade_order_item,trade_order_invoice,trade_order_return,trade_order_return_item,trade_order_return_reason,trade_order_delivery_address,trade_order_logistics,trade_user_cart,trade_chain_code,trade_distribution_order,trade_distribution_order_item,trade_distribution_generated_commission"
@@ -54,7 +54,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "invoicing"
         removePrefix: "invoicing_"
         tables: "invoicing_warehouse_base,invoicing_warehouse_item,invoicing_stock_bill,invoicing_stock_bill_item"
@@ -62,7 +62,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "admin"
         removePrefix: "admin_"
         tables: "admin_menu_base,admin_user_admin,admin_user_role"
@@ -70,7 +70,7 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "sys"
         removePrefix: "sys_"
         tables: "sys_ip_ban,sys_config_base,sys_config_type,sys_log_action,sys_log_error,sys_number_seq,sys_dict_base,sys_dict_item,sys_material_base,sys_material_gallery,sys_access_history,sys_express_base,sys_page_user_form,sys_page_base,sys_page_module,sys_page_category_nav,sys_page_mobile_nav,sys_page_pc_nav,sys_district_base,sys_contract_type,sys_feedback_base,sys_feedback_category,sys_feedback_type,sys_message_template,sys_crontab_base"
@@ -78,10 +78,26 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:store:storefhwui!#2sf13f@tcp(127.0.0.1:3306)/dev_shop_suite?loc=Local&parseTime=true"
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
         group: "cms"
         removePrefix: "cms_"
         tables: "cms_article_category,cms_article_tag,cms_article_base,cms_article_comment"
+        jsonCase: "Snake"
+        gJsonSupport: true
+        overwriteDao: true
+
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
+        group: "sns"
+        removePrefix: "sns_"
+        tables: "sns_story_timeline,sns_story_like,sns_story_forward,sns_story_comment_reply_helpful,sns_story_comment_reply,sns_story_comment_helpful,sns_story_comment,sns_story_collection,sns_story_category,sns_story_base,sns_story_advertisement"
+        jsonCase: "Snake"
+        gJsonSupport: true
+        overwriteDao: true
+
+      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
+        group: "o2o"
+        removePrefix: "o2o_"
+        tables: "o2o_chain_base,o2o_chain_item"
         jsonCase: "Snake"
         gJsonSupport: true
         overwriteDao: true

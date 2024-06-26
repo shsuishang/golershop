@@ -93,6 +93,7 @@ var (
 					pay.Record,
 					pt.Product,
 					pt.ProductCategory,
+					pt.ProductComment,
 					pt.ProductTag,
 					pt.ProductBrand,
 					pt.ProductItem,

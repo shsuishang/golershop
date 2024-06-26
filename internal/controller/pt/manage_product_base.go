@@ -2,6 +2,7 @@ package pt
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pt"
@@ -130,4 +131,37 @@ func (c *cProductBase) GetProduct(ctx context.Context, req *pt.ProductDateReq) (
 	gconv.Scan(data, &res)
 
 	return res, err
+}
+
+// ListItem 商品SKU列表查询
+func (c *cProduct) ListItem(ctx context.Context, req *pt.ProductBaseItemListReq) (res *pt.ProductBaseItemListRes, err error) {
+	// 将请求参数复制到输入结构体
+	input := pt.ItemListReq{}
+	gconv.Scan(req, &input)
+
+	// 转换 ItemId
+	if req.ItemId != "" {
+		input.ItemId = req.ItemId
+	}
+
+	// 处理 CategoryId
+	if !g.IsEmpty(req.CategoryId) {
+		categoryLeafs, _ := service.ProductCategory().GetCategoryLeafs(ctx, req.CategoryId)
+		if !g.IsEmpty(categoryLeafs) {
+			input.CategoryId = gconv.String(*categoryLeafs)
+		} else {
+			input.CategoryIds = []uint{req.CategoryId}
+		}
+	}
+
+	// 调用 service 方法获取列表
+	result, err := service.ProductIndex().ListItem(ctx, &input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将结果转换为响应结构体
+	gconv.Scan(result, &res)
+
+	return
 }

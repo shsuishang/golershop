@@ -54,6 +54,7 @@ type ProductItem struct {
 	ItemRebate         interface{} // 返利额度
 	ItemSrcId          interface{} // 供应商SKU编号
 	CategoryId         interface{} // 商品分类
+	CourseCategoryId   interface{} // 课程分类
 	StoreId            interface{} // 所属店铺
 	Version            interface{} // 版本
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/model"
+	"golershop.cn/internal/model/entity"
 )
 
 // start fo front
@@ -244,4 +245,25 @@ type ProductEditStateReq struct {
 
 	ProductId      interface{} `json:"product_id"   v:"required#请输入商品编号"           ` // 产品编号`
 	ProductStateId uint        `json:"product_state_id"            `                 // 商品状态:1001-正常;1002-下架仓库中;1003-待审核; 1000-违规禁售
+}
+
+type ProductBaseItemListReq struct {
+	g.Meta `path:"/manage/pt/productBase/listItem" tags:"商品SKU列表" method:"get" summary:"商品SKU列表接口"`
+	ml.BaseList
+
+	BrandId     uint   `json:"brand_id"                    ` // 品牌编号
+	ProductId   uint64 `json:"product_id"                  ` // 产品编号
+	ProductName string `json:"product_name" type:"LIKE"    ` // 产品名称
+	CategoryId  uint   `json:"category_id"                 ` // 商品分类
+	ItemId      string `json:"item_id"                  `    // 商品编号-SKU编号
+}
+
+type ProductBaseItemListRes struct {
+	Assists      []model.ProductAssistOutput `json:"assists"       dc:"分类辅助属性"` // 分类辅助属性
+	ActivityBase entity.ActivityBase         `json:"activity_base" dc:"活动信息"`   // 活动信息
+	Items        interface{}                 `json:"items"    dc:"商品列表信息"`
+	Page         int                         `json:"page"`    // 分页号码
+	Total        int                         `json:"total"`   // 总页数
+	Records      int                         `json:"records"` // 数据总数
+	Size         int                         `json:"size"`    // 单页数量
 }

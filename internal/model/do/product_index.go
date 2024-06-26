@@ -38,6 +38,7 @@ type ProductIndex struct {
 	StoreType                interface{} // 店铺类型(ENUM): 1-卖家店铺; 2-供应商店铺
 	StoreCategoryIds         interface{} // 店铺分类(DOT)
 	CategoryId               interface{} // 商品分类
+	CourseCategoryId         interface{} // 课程分类
 	TypeId                   interface{} // 类型编号:冗余检索
 	ProductQuantity          interface{} // 商品库存:冗余计算
 	ProductWarnQuantity      interface{} // 预警数量

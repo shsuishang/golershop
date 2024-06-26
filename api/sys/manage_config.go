@@ -140,7 +140,7 @@ type ConfigBaseEditSiteRes struct {
 }
 
 type CleanCacheReq struct {
-	g.Meta `path:"/manage/sys/cache/clean" tags:"配置管理" method:"get" summary:"清理缓存"`
+	g.Meta `path:"/manage/sys/cache/clean" tags:"配置管理" method:"post" summary:"清理缓存"`
 }
 
 type CleanCacheRes struct {

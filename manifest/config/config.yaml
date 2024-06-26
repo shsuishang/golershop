@@ -82,55 +82,63 @@ database:
     ctxKeys: [ "RequestId" ]
 
   default:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   sys:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   account:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   pay:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   store:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   pt:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   order:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   shop:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   admin:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   cms:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   marketing:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   trade:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
   invoicing:
-    link: "mysql:store:pwd@tcp(127.0.0.1:3306)/golershop?loc=Local&parseTime=true"
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
+    debug: true
+
+  sns:
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
+    debug: true
+
+  o2o:
+    link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
     debug: true
 
 # Redis 配置示例
@@ -201,6 +209,8 @@ secure:
 
 
     - "/front/sys/page/getMobilePage"
+    - "/front/sys/page/getPcPage"
+    - "/front/sys/page/pcLayout"
     - "/front/pt/product/listCategory"
     - "/front/pt/product/treeCategory"
     - "/front/pt/product/list"
@@ -223,7 +233,7 @@ shopSuite:
   appDebug: "true"
 
   # 调试模式
-  dbDebug: "false"
+  dbDebug: "true"
 
   # 文件上传磁盘位置
   uploadDir: "./resource/public/uploads"
@@ -233,7 +243,7 @@ shopSuite:
   urlPc: "https://demo.modulithshop.cn"
 
   # 启用缓存
-  cacheEnable: "true"
+  cacheEnable: "false"
 
   cacheNamespace: "c:1001:"
 

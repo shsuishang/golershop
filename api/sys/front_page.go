@@ -31,7 +31,9 @@ type GetPcPageReq struct {
 	CategoryId int    `json:"category_id,omitempty" description:"分类编号"`
 }
 
-type GetPcPageRes struct{}
+type GetPcPageRes struct {
+	Floor []interface{} `json:"floor"`
+}
 
 type PcLayoutReq struct {
 	g.Meta `path:"/front/sys/page/pcLayout" tags:"page" method:"get" summary:"PC头尾数据"`

@@ -32,8 +32,10 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/sys"
 	"golershop.cn/internal/consts"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -177,10 +179,10 @@ func dealWithPopUp(ctx context.Context, activityList []*model.ActivityOutput, us
 
 // GetPcPage 读取PC页面
 func (c *cPage) GetPcPage(ctx context.Context, req *sys.GetPcPageReq) (res *sys.GetPcPageRes, err error) {
-
-	if req.PageId > 0 {
+	res = &sys.GetPcPageRes{}
+	if !g.IsEmpty(req.PageId) {
 		// 如果PageId存在
-	} else if req.PageIndex != "" {
+	} else if !g.IsEmpty(req.PageIndex) {
 		// 根据类型读取pageId
 		baseQueryWrapper := &do.PageBaseListInput{}
 
@@ -224,11 +226,11 @@ func (c *cPage) GetPcPage(ctx context.Context, req *sys.GetPcPageReq) (res *sys.
 
 		pageIds, _ := service.PageBase().FindKey(ctx, baseQueryWrapper)
 
-		if len(pageIds) > 0 {
+		if !g.IsEmpty(pageIds) {
 			req.PageId = gconv.Int64(pageIds[0])
 		}
 
-	} else if req.CategoryId > 0 {
+	} else if !g.IsEmpty(req.CategoryId) {
 		// 根据分类读取pageId
 	} else {
 		panic("请求数据有误！")
@@ -241,7 +243,10 @@ func (c *cPage) GetPcPage(ctx context.Context, req *sys.GetPcPageReq) (res *sys.
 			Where: do.PageModule{
 				PageId:   req.PageId,
 				PmEnable: 1,
-				PmOrder:  "pm_order ASC",
+			},
+			BaseList: ml.BaseList{
+				Sort: ml.ORDER_BY_ASC,
+				Sidx: dao.PageModule.Columns().PmOrder,
 			},
 		}
 

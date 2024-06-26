@@ -23,6 +23,7 @@ package product
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -210,10 +211,13 @@ func (s *sProductIndex) ListItem(ctx context.Context, req *pt.ItemListReq) (out 
 
 	if len(itemIds) > 0 {
 		productItems, _ := dao.ProductItem.Gets(ctx, itemIds)
-		productIds := make([]uint64, len(productItems))
-		for i, item := range productItems {
-			productIds[i] = item.ProductId
+		uniqueProductIds := garray.NewArray()
+		for _, item := range productItems {
+			if !uniqueProductIds.Contains(item.ProductId) {
+				uniqueProductIds.Append(item.ProductId)
+			}
 		}
+		productIds := uniqueProductIds.Slice()
 
 		// SKU图片
 		productImages, _ := dao.ProductImage.Find(ctx, &do.ProductImageListInput{Where: do.ProductImage{

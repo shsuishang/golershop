@@ -31,6 +31,7 @@ type ProductIndex struct {
 	StoreType                uint    `json:"store_type"                  ` // 店铺类型(ENUM): 1-卖家店铺; 2-供应商店铺
 	StoreCategoryIds         string  `json:"store_category_ids"          ` // 店铺分类(DOT)
 	CategoryId               uint    `json:"category_id"                 ` // 商品分类
+	CourseCategoryId         uint    `json:"course_category_id"          ` // 课程分类
 	TypeId                   uint    `json:"type_id"                     ` // 类型编号:冗余检索
 	ProductQuantity          uint    `json:"product_quantity"            ` // 商品库存:冗余计算
 	ProductWarnQuantity      uint    `json:"product_warn_quantity"       ` // 预警数量

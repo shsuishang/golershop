@@ -150,9 +150,9 @@ type PopupVo struct {
 
 // BuyVo 结构体
 type BuyVo struct {
-	Item     []int64 `json:"item"`     // 商品
-	Subtotal float64 `json:"subtotal"` // 总额
-	Num      int     `json:"num"`      // 总数量
+	Item     []uint64 `json:"item"`     // 商品
+	Subtotal float64  `json:"subtotal"` // 总额
+	Num      int      `json:"num"`      // 总数量
 }
 
 // PointsVo 结构体
@@ -171,7 +171,7 @@ type ActivityOutput struct {
 	ProductItemName      string           `json:"product_item_name"`       //折扣商品
 	ActivityUseLevelName string           `json:"activity_use_level_name"` //使用等级名称(DOT)
 
-	remainQuantity int `json:"remain_quantity"` //剩余库存
+	RemainQuantity int `json:"remain_quantity"` //剩余库存
 }
 
 type ActivityBaseRes ActivityOutput

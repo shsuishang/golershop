@@ -362,5 +362,6 @@ func (c *cConfig) EditSite(ctx context.Context, req *sys.ConfigBaseEditSiteReq) 
 }
 
 func (c *cConfig) CleanCache(ctx context.Context, req *sys.CleanCacheReq) (res sys.CleanCacheRes, err error) {
-	return
+	_, err = service.ConfigBase().CleanCache(ctx)
+	return res, err
 }

@@ -142,6 +142,10 @@ type (
 		GetActivityItemNum(ctx context.Context, activityBase *entity.ActivityBase) (map[uint64]*model.ItemNumVo, error)
 		// ListVoucher 活动表-优惠券列表
 		ListVoucher(ctx context.Context, input *do.ActivityBaseListInput) (res *model.ActivityListOutput, err error)
+		// GetList
+		GetList(ctx context.Context, activityBaseListReq *do.ActivityBaseListInput) (activityBaseResPage *model.ActivityListOutput, err error)
+		// EditActivityBase
+		EditActivityBase(ctx context.Context, activityId uint, data *do.ActivityBase) (bool, error)
 	}
 )
 

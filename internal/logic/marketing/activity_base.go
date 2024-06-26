@@ -25,6 +25,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/container/garray"
+	"github.com/gogf/gf/v2/encoding/gjson"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -35,8 +37,10 @@ import (
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 	"sort"
 	"strings"
+	"time"
 )
 
 type sActivityBase struct{}
@@ -283,4 +287,408 @@ func (s *sActivityBase) ListVoucher(ctx context.Context, input *do.ActivityBaseL
 	}
 
 	return res, nil
+}
+
+// GetList 获取活动列表
+func (s *sActivityBase) GetList(ctx context.Context, activityBaseListReq *do.ActivityBaseListInput) (activityBaseResPage *model.ActivityListOutput, err error) {
+	activityBaseResPage = &model.ActivityListOutput{}
+	activityBaseIPage, err := s.List(ctx, activityBaseListReq)
+
+	if err != nil || g.IsEmpty(activityBaseIPage.Items) {
+		return activityBaseResPage, nil
+	}
+
+	var activityBaseList []*entity.ActivityBase
+	gconv.Scan(activityBaseIPage.Items, &activityBaseList)
+
+	// 修正活动最新状态
+	activityBases, err := s.FixActivityData(ctx, activityBaseList)
+	if err != nil {
+		return nil, err
+	}
+
+	var activityBaseRes []*model.ActivityOutput
+
+	for _, activityBase := range activityBases {
+		activityRes := &model.ActivityOutput{}
+		gconv.Struct(activityBase, activityRes)
+
+		// 会员等级处理
+		activityUseLevel := activityBase.ActivityUseLevel
+		if len(activityUseLevel) > 0 {
+			levelIdsStr := gconv.Strings(gstr.Split(activityUseLevel, ","))
+			levelIds := gconv.Ints(levelIdsStr)
+			userLevelList, err := dao.UserLevel.Gets(ctx, levelIds)
+			if err != nil {
+				return nil, err
+			}
+
+			if !g.IsEmpty(userLevelList) {
+				useLevelList := g.SliceStr{}
+				for _, level := range userLevelList {
+					useLevelList = append(useLevelList, level.UserLevelName)
+				}
+				useLevelStr := gstr.Join(useLevelList, ",")
+				activityRes.UseLevel = useLevelStr
+			}
+		}
+
+		activityTypeId := activityBase.ActivityTypeId
+		activityRule := activityBase.ActivityRule
+		activityRuleVo := &model.ActivityRuleVo{}
+
+		switch activityTypeId {
+		case consts.ACTIVITY_TYPE_REDUCTION,
+			consts.ACTIVITY_TYPE_FULL_RETURN,
+			consts.ACTIVITY_TYPE_PF_GROUPBUY_STORE,
+			consts.ACTIVITY_TYPE_REDUCTION_AGAIN,
+			consts.ACTIVITY_TYPE_MULTIPLEDISCOUNT,
+			consts.ACTIVITY_TYPE_BATDISCOUNT,
+			consts.ACTIVITY_TYPE_MULTIPLE_POINTS:
+			//consts.ACTIVITY_TYPE_GIFTPACK:
+			if len(activityRule) > 0 {
+				gjson.DecodeTo(activityRule, activityRuleVo)
+
+				if activityRuleVo != nil {
+					requirement := &activityRuleVo.Requirement
+					if requirement != nil {
+						buy := requirement.Buy
+						if buy != nil {
+							items, err := service.ProductBase().GetItems(ctx, buy.Item, 0)
+							if err != nil {
+								return nil, err
+							}
+							activityRes.Item = items
+						}
+					}
+				}
+			}
+		case consts.ACTIVITY_TYPE_CUTPRICE:
+			if len(activityRule) > 0 {
+				gjson.DecodeTo(activityRule, activityRuleVo)
+
+				if activityRuleVo != nil {
+					cutprice := &activityRuleVo.Cutprice
+					if cutprice != nil {
+						items := cutprice.Items
+						if !g.IsEmpty(items) {
+							// 假设 array.Column 返回的是 []interface{}
+							itemIdsInterface := array.Column(items, "ItemId")
+
+							// 将 itemIds 转换为 []uint64
+							var itemIds []uint64
+							for _, id := range itemIdsInterface {
+								if uintID, ok := id.(uint64); ok {
+									itemIds = append(itemIds, uintID)
+								} else {
+									return nil, fmt.Errorf("invalid itemId type: %T", id)
+								}
+							}
+
+							productItemVos, err := service.ProductBase().GetItems(ctx, itemIds, 0)
+							if err != nil {
+								return nil, err
+							}
+							activityRes.Item = productItemVos
+
+							totalPriceInterface := array.Column(productItemVos, "ItemUnitPrice")
+							var totalPrice float64
+							for _, price := range totalPriceInterface {
+								if priceFloat, ok := price.(float64); ok {
+									totalPrice += priceFloat
+								} else {
+									return nil, fmt.Errorf("invalid price type: %T", price)
+								}
+							}
+							cutprice.TotalPrice = totalPrice
+						}
+					}
+				}
+			}
+		case consts.ACTIVITY_TYPE_GIFTBAG:
+			if len(activityRule) > 0 {
+				gjson.DecodeTo(activityRule, activityRuleVo)
+				if activityRuleVo != nil {
+					giftbag := &activityRuleVo.Giftbag
+					if giftbag != nil {
+						items := giftbag.Items
+						if !g.IsEmpty(items) {
+							// 获取 itemIds 并转换为 []uint64
+							itemIdsInterface := array.Column(items, "ItemId")
+							var itemIds []uint64
+							for _, id := range itemIdsInterface {
+								if uintID, ok := id.(uint64); ok {
+									itemIds = append(itemIds, uintID)
+								} else {
+									return nil, fmt.Errorf("invalid itemId type: %T", id)
+								}
+							}
+							productItems, err := service.ProductBase().GetItems(ctx, itemIds, 0)
+							if err != nil {
+								return nil, err
+							}
+							activityRes.Item = productItems
+
+							remain := giftbag.GiftbagQuantity - activityBase.ActivityEffectiveQuantity
+							if remain < 0 {
+								remain = 0
+							}
+							activityRes.RemainQuantity = int(remain)
+						}
+					}
+				}
+			}
+		default:
+			if len(activityRule) > 0 {
+				gjson.DecodeTo(activityRule, &activityRuleVo)
+			}
+			itemIds, _ := s.GetActivityAllItemIds(ctx, activityBase)
+			if !g.IsEmpty(itemIds) {
+				items, err := service.ProductBase().GetItems(ctx, itemIds, 0)
+				if err != nil {
+					return nil, err
+				}
+				activityRes.Item = items
+			}
+		}
+
+		activityRes.ActivityRuleJson = activityRuleVo
+		activityBaseRes = append(activityBaseRes, activityRes)
+	}
+
+	activityBaseResPage.Items = activityBaseRes
+
+	return activityBaseResPage, nil
+}
+func (s *sActivityBase) FixActivityData(ctx context.Context, activityBaseList []*entity.ActivityBase) ([]*entity.ActivityBase, error) {
+	if len(activityBaseList) == 0 {
+		return []*entity.ActivityBase{}, nil
+	}
+
+	now := time.Now()
+	currentTime := now.UnixNano() / int64(time.Millisecond)
+
+	var baserMap *do.ActivityBase
+	for _, i := range activityBaseList {
+		gconv.Scan(i, &baserMap)
+		activityId := i.ActivityId
+		// 判断活动店铺有效
+		activityState := i.ActivityState
+		// 活动开始时间
+		activityStartTime := i.ActivityStarttime
+		// 活动结束时间
+		activityEndTime := i.ActivityEndtime
+		// 活动类型
+		activityType := i.ActivityType
+
+		if !g.IsEmpty(activityType) && activityType == consts.GET_VOUCHER_BY_PURCHASE {
+			// 根据售卖优惠券id获取对应商品信息
+		}
+
+		switch activityState {
+		case consts.ACTIVITY_STATE_WAITING:
+			if activityStartTime <= uint64(currentTime) {
+				if activityEndTime <= uint64(currentTime) {
+					baserMap.ActivityState = consts.ACTIVITY_STATE_FINISHED
+				} else {
+					i.ActivityState = consts.ACTIVITY_STATE_NORMAL
+				}
+
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+		case consts.ACTIVITY_STATE_NORMAL:
+			if activityEndTime < uint64(currentTime) {
+				i.ActivityState = consts.ACTIVITY_STATE_FINISHED
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+
+			if activityStartTime > uint64(currentTime) {
+				i.ActivityState = consts.ACTIVITY_STATE_WAITING
+
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+		case consts.ACTIVITY_STATE_FINISHED:
+			if activityStartTime <= uint64(currentTime) {
+				if activityEndTime <= uint64(currentTime) {
+					i.ActivityState = consts.ACTIVITY_STATE_FINISHED
+				} else {
+					i.ActivityState = consts.ACTIVITY_STATE_NORMAL
+				}
+
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+			if activityStartTime > uint64(currentTime) {
+				i.ActivityState = consts.ACTIVITY_STATE_WAITING
+
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+		case consts.ACTIVITY_STATE_CLOSED:
+			if activityStartTime <= uint64(currentTime) && activityEndTime <= uint64(currentTime) {
+				i.ActivityState = consts.ACTIVITY_STATE_FINISHED
+				// 更新数据
+				dao.ActivityBase.Edit(ctx, activityId, baserMap)
+			}
+		}
+	}
+
+	return activityBaseList, nil
+}
+
+// GetActivityAllItemIds 获取所有活动商品的ID列表
+func (s *sActivityBase) GetActivityAllItemIds(ctx context.Context, activityBase *entity.ActivityBase) ([]uint64, error) {
+	var itemIds []uint64
+
+	// 如果 activityBase 为空，返回空列表
+	if activityBase == nil {
+		return nil, nil
+	}
+
+	activityTypeId := activityBase.ActivityTypeId
+	var activityRuleVo *model.ActivityRuleVo
+
+	// 如果 activityBase 的活动规则不为空，将其解析为 ActivityRuleVo
+	if !g.IsEmpty(activityBase.ActivityRule) {
+		err := gconv.Struct(activityBase.ActivityRule, &activityRuleVo)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// 根据活动类型ID进行不同的处理
+	switch activityTypeId {
+	case consts.ACTIVITY_TYPE_BARGAIN,
+		consts.ACTIVITY_TYPE_POINT_SHOPPING,
+		consts.ACTIVITY_TYPE_GIFT,
+		consts.ACTIVITY_TYPE_REDUCTION,
+		consts.ACTIVITY_TYPE_PF_GROUPBUY_STORE:
+		// 如果活动类型是特定类型，从活动规则中获取商品ID列表
+		if activityRuleVo != nil && &activityRuleVo.Requirement != nil && activityRuleVo.Requirement.Buy != nil {
+			itemIds = activityRuleVo.Requirement.Buy.Item
+		}
+	case consts.ACTIVITY_TYPE_LIMITED_DISCOUNT,
+		consts.ACTIVITY_TYPE_GROUPBOOKING:
+		// 如果活动类型是限时折扣或拼团，从活动商品表中获取商品ID列表
+		activityId := activityBase.ActivityId
+		activityItems, err := dao.ActivityItem.Find(ctx, &do.ActivityItemListInput{Where: do.ActivityItem{ActivityId: activityId}})
+		if err != nil {
+			return nil, err
+		}
+
+		if !g.IsEmpty(activityItems) {
+			for _, item := range activityItems {
+				itemIds = append(itemIds, item.ItemId)
+			}
+		}
+	}
+
+	return itemIds, nil
+}
+
+// EditActivityBase 编辑活动基础信息
+func (s *sActivityBase) EditActivityBase(ctx context.Context, activityId uint, data *do.ActivityBase) (bool, error) {
+	/*	activityTypeId := data.ActivityTypeId
+
+		if g.Equal(activityTypeId, consts.ACTIVITY_TYPE_GROUPBOOKING) || gutil.Equal(activityTypeId, consts.ACTIVITY_TYPE_CUTPRICE) {
+			// 判断商品是否更改
+			activityItems, err := dao.ActivityItem.Find(ctx, &do.ActivityItemListInput{Where: do.ActivityItem{ActivityId: activityId}})
+			if err != nil {
+				return false, err
+			}
+
+			itemIdRow := array.Column(activityItems, "ItemId"
+
+			activityRule := gjson.New(data.ActivityRule)
+			itemId := gconv.Uint64(activityRule.Get("item_id"))
+
+			for _, itemIdInRow := range itemIdRow {
+				if garray.NotEqual(itemId, itemIdInRow) {
+					if !s.Remove(ctx, activityId, itemIdInRow, data) {
+						return false, gerror.New("修改活动商品信息失败！")
+					}
+				}
+			}
+
+			if !gutil.InArray(itemIdRow, itemId) {
+				if !s.Add(ctx, activityId, []uint64{itemId}, data) {
+					return false, gerror.New("修改活动商品信息失败！")
+				}
+			}
+		}
+	*/
+	// 保存活动基础信息
+	if _, err := dao.ActivityBase.Save(ctx, data); err != nil {
+		return false, err
+	}
+
+	activityState := data.ActivityState
+
+	if activityState != nil {
+		// 获取活动项
+		activityItems, err := dao.ActivityItem.Find(ctx, &do.ActivityItemListInput{Where: do.ActivityItem{ActivityId: activityId}})
+		if err != nil {
+			return false, err
+		}
+
+		// 修改store_activity_item
+		if len(activityItems) > 0 {
+			activityItemList := &do.ActivityItem{}
+			activityItemIds := array.Column(activityItems, "ActivityItemId")
+			activityItemList.ActivityItemId = activityItemIds
+			activityItem := &do.ActivityItem{
+				ActivityItemState: activityState,
+			}
+			if _, err := dao.ActivityItem.Edit(ctx, activityItem, activityItemList); err != nil {
+				return false, err
+			}
+		}
+
+		// 判断是否有状态的变化，如果有，则修改product_index
+		if len(activityItems) > 0 {
+			activityRow, err := s.Get(ctx, activityId)
+			if err != nil {
+				return false, err
+			}
+			activityTypeId := activityRow.ActivityTypeId
+
+			productIdRow := array.Column(activityItems, "ProductId")
+			productIndexRows, err := dao.ProductIndex.Gets(ctx, productIdRow)
+			if err != nil {
+				return false, err
+			}
+
+			for _, productIndexRow := range productIndexRows {
+				uniqueActivityTypeIds := garray.NewArray()
+				uniqueActivityTypeIds.Append(productIndexRow.ActivityTypeIds)
+				if activityState == consts.ACTIVITY_STATE_NORMAL {
+					// 不存在则添加
+					if !uniqueActivityTypeIds.Contains(activityTypeId) {
+						uniqueActivityTypeIds.Append(activityTypeId)
+						activityTypeIds := uniqueActivityTypeIds.Slice()
+						productIndexRow.ActivityTypeIds = gstr.Join(gconv.Strings(activityTypeIds), ",")
+					}
+				} else {
+					// 存在则删除
+					if uniqueActivityTypeIds.Contains(activityTypeId) {
+						uniqueActivityTypeIds.Remove(int(activityTypeId))
+						activityTypeIds := uniqueActivityTypeIds.Slice()
+						productIndexRow.ActivityTypeIds = gstr.Join(gconv.Strings(activityTypeIds), ",")
+					}
+				}
+
+				productIndex := &do.ProductIndex{}
+				gconv.Scan(productIndexRows, productIndex)
+
+				if _, err := dao.ProductIndex.Save(ctx, productIndex); err != nil {
+					return false, err
+				}
+			}
+		}
+	}
+
+	return true, nil
 }

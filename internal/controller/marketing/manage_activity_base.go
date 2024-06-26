@@ -2,8 +2,8 @@ package marketing
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/marketing"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -22,9 +22,9 @@ func (c *cActivityBase) List(ctx context.Context, req *marketing.ActivityBaseLis
 	input := do.ActivityBaseListInput{}
 	gconv.Scan(req, &input)
 
-	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
+	input.Where.ActivityTypeId = req.ActivityTypeId
 
-	var result, error = service.ActivityBase().List(ctx, &input)
+	var result, error = service.ActivityBase().GetList(ctx, &input)
 
 	if error != nil {
 		err = error
@@ -40,6 +40,8 @@ func (c *cActivityBase) Add(ctx context.Context, req *marketing.ActivityBaseAddR
 
 	input := do.ActivityBase{}
 	gconv.Scan(req, &input)
+
+	input.ActivityName = req.ActivityTitle
 
 	var result, error = service.ActivityBase().Add(ctx, &input)
 
@@ -59,6 +61,8 @@ func (c *cActivityBase) Edit(ctx context.Context, req *marketing.ActivityBaseEdi
 
 	input := do.ActivityBase{}
 	gconv.Scan(req, &input)
+
+	input.ActivityName = req.ActivityTitle
 
 	var result, error = service.ActivityBase().Edit(ctx, &input)
 
@@ -82,6 +86,39 @@ func (c *cActivityBase) Remove(ctx context.Context, req *marketing.ActivityBaseR
 	}
 
 	res = &marketing.ActivityBaseRemoveRes{}
+
+	return
+}
+
+// EditState 活动编辑
+func (c *cActivityBase) EditState(ctx context.Context, req *marketing.ActivityBaseEditStateReq) (res *marketing.ActivityBaseEditStateRes, err error) {
+	// 获取活动详情
+	activityBase, err := service.ActivityBase().Get(ctx, req.ActivityId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 获取当前登录用户
+	user := service.BizCtx().GetUser(ctx)
+	if user == nil {
+		return nil, gerror.New("需要登录")
+	}
+
+	// 更新活动状态
+	activityBase.ActivityState = req.ActivityState
+
+	input := &do.ActivityBase{}
+	gconv.Scan(activityBase, input)
+
+	// 编辑活动
+	success, err := service.ActivityBase().EditActivityBase(ctx, req.ActivityId, input)
+	if err != nil {
+		return nil, err
+	}
+
+	if success == false {
+		return nil, gerror.New("操作失败")
+	}
 
 	return
 }

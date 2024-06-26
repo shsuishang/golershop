@@ -36,6 +36,7 @@ import (
 	"golershop.cn/internal/service"
 	"golershop.cn/utility/array"
 	"sort"
+	"strings"
 )
 
 type sProductBase struct{}
@@ -530,6 +531,8 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
 				}
 			}
 
+			itemSpecName := strings.ReplaceAll(itemVo.ItemName, ",", "")
+			itemVo.ProductItemName = productName + " " + itemSpecName
 			itemVo.ProductName = productName
 			itemVo.ProductTips = productTips
 			itemVo.ProductCommissionRate = productCommissionRate

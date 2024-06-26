@@ -153,6 +153,20 @@ type (
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
+	IProductComment interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductCommentListInput) (out []*entity.ProductComment, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductCommentListInput) (out *do.ProductCommentListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductComment) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductComment) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetList
+		GetList(ctx context.Context, productCommentListReq *do.ProductCommentListInput) (productCommentPage *do.ProductCommentListOutput, err error)
+	}
 	IProductAssist interface {
 		// Get 读取属性
 		Get(ctx context.Context, id any) (out *entity.ProductAssist, err error)
@@ -230,6 +244,7 @@ var (
 	localProductType       IProductType
 	localProductSpec       IProductSpec
 	localProductTag        IProductTag
+	localProductComment    IProductComment
 	localProductAssistItem IProductAssistItem
 	localProductBase       IProductBase
 	localProductCategory   IProductCategory
@@ -334,6 +349,17 @@ func ProductTag() IProductTag {
 
 func RegisterProductTag(i IProductTag) {
 	localProductTag = i
+}
+
+func ProductComment() IProductComment {
+	if localProductComment == nil {
+		panic("implement not found for interface IProductComment, forgot register?")
+	}
+	return localProductComment
+}
+
+func RegisterProductComment(i IProductComment) {
+	localProductComment = i
 }
 
 func ProductAssistItem() IProductAssistItem {
