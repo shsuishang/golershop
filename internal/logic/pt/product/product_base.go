@@ -23,6 +23,8 @@ package product
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -37,6 +39,7 @@ import (
 	"golershop.cn/utility/array"
 	"sort"
 	"strings"
+	"time"
 )
 
 type sProductBase struct{}
@@ -572,4 +575,81 @@ func (s *sProductBase) checkSingleActivity(ctx context.Context, activityTypeId u
 	}
 
 	return true
+}
+
+// BatchEditState 批量编辑商品状态
+func (s *sProductBase) BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error) {
+	var productSaleTime time.Time
+
+	for _, productId := range productIds {
+		productBase, err := dao.ProductBase.Get(ctx, productId)
+		if err != nil {
+			return false, err
+		}
+		if productBase == nil {
+			return false, errors.New("商品不存在！")
+		}
+
+		productIndex, err := dao.ProductIndex.Get(ctx, productId)
+		if err != nil {
+			return false, err
+		}
+		if productIndex == nil {
+			return false, errors.New("商品索引数据有误！")
+		}
+
+		switch productStateId {
+		case consts.PRODUCT_STATE_NORMAL:
+			productVerifyId := productIndex.ProductVerifyId
+			if productVerifyId == consts.PRODUCT_VERIFY_WAITING || productVerifyId == consts.PRODUCT_VERIFY_REFUSED {
+				return false, fmt.Errorf("商品编号: %d 尚未审核通过，无法上架！", productIndex.ProductId)
+			}
+
+			productItemQuery := &do.ProductItemListInput{
+				Where: do.ProductItem{ProductId: productId},
+			}
+			productItemList, err := dao.ProductItem.Find(ctx, productItemQuery)
+			if err != nil {
+				return false, err
+			}
+
+			if len(productItemList) > 0 {
+				itemEnable := false
+				for _, item := range productItemList {
+					if item.ItemEnable == consts.PRODUCT_STATE_NORMAL {
+						itemEnable = true
+						break
+					}
+				}
+				if !itemEnable {
+					return false, fmt.Errorf("SPU编号: %d，由于SKU商品都处于下架仓库中，无法上架！", productId)
+				}
+			}
+
+			productSaleTime = time.Now()
+		case consts.PRODUCT_STATE_OFF_THE_SHELF:
+			productSaleTime = time.Now().AddDate(10, 0, 0) // 待上架时间，此处添加了10年
+		case consts.PRODUCT_STATE_ILLEGAL:
+			// 违规下架
+			/* messageId := "illegal-commodity-shelves"
+			args := map[string]interface{}{
+				"des":         "",
+				"productId":   productId,
+				"productName": productIndex.ProductName,
+			}
+			messageService.SendNoticeMsg(0, messageId, args) */
+		}
+
+		productIndex.ProductStateId = productStateId
+		productIndex.ProductSaleTime = uint64(productSaleTime.Unix())
+
+		newProductIndex := &do.ProductIndex{}
+		gconv.Scan(productIndex, newProductIndex)
+		_, err = dao.ProductIndex.Edit(ctx, productId, newProductIndex)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return true, err
 }

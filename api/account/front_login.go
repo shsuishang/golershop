@@ -6,7 +6,7 @@ import (
 )
 
 type LoginReq struct {
-	g.Meta   `path:"/front/account/login/login" tags:"login" method:"post" summary:"登录接口"`
+	g.Meta   `path:"/front/account/login/login" tags:"login" method:"post" method:"post,get" summary:"登录接口"`
 	UserName string `p:"username" v:"required|length:4,30#请输入登录账号|账号长度为：min-max位"`
 	Password string `p:"password" v:"required|length:5,9999#请输入密码|密码长度为：min-max位"`
 	Captcha  string `p:"verify_code"`

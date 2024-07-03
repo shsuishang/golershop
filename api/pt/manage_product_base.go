@@ -267,3 +267,11 @@ type ProductBaseItemListRes struct {
 	Records      int                         `json:"records"` // 数据总数
 	Size         int                         `json:"size"`    // 单页数量
 }
+
+type BatchEditStateReq struct {
+	g.Meta `path:"/manage/pt/productBase/batchEditState" tags:"批量修改商品状态" method:"post" summary:"批量修改商品状态"`
+
+	ProductIds     string `json:"product_ids"                  ` // 产品编号
+	ProductStateId uint   `json:"product_state_id"            `  // 商品状态:1001-正常;1002-下架仓库中;1003-待审核; 1000-违规禁售
+}
+type BatchEditStateRes struct{}

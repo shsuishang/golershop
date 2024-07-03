@@ -60,7 +60,10 @@ type (
 		RemoveProdcut(ctx context.Context, id any) (affected int64, err error)
 		// GetProduct 读取商品信息
 		GetProduct(ctx context.Context, id any) (productData model.ProductDateOutput, err error)
+		// GetItems 读取商品信息
 		GetItems(ctx context.Context, itemIds []uint64, userId uint) (out []*model.ProductItemVo, err error)
+		// BatchEditState 批量编辑商品状态
+		BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error)
 	}
 	IProductCategory interface {
 		// 读取商品分类

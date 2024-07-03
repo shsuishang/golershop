@@ -9,6 +9,8 @@ import (
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
+	"strconv"
+	"strings"
 )
 
 var (
@@ -164,4 +166,29 @@ func (c *cProduct) ListItem(ctx context.Context, req *pt.ProductBaseItemListReq)
 	gconv.Scan(result, &res)
 
 	return
+}
+
+// BatchEditState 批量修改商品状态
+func (c *cProductBase) BatchEditState(ctx context.Context, req *pt.BatchEditStateReq) (res *pt.BatchEditStateRes, err error) {
+	idStrings := strings.Split(req.ProductIds, ",")
+	var ids []uint64
+	for _, idStr := range idStrings {
+		id, err := strconv.ParseUint(idStr, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+
+	// 调用 Golershop 的服务进行批量修改状态操作
+	success, err := service.ProductBase().BatchEditState(ctx, ids, req.ProductStateId)
+	if err != nil {
+		return nil, err
+	}
+
+	if success {
+		return
+	} else {
+		return
+	}
 }
