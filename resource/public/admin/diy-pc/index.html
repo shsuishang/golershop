@@ -1,0 +1,3207 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>首页可视化布局系统</title>
+  <meta name="keywords" content="可视化,操作,布局">
+  <meta name="description" content="可拖放排序在线编辑的Bootstrap可视化布局系统">
+
+  <!-- Le styles -->
+  <link rel="stylesheet" type="text/css" href="./static/shop/common/css/bootstrap.css?v=2.0.277"/>
+  <link rel="stylesheet" type="text/css" href="./static/shop/common/css/common.css?v=2.0.277"/>
+  <link rel="stylesheet" type="text/css" href="./static/shop/default/css/default.css?v=2.0.277"/>
+
+
+  <link href="./static/admin/default/css/page_layout.css?v=2.0.277" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="./static/shop/default/css/option2.css?v=2.0.277"/>
+
+  <link rel="stylesheet" type="text/css" media="screen" href="./static/admin/common/css/dialog.css" />
+
+  <style>
+
+    .icon-radio {
+      display: inline-block;
+      *zoom:1;*display: inline;
+      width: 14px;
+      height: 14px;
+      border-radius: 7px;
+      background-color: #fff;
+      position: relative;
+      -webkit-transition: all .3s ease;
+      transition: all .3s ease
+    }
+
+    .icon-radio:before {
+      content: "";
+      display: block;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 11px;
+      position: absolute;
+      top: -3px;
+      left: -3px
+    }
+
+    .modal-choose-pro
+    {
+      margin:0px;
+      width: auto;
+
+    }
+
+    .modal-choose-pro .modal-content {
+      padding:10px;
+    }
+
+
+    .modal-choose-pro .modal-footer {
+      padding:10px;
+    }
+
+    .modal-choose-pro .list li
+    {
+      margin:0 10px;
+      height: auto;
+    }
+    .modal-choose-pro .list li img{
+
+      height: 100px;
+    }
+
+
+    form .form-group-separator {
+      height: 1px;
+      background: #eee;
+      margin-bottom: 15px;
+    }
+
+
+
+
+    .products-block-left {
+      background-color: #FFF;
+      text-align: center;
+      padding: 4px;
+      border: dashed 1px #DDD;
+      position: relative;
+      z-index: 1;
+    }
+
+    .products-block-left:hover {
+      border: solid 1px #19AEDE;
+      box-shadow: 0 0 6px rgba(0,0,0,0.25);
+    }
+
+    .products-block-left a {
+      color: #FFF;
+      background-color: #19AEDE;
+      display: none;
+      padding: 4px 8px;
+      position: absolute;
+      z-index: 1;
+      top: 4px;
+      right: 4px;
+      cursor: pointer;
+    }
+
+    .products-block-left a i {
+      font-size: 14px;
+      margin-right: 4px;
+    }
+
+    .products-block-left:hover a {
+      display: block;
+    }
+
+    .product-container
+    {
+      margin-bottom: 20px;
+    }
+  </style>
+
+
+  <script type="text/javascript">
+    window.SYS = {CONFIG:{}, URL:{}};
+    window.zIndex = 2976;
+
+
+    SYS.CONFIG['static_url'] = '/diy-pc/static/admin'
+    SYS.LD = {lang:'zh_CN', currency_id:86, symbol:'￥', symbol_right:'RMB'};
+
+    function getUrlParam(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]); return null;
+    }
+
+    api_url = getUrlParam('api_url');
+  </script>
+
+  <script type="text/javascript" src="../config.js?v=2.0.278"></script>
+
+
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+  <script src="./static/admin/common/js/html5shiv.js?v=2.0.277"></script>
+  <![endif]-->
+  <script src="./static/admin/common/js/libs.min.js?v=2.0.277?self=false"></script>
+
+  <script type="text/javascript" src="./static/admin/common/js/vue.min.js?v=2.0.277"></script>
+
+  <script type="text/javascript" src="./static/shop/common/js/common.js?v=2.0.277"></script>
+  <script type="text/javascript" src="./static/shop/default/js/default.js?v=2.0.277"></script>
+
+
+  <script type="text/javascript" src="./static/admin/common/js/jquery-ui.min.js?v=2.0.277"></script>
+  <script type="text/javascript" src="./static/admin/common/js/jquery.ui.touch-punch.min.js?v=2.0.277"></script>
+  <script type="text/javascript" src="./static/admin/common/js/plugins/jquery.htmlClean.js?v=2.0.277"></script>
+  <script type="text/javascript" src="./static/admin/common/js/ckeditor/ckeditor.js?v=2.0.277"></script>
+  <script type="text/javascript" src="./static/admin/common/js/ckeditor/config.js?v=2.0.277"></script>
+
+
+</head>
+
+<body style="min-height: 824px;padding-top:0px;margin-left:0px;padding: 20px;" class="edit home ">
+
+
+<div class="page-container">
+  <!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+  <div class="main-content" style="">
+
+
+    <div class="container">
+      <!--row-->
+      <div class="row">
+        <a href="#add" class="add btn btn-default" data-target="#addConponentModal"  data-toggle="modal" style="position:relative;margin: 20px 0"><i class="glyphicon-plus glyphicon"></i>添加新的楼层</a>
+        <div style="min-height: 763px;" class="demo changeDimension">
+        </div>
+
+        <div id="download-layout">
+          <div class="container">
+          </div>
+        </div>
+      </div>
+      <!--/row-->
+
+
+      <script type="text/javascript">
+        window.is_diy_page = true;
+        $(document).ready(function ()
+        {
+          // alert($('#download-layout').html());
+        });
+      </script>
+    </div>
+    <!--/.fluid-container-->
+  </div>
+</div>
+
+
+<!-- box product special-products -->
+<!--<div class="box-products special-products">
+    <div class="container">
+        <div class="box-product-head">
+            <span class="box-title">SPECIAL PRODUCTS</span>
+            <ul class="box-tabs nav-tab">
+                <li><a data-toggle="tab" href="#tab-6">All</a></li>
+                <li class="active"><a data-toggle="tab" href="#tab-5">Women Fashion</a></li>
+                <li><a data-toggle="tab" href="#tab-6">Bags</a></li>
+                <li><a data-toggle="tab" href="#tab-5">SHOES</a></li>
+                <li><a data-toggle="tab" href="#tab-6">GLASSES</a></li>
+            </ul>
+        </div>
+        <div class="box-product-content">
+            <div class="box-product-adv">
+                <ul class="owl-carousel nav-center" data-items="1" data-dots="false" data-autoplay="true" data-loop="true" data-nav="true">
+                    <li><a href="#"><img src="https://dev.suteshop.com/assets/data/option3/adv3.jpg" alt="adv"></a></li>
+                    <li><a href="#"><img src="https://dev.suteshop.com/assets/data/option3/adv3.jpg" alt="adv"></a></li>
+                </ul>
+            </div>
+            <div class="box-product-list">
+                <div class="tab-container">
+                    <div id="tab-5" class="tab-panel active">
+                        <ul class="product-list owl-carousel nav-center" data-dots="false" data-loop="true" data-nav = "true" data-margin = "10" data-responsive='{"0":{"items":1},"600":{"items":3},"1000":{"items":4}}'>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p22.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Luxury Perfume</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                                <div class="price-percent-reduction2">
+                                    -8% OFF
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p23.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Blue Diamond Ring</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html#"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p24.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Superior Bag</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p25.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Luxury Lady</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p26.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Smart Phone</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="tab-6" class="tab-panel">
+                        <ul class="product-list owl-carousel" data-dots="false" data-loop="true" data-nav = "true" data-margin = "10" data-responsive='{"0":{"items":1},"600":{"items":3},"1000":{"items":4}}'>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p27.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Luxury Perfume</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                                <div class="price-percent-reduction2">
+                                    -30% OFF
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p28.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Blue Diamond Ring</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p29.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Superior Bag</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p30.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Luxury Lady</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="left-block">
+                                    <a href="detail.html"><img class="img-responsive" alt="product" src="https://dev.suteshop.com/assets/data/option3/p22.jpg" /></a>
+                                    <div class="quick-view">
+                                        <a title="Add to my wishlist" class="heart" href="#"></a>
+                                        <a title="Add to compare" class="compare" href="#"></a>
+                                        <a title="Quick view" class="search" href="#"></a>
+                                    </div>
+                                    <div class="add-to-cart">
+                                        <a title="Add to Cart" href="#">Add to Cart</a>
+                                    </div>
+                                </div>
+                                <div class="right-block">
+                                    <h5 class="product-name"><a href="detail.html">Smart Phone</a></h5>
+                                    <div class="content_price">
+                                        <span class="price product-price">$38,95</span>
+                                        <span class="price old-price">$52,00</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>-->
+<!-- ./box product SPECIAL PRODUCTS -->
+
+<div style="display: none;" class="modal fade" id="downloadModal" tabindex="-1" role="dialog"
+     aria-labelledby="downloadModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">下载</h4>
+      </div>
+      <div class="modal-body">
+
+        <div id="download-logged" class="">
+          <div class="alert alert-info">已在下面生成干净的HTML, 可以复制粘贴代码到你的body内<br>
+            请使用bootstrap3.0.1,可在这里下载 <a target="_blank" href="http://www.bootcdn.cn/bootstrap/">http://www.bootcdn.cn/bootstrap</a>
+          </div>
+          <p>
+            <textarea></textarea>
+          </p>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+
+</div>
+
+<div style="display: none;" class="modal fade" id="editorModal" tabindex="-2" role="dialog"
+     aria-labelledby="editorModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">Save your Layout</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+          <textarea id="contenteditor"></textarea>
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="savecontent" class="btn btn-primary" data-dismiss="modal">确定</a> <a
+        rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+
+<div style="display: none;" class="modal fade" id="editorConponentModal" tabindex="-2" role="dialog"
+     aria-labelledby="editorConponentModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑模块内容</h4>
+      </div>
+      <div class="modal-body" id="editor-conponent-module-body">
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="saveConponentContentBtn" class="btn btn-primary" data-dismiss="modal">确定</a> <a
+        rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+
+<div style="display: none;" class="modal fade modal-choose-pro" id="addConponentModal" tabindex="-2" role="dialog"
+     aria-labelledby="addConponentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width: 100%">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">选择模块</h4>
+      </div>
+      <div class="modal-body row" id="add-conponent-module-body">
+        <div class="col-xs-12 clearfix">
+          <ul class="clearfix list J_chooseProList ">
+            <li class="span4  "  v-for="(item, index) in items" :data-module_id="item.module_id"  :data-item="item"> <img width="60" height="60" :src="item.module_preview"> <p class="g-name">{{item.module_name}}</p><i class="icon-radio"></i> </li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="saveAddConponentContent" class="btn btn-primary" data-dismiss="modal">确定</a> <a
+        rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+
+<div style="display: none;" class="modal fade" id="editorCustomModal" tabindex="-2" role="dialog"
+     aria-labelledby="editorCustomModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑模块内容</h4>
+      </div>
+      <div class="modal-body" id="custom-module-body">
+        <p>
+          自定义编辑
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="saveCustomContent" class="btn btn-primary" data-dismiss="modal">确定</a> <a
+        rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<div style="display: none;" class="modal fade" role="dialog" id="saveModal" aria-labelledby="saveModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">保存</h4>
+      </div>
+      <div class="modal-body">
+        保存成功            </div>
+      <div class="modal-footer">
+        <a rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!----------------------------------------- 弹出框 start----------------------------------------->
+<div style="display: none;" class="modal fade" id="edit-floor-title" tabindex="-2" role="dialog" aria-labelledby="edit-floor-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑模块内容</h4>
+      </div>
+      <div class="modal-body" id="custom-module-body">
+        <div id="manage-wrap">
+          <div class="manage-edit-box">
+            <div class="box-main">
+              <div class="form-section">
+                <label class="input-label" for="link">楼层链接</label>
+                <input type="text" class="input-text form-control" name="floor-link" id="floor-link" placeholder="楼层链接" autocomplete="off">
+              </div>
+              <div class="form-section">
+                <label class="input-label" for="link-name">楼层名称</label>
+                <input type="text" class="input-text form-control" name="floor-title" id="floor-title" placeholder="楼层名称" autocomplete="off">
+              </div>
+              <div class="form-section">
+                <label class="input-label" for="floor-icon">楼层图标</label>
+
+                <a href="#" data-toggle="image" class="img-thumbnail  picture_upload_replace" id="floor-icon">
+                  <input type="hidden" class="input-text form-control" name="link-img-url" id="floor-icon-url" value="./static/admin/common/images/image.png" />
+                  <img src="./static/admin/common/images/image.png" width="30" height="30" data-toggle="tooltip" /><em class="pur-edit"></em>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="saveConponentContent" class="btn btn-primary" data-dismiss="modal">确定</a>
+        <a rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div style="display: none;" class="modal fade" id="edit-adv" tabindex="-2" role="dialog" aria-labelledby="edit-adv" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title">编辑模块内容</h4>
+      </div>
+      <div class="modal-body" id="custom-module-body">
+        <div id="manage-wrap">
+          <div class="manage-edit-box">
+            <div class="box-main">
+              <div class="form-section">
+                <label class="input-label" for="link">广告链接</label>
+                <input type="text" class="input-text form-control" name="adv-url" id="adv-url" placeholder="广告链接" autocomplete="off">
+              </div>
+              <div class="form-section">
+                <label class="input-label" for="category_image">广告图片</label>
+                <a href="#" data-toggle="image" class="img-thumbnail  picture_upload_replace" id="adv-img">
+                  <input type="hidden" class="input-text form-control" name="adv-img-url" id="adv-img-url" value="./static/admin/common/images/image.png" />
+                  <img src="./static/admin/common/images/image.png" width="585" height="65" data-toggle="tooltip" /><em class="pur-edit"></em>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a rel="nofollow" id="saveConponentContent" class="btn btn-primary" data-dismiss="modal">确定</a>
+        <a rel="nofollow" class="btn" data-dismiss="modal">取消</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!----------------------------------------- 弹出框 end------------------------------------------->
+
+
+
+<script type="text/x-template" id="module_id_1001-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+
+            <!-- 内容开始 -->
+            <!-- featured category furniture -->
+            <div class="category-featured" id="pm_id_%d"  :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <nav class="navbar nav-menu" :class="(setting.showFloorName=='1' ? 'show-brand' : '') + ' '  + setting.className ">
+                <div class="container">
+                  <!-- Brand and toggle get grouped for better mobile display -->
+                  <div class="navbar-brand">
+                    <span class="modify item_modify_l label label-info" data-target="#editorConponentModal" :data-key="'floor'" :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="floor.url"><img alt="fashion" :src="floor.picimg" />{{floor.name}}</a>
+                  </div>
+                  <span class="toggle-menu"></span>
+                  <!-- Collect the nav links, forms, and other content for toggling -->
+                  <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                      <li  v-for="(tab, index) in tabs" :class="{ active: 0==index }">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i></span>
+                        <span  class="modify item_remove label label-danger"  :data-key="'tabs'"  :data-index="index"   :data-pm_id="pm_id" ><i class="glyphicon glyphicon-remove"></i></span>
+                        <a data-toggle="tab" :href="'#tab-' + pm_id + '-' + index + ''">{{tab.name}}</a></li>
+
+
+                      <li>
+                        <span  class="label label-info item_add-tab"  data-key="tabs"  :data-pm_id="pm_id" style="cursor: pointer"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                  </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+                <div id="elevator-5" class="floor-elevator">
+                  <a href="#elevator-4" class="btn-elevator up fa fa-angle-up"></a>
+                  <a href="#elevator-6" class="btn-elevator down fa fa-angle-down"></a>
+                </div>
+              </nav>
+              <div class="category-banner">
+                <div class="col-sm-6 banner">
+                  <span  class="modify item_modify label label-info" data-img-size="585x65" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner1.url"><img alt="ads2" class="img-responsive" :src="banner1.picimg" /></a>
+                </div>
+                <div class="col-sm-6 banner">
+                  <span  class="modify item_modify label label-info" data-img-size="585x65" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner2.url"><img alt="ads2" class="img-responsive" :src="banner2.picimg" /></a>
+                </div>
+              </div>
+              <div class="product-featured clearfix">
+                <div class="banner-featured">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <div class="featured-text"><span>featured</span></div>
+                  <div class="banner-img">
+                    <a :href="banner3.url"><img alt="Featurered 1" :src="banner3.picimg" /></a>
+                  </div>
+                </div>
+                <div class="product-featured-content">
+                  <div class="product-featured-list">
+                    <div class="tab-container autoheight">
+                      <!-- tab product -->
+                      <div class="tab-panel"   v-for="(tab, index) in tabs" :class="{ active: 0==index }" :id="'tab-' + pm_id + '-' + index + ''">
+                        <ul class="product-list owl-carousel"  data-dots="false" data-loop="true" data-nav = "true" data-margin = "0" data-autoplayTimeout="1000" data-autoplayHoverPause = "true" data-responsive='{"0":{"items":1},"600":{"items":3},"1000":{"items":4}}'>
+                          <li v-for="(item, index) in tab.items">
+                            <div class="left-block">
+                              <a href="detail.html"><img class="img-responsive" alt="product" :src="item.picimg" /></a>
+                              <div class="quick-view">
+                                <a title="Add to my wishlist" class="heart" href="#"></a>
+                                <a title="Add to compare" class="compare" href="#"></a>
+                                <a title="Quick view" class="search"  data-style="contract" data-size="xs" href="https://store.shopsuite.cn/index.php/Product/quick" data-type="ajax" data-src="https://store.shopsuite.cn/index.php/Product/quick"></a>
+                              </div>
+                              <div class="add-to-cart">
+                                <a class="ajax_add_to_cart_button" data-rel="nofollow"  data-id-product="56" data-minimal_quantity="1" title="Add to Cart" href="#">Add to Cart</a>
+                              </div>
+                            </div>
+                            <div class="right-block">
+                              <h5 class="product-name"><a href="detail.html">Maecenas consequat mauris</a></h5>
+                              <div class="content_price">
+                                <span class="price product-price">$38,95</span>
+                                <span class="price old-price">$52,00</span>
+                              </div>
+                              <div class="product-star">
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star"></i>
+                                <i class="fa fa-star-half-o"></i>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                      <!-- tab product -->
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end featured category furniture-->
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1013-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+
+            <!-- 内容开始 -->
+            <!-- featured category furniture -->
+            <div class="floor_theme4-container" id="pm_id_%d"  :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <div class="floor_theme4-content">
+                <div class="layerBox">
+                  <div class="title bb">
+                    <span class="flag metal"></span>
+                    <span class="modify item_modify_l label label-info" data-target="#editorConponentModal" :data-key="'floor'" :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <h2>{{floor.name}}</h2>
+                    <h5></h5>
+                    <span cid="0" class="category">
+                                            <div>
+                                                <ul class="" style="display: inline-flex;">
+                                                    <li  v-for="(tab, index) in tabs" :class="{ active: 0==index }">
+                                                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i></span>
+                                                        <span  class="modify item_remove label label-danger"  :data-key="'tabs'"  :data-index="index"   :data-pm_id="pm_id" ><i class="glyphicon glyphicon-remove"></i></span>
+                                                        <a data-toggle="tab" :href="'#tab-' + pm_id + '-' + index + ''">{{tab.name}}</a></li>
+
+
+                                                    <li>
+                                                        <span  class="label label-info item_add-tab"  data-key="tabs"  :data-pm_id="pm_id" style="cursor: pointer"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                                                    </li>
+                                                </ul>
+                                            </div><!-- /.navbar-collapse -->
+
+					                    </span>
+                    <div id="elevator-5" class="floor-elevator hide">
+                      <a href="#elevator-4" class="btn-elevator up fa fa-angle-up"></a>
+                      <a href="#elevator-6" class="btn-elevator down fa fa-angle-down"></a>
+                    </div>
+                  </div>
+                  <div class="product-featured clearfix conBox">
+                    <div class="imgLeft" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner1.url" target="_blank">
+                        <img  :alt="banner1.name"
+                              :src="banner1.picimg">
+                      </a>
+                    </div>
+
+                    <div class="">
+                      <div class="">
+                        <div class="tab-container autoheight">
+                          <!-- tab product -->
+                          <div class="tab-panel"   v-for="(tab, index) in tabs" :class="{ active: 0==index }" :id="'tab-' + pm_id + '-' + index + ''">
+                            <ul class="product-list"  data-dots="false" data-loop="true" data-nav = "true" data-margin = "0" data-autoplayTimeout="1000" data-autoplayHoverPause = "true" data-responsive='{"0":{"items":1},"600":{"items":3},"1000":{"items":4}}'>
+                                                            <span class="cbb">
+                                                                <a v-for="(item, index) in tab.items"  class="skuBox split bb" href="/item/RJ1574" target="_blank">
+                                                                    <div class="tagBox"></div>
+                                                                    <div class="skuImgBox">
+                                                                        <img class="skuImg" :src="item.picimg">
+                                                                    </div>
+                                                                    <div class="skuDetails" title="{{ item.name }}">
+                                                                        {{ item.name }}
+                                                                    </div>
+                                                                    <div class="priceBox tc hide"><button class="btn btn-outline btn-sm btnTag"
+                                                                                                          onclick="checkUserInfo(event)">认证即享批发价</button></div>
+                                                                </a>
+                                                            </span>
+                            </ul>
+                          </div>
+                          <!-- tab product -->
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="brandBox">
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b1.url" target="_blank">
+                        <img  :alt="b1.name"
+                              :src="b1.picimg">
+                      </a>
+                    </div>
+
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b2.url" target="_blank">
+                        <img  :alt="b2.name"
+                              :src="b2.picimg">
+                      </a>
+                    </div>
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b3.url" target="_blank">
+                        <img  :alt="b3.name"
+                              :src="b3.picimg">
+                      </a>
+                    </div>
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b4.url" target="_blank">
+                        <img  :alt="b4.name"
+                              :src="b4.picimg">
+                      </a>
+                    </div>
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b5.url" target="_blank">
+                        <img  :alt="b5.name"
+                              :src="b5.picimg">
+                      </a>
+                    </div>
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b6'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b6.url" target="_blank">
+                        <img  :alt="b6.name"
+                              :src="b6.picimg">
+                      </a>
+                    </div>
+
+                    <div style="position: relative;width: 164px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'b7'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="b7.url" target="_blank">
+                        <img  :alt="b7.name"
+                              :src="b7.picimg">
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end featured category furniture-->
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/x-template" id="module_id_1002-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div id="pm_id_%d" class="view-product-list"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <ul class="row product-list grid">
+                <li class="col-xs-6 col-sm-4 col-md-3" v-for="(item, index) in items">
+                  <div class="product-container">
+                    <div class="left-block figure-img">
+                      <a  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'items[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+                      <a class="item_link" data-pjax="#page-container" :href="item.url">
+                        <img class="img-responsive" alt="商品图片" :src="item.picimg"/>
+                      </a>
+                      <div class="add-to-cart">
+                        <a title="加入购物车" href="#add" data-item_id="1025">{{ item.name }}</a>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<script type="text/x-template" id="module_id_1003-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <!-- Home slideder-->
+          <div class="home-slider" id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="container">
+              <div class="row">
+                <div class="col-sm-3 slider-left"></div>
+                <div class="col-sm-9 header-top-right">
+                  <div class="homeslider">
+                    <div class="content-slide">
+                      <div class="owl-carousel" data-margin="0" data-items="1" data-nav="true" data-autoplay="true" data-loop="true" style="position: relative;">
+
+                        <a    v-for="(item, index) in items" :href="item.url">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'items[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal" ><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'items'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <img :alt="item.name" :src="item.picimg"  height="453" />
+                        </a>
+
+
+                        <a >
+                          <span  class="label label-info item_add"  data-key="items" data-imgsize="1920x453"  :data-pm_id="pm_id" style="cursor: pointer"><i class="glyphicon glyphicon-edit"></i>  添加 </span><img src=""  height="453" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="header-banner banner-opacity">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="banner.url"><img :alt="banner.name" :src="banner.picimg" /></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- END Home slideder-->
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+
+
+
+<script type="text/x-template" id="module_id_3001-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+
+          <!-- Home slideder-->
+          <!-- Slide -->
+          <div class="full-width-homeslider-box"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="section-slide">
+              <div class="owl-carousel" data-margin="0" data-items="1" data-nav="true" data-autoplay="true" data-loop="true" style="position: relative;">
+
+                <a    v-for="(item, index) in items" :href="item.url">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'items[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal" style="right: 300px;"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <span :data-key="'items'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 260px;"><i class="glyphicon glyphicon-remove"></i></span>
+                  <img :alt="item.name" :src="item.picimg"  height="453" />
+                </a>
+
+
+                <a >
+                  <span  class="label label-info item_add"  data-key="items" data-imgsize="1920x453"  :data-pm_id="pm_id" style="cursor: pointer"><i class="glyphicon glyphicon-edit"></i>  添加 </span><img src=""  height="453" />
+                </a>
+              </div>
+
+              <div class="container">
+                <div class="row">
+                  <div class="section-slide-banner-box-1">
+                    <ul class="section-slide-banner">
+                      <li style="position: relative">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <a :href="banner1.url"><img :alt="banner1.name" :src="banner1.picimg" /></a>
+                      </li>
+                      <li style="position: relative">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <a :href="banner2.url"><img :alt="banner2.name" :src="banner2.picimg" /></a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Slide -->
+          <!-- 内容结束 -->
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+
+
+<script type="text/x-template" id="module_id_1004-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div class="option2 category-featured electronic" id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <nav class="navbar nav-menu" :class="(setting.showFloorName=='1' ? 'show-brand' : '')">
+                <div class="container">
+                  <!-- Brand and toggle get grouped for better mobile display -->
+                  <div class="navbar-brand">
+                    <!-- 楼层title -->
+                    <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify_l label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a :href="floor.link"><img :alt="floor.name" :src="floor.picimg">{{ floor.name }}</a>
+                  </div>
+                  <span class="toggle-menu"></span>
+                  <!-- Collect the nav links, forms, and other content for toggling -->
+                  <div class="collapse navbar-collapse">
+                    <!-- tabs -->
+                    <ul class="nav navbar-nav">
+                      <li v-for="(tab, index) in tabs" :class="{ active: index === 0 }">
+                        <span data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i></span>
+                        <span :data-key="tabs.index" :data-index="index" :data-pm_id="pmId" class="modify item_remove label label-danger"><i class="glyphicon glyphicon-remove"></i></span>
+                        <a data-toggle="tab" :href="getTabId(index, true)">{{ tab.name }}</a>
+                      </li>
+                      <li>
+                        <span  class="label label-info item_add-tab"  data-key="tabs"  :data-pm_id="pm_id" style="cursor: pointer"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                    <!-- tabs -->
+                  </div><!-- /.navbar-collapse -->
+                </div><!-- /.container-fluid -->
+                <div id="elevator-3" class="floor-elevator">
+                  <a href="#elevator-2" class="btn-elevator up fa fa-angle-up"></a>
+                  <a href="#elevator-4" class="btn-elevator down fa fa-angle-down"></a>
+                </div>
+              </nav>
+              <div class="product-featured clearfix">
+                <div class="row">
+                  <div class="col-sm-2 sub-category-wapper">
+                    <!-- 左侧链接列表 -->
+                    <span data-target="#editorConponentModal" data-key="links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <ul class="sub-category-list">
+                      <li v-for="linkData in links"><a :href="linkData.link">{{ linkData.name }}</a></li>
+                    </ul>
+                    <!-- 左侧链接列表 -->
+                  </div>
+                  <div class="col-sm-10 col-right-tab">
+                    <div class="product-featured-tab-content">
+                      <div class="tab-container">
+                        <!-- 对应tab商品列表 限定商品个数6个 -->
+                        <div v-for="(tab, index) in tabs" class="tab-panel" :class="{active: index === 0}" :id="getTabId(index)">
+                          <div class="box-left">
+                            <!-- 广告图片，重复渲染多次 -->
+                            <div class="banner-img">
+                              <span data-target="#editorConponentModal" data-key="banner" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                              <a :href="banner.link"><img :src="banner.picimg" :alt="banner.name"></a>
+                            </div>
+                          </div>
+                          <div class="box-right">
+                            <ul class="product-list row">
+                              <li v-for="(item, productCount) in tab.items" v-if="productCount < 6" class="col-sm-4">
+                                <div class="right-block">
+                                  <h5 class="product-name"><a href="detail2.html">{{ item.name }}</a></h5>
+                                  <div class="content_price">
+                                    <span class="price product-price">$38,95</span>
+                                  </div>
+                                </div>
+                                <div class="left-block">
+                                  <a :href="item.link">
+                                    <img class="img-responsive" :alt="item.name" :src="item.picimg"></a>
+                                  <div class="quick-view">
+                                    <a title="Add to my wishlist" class="heart" href="#"></a>
+                                    <a title="Add to compare" class="compare" href="#"></a>
+                                    <a title="Quick view" class="search" href="#"></a>
+                                  </div>
+                                  <div class="add-to-cart">
+                                    <a title="Add to Cart" href="#">Add to Cart</a>
+                                  </div>
+                                </div>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <!-- 对应tab商品列表 限定商品个数6个 -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="module_id_1005-template">
+
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a class="modify  label label-info" data-target="#editorConponentModal" data-key="setting" data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i> 编辑</a>
+    <a class="modify enable label label-warning JS_pm_enable" data-key="$data" data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i> %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div class="box-products special-products" id="pm_id_%d"  :class="setting.className"  :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <div class="container">
+                <div class="box-product-head">
+                  <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify_l label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                  <span class="box-title">{{ floor.name }}</span>
+                  <!-- tab列表 -->
+                  <span data-key="tabs" :data-pm_id="pmId" class="label label-info item_add-tab" style="cursor: pointer;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                  <ul class="box-tabs nav-tab">
+                    <li v-for="(tab, index) in tabs" :class="{ active: index === 0 }" style="position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i></span>
+                      <span  class="modify item_remove label label-danger"  :data-key="'tabs'"  :data-index="index"   :data-pm_id="pm_id" ><i class="glyphicon glyphicon-remove"></i></span>
+                      <a data-toggle="tab" :href="getTabId(index, true)">{{ tab.name }}</a>
+                    </li>
+                  </ul>
+                  <!-- tab列表 -->
+                </div>
+                <div class="box-product-content"  style="position: relative">
+                  <div class="box-product-adv">
+                    <span data-target="#editorConponentModal" data-key="banners" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify_l label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <!-- 广告图片列表 -->
+                    <ul class="owl-carousel nav-center" data-items="1" data-dots="false" data-autoplay="true" data-loop="true" data-nav="true">
+                      <li v-for="item in banners.items"><a :href="item.link"><img :src="item.picimg" :alt="item.name"></a></li>
+                    </ul>
+                    <!-- 广告图片列表 -->
+                  </div>
+                  <div class="box-product-list">
+                    <div class="tab-container">
+                      <!-- tab下对应的商品列表 -->
+                      <div v-for="(tab, index) in tabs" :id="getTabId(index)" class="tab-panel" :class="{  active: index === 0 }">
+                        <!-- 商品列表 -->
+                        <ul class="product-list owl-carousel nav-center" data-dots="false" data-loop="true" data-nav="true" data-margin="10" data-responsive='{"0":{"items":1},"600":{"items":3},"1000":{"items":4}}'>
+                          <li v-for="productItem in tab.items">
+                            <div class="left-block">
+                              <a :href="productItem.link"><img class="img-responsive" :alt="productItem.name" :src="productItem.picimg" /></a>
+                              <div class="quick-view">
+                                <a title="Add to my wishlist" class="heart" href="#"></a>
+                                <a title="Add to compare" class="compare" href="#"></a>
+                                <a title="Quick view" class="search" href="#"></a>
+                              </div>
+                              <div class="add-to-cart">
+                                <a title="Add to Cart" href="#">Add to Cart</a>
+                              </div>
+                            </div>
+                            <div class="right-block">
+                              <h5 class="product-name">
+                                <a :href="productItem.link">{{ productItem.name }}</a>
+                              </h5>
+                              <div class="content_price">
+                                <span class="price product-price">$38,95</span>
+                                <span class="price old-price">$52,00</span>
+                              </div>
+                            </div>
+                            <div class="price-percent-reduction2">
+                              -8% OFF
+                            </div>
+                          </li>
+                          <!-- 商品列表 -->
+                        </ul>
+                      </div>
+                    </div>
+                    <!-- tab下对应的商品列表 -->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+
+
+<script type="text/x-template" id="module_id_1006-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <div class="block-tab-category14"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="head">
+              <span class="bar"><i class="fa fa-bars"></i></span>
+
+              <!-- tab列表 -->
+              <ul class="box-tabs nav-tab">
+                <li v-for="(tab, index) in tabs" :class="{ active: index === 0 }" style="position: relative">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i></span>
+                  <span  class="modify item_remove label label-danger"  :data-key="'tabs'"  :data-index="index"   :data-pm_id="pm_id" ><i class="glyphicon glyphicon-remove"></i></span>
+                  <a data-toggle="tab" :href="getTabId(index, true)">{{ tab.name }}</a>
+                </li>
+              </ul>
+              <span data-key="tabs" :data-pm_id="pmId" class="label label-info item_add-tab" style="cursor: pointer;"><i class="glyphicon glyphicon-edit"></i>  新增Tab </span>
+              <!-- tab列表 -->
+
+              <a class="link-all" :href="floor.url">
+                <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify_l label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>{{ floor.name }}</a>
+            </div>
+            <div class="tab-container">
+              <div  v-for="(tab, index) in tabs" :id="getTabId(index)" class="tab-panel" :class="{  active: index === 0 }">
+                <div class="row">
+                  <div class="col-sm-4 col-md-3"  v-for="productItem in tab.items">
+                    <div class="product-style4">
+                      <div class="product-thumb">
+                        <a :href="productItem.link">
+                          <img class="primary_image" :alt="productItem.name" :src="productItem.picimg" >
+                          <img class="secondary_image" :alt="productItem.name" :src="productItem.picimg" >
+                        </a>
+                        <div class="group-button-control">
+                          <a class="wishlist" href="#">Wishlist</a>
+                          <a class="compare" href="#">Compare</a>
+                          <a class="quickview" href="#">Quickview</a>
+                        </div>
+                        <a :href="productItem.link" class="btn-add-to-cart">Add to Cart</a>
+                      </div>
+                      <div class="product-info">
+                        <h4 class="product-name"><a :href="productItem.link">{{ productItem.name }}</a></h4>
+                        <span class="price">
+	                                                        <ins>$86.95</ins>
+	                                                        <del>$92.95</del>
+	                                                    </span>
+                      </div>
+                      <span class="status sale">Sale</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/x-template" id="module_id_1007-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div class="wrap floor fn-clear">
+              <div class="m frame1 gray"  id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+                <div class="mt fn-clear">
+                  <div class="title"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info" style="left:80px;height: 20px;line-height: 20px;width: 80px;"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a :href="floor.url"><span :style="'background: url(' +  floor.picimg + ');'"></span>{{ floor.name }}</a>
+                  </div>
+                  <div class="tit_nav"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="nav_links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a  v-for="linkData in nav_links" :href="linkData.link">{{ linkData.name }}</a>
+                  </div>
+                </div>
+                <div class="mc fn-clear">
+                  <div class="block block1" style="width:210px;height:360px;">
+                    <div class="block2" style="width:210px;height:110px;position: relative;">
+                      <ul class="fn-clear">
+                        <span data-target="#editorConponentModal" data-key="links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                        <li v-for="linkData in links"><a :href="linkData.link">{{ linkData.name }}</a></li>
+                      </ul>
+                    </div>
+                    <div class="block3" style="width:210px;height:249px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner1.url"><img alt="Featurered 1" :src="banner1.picimg" width="210" height="249" /></a></div>
+                  </div>
+                  <div class="block block4" style="width:326px;height:360px;">
+                    <div class="blueberry">
+                      <ul class="slides" style="position: relative">
+
+                        <li v-for="(item, index) in img_items1">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items1[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'img_items1'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="326" height="360"  /></a>
+
+                          <span  class="label label-info item_add"  data-key="img_items1"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="block block5" style="width:220px;height:360px;">
+                    <div class="block6" style="width:220px;height:179px;;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner2.url"><img alt="Featurered 1" :src="banner2.picimg" width="220" height="179" /></a>
+                    </div>
+                    <div class="block7" style="width:220px;height:180px;;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner3.url"><img alt="Featurered 1" :src="banner3.picimg" width="220" height="180" /></a>
+                    </div>
+                  </div>
+                  <div class="block block8" style="width:220px;height:360px;">
+                    <div class="blueberry">
+                      <ul class="slides">
+                        <li v-for="(item, index) in img_items2">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items2[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'img_items2'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="220" height="360"  /></a>
+
+                          <span  class="label label-info item_add"  data-key="img_items2"  :data-pm_id="pm_id" data-imgsize="220x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="block block9" style="width:218px;height:360px;">
+                    <div class="block10" style="width:220px;height:179px;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner4.url"><img alt="Featurered 1" :src="banner4.picimg" width="220" height="179" /></a>
+                    </div>
+                    <div class="block11" style="width:220px;height:180px;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner5.url"><img alt="Featurered 1" :src="banner5.picimg" width="220" height="180" /></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1008-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div class="wrap floor fn-clear">
+              <div class="m frame1 gray"  id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+                <div class="mt fn-clear">
+                  <div class="title"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info" style="left:80px;height: 20px;line-height: 20px;width: 80px;"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a :href="floor.url"><span :style="'background: url(' +  floor.picimg + ');'"></span>{{ floor.name }}</a>
+                  </div>
+                  <div class="tit_nav"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="nav_links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a  v-for="linkData in nav_links" :href="linkData.link">{{ linkData.name }}</a>
+                  </div>
+                </div>
+                <div class="mc fn-clear">
+                  <div class="block block1" style="width:210px;height:360px;">
+                    <div class="block2" style="width:210px;height:110px;position: relative;">
+                      <ul class="fn-clear">
+                        <span data-target="#editorConponentModal" data-key="links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                        <li v-for="linkData in links"><a :href="linkData.link">{{ linkData.name }}</a></li>
+                      </ul>
+                    </div>
+                    <div class="block3" style="width:210px;height:249px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner1.url"><img alt="Featurered 1" :src="banner1.picimg" width="210" height="249" /></a></div>
+                  </div>
+                  <div class="block block4" style="width:326px;height:360px;">
+                    <div class="blueberry">
+                      <ul class="slides" style="position: relative">
+
+                        <li v-for="(item, index) in img_items1">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items1[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'img_items1'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="326" height="360"  /></a>
+
+                          <span  class="label label-info item_add"  data-key="img_items1"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="block block5" style="width:220px;height:360px;">
+                    <div class="block6" style="width:220px;height:179px;;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner2.url"><img alt="Featurered 1" :src="banner2.picimg" width="220" height="179" /></a>
+                    </div>
+                    <div class="block7" style="width:220px;height:180px;;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner3.url"><img alt="Featurered 1" :src="banner3.picimg" width="220" height="180" /></a>
+                    </div>
+                  </div>
+                  <div class="block block8" style="width:220px;height:360px;">
+                    <div class="blueberry">
+                      <ul class="slides">
+                        <li v-for="(item, index) in img_items2">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items2[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'img_items2'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="220" height="360"  /></a>
+
+                          <span  class="label label-info item_add"  data-key="img_items2"  :data-pm_id="pm_id" data-imgsize="220x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="block block9" style="width:218px;height:360px;">
+                    <div class="block10" style="width:220px;height:179px;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner4.url"><img alt="Featurered 1" :src="banner4.picimg" width="220" height="179" /></a>
+                    </div>
+                    <div class="block11" style="width:220px;height:180px;position: relative">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner5.url"><img alt="Featurered 1" :src="banner5.picimg" width="220" height="180" /></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1009-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+
+            <div class="wrap floor fn-clear">
+              <div class="m frame3"  id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+                <div class="mt fn-clear">
+                  <div class="title"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info" style="left:80px;height: 20px;line-height: 20px;width: 80px;"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a :href="floor.link"><span :style="'background: url(' +  floor.picimg + ');'"></span>{{ floor.name }}</a>
+                  </div>
+                  <div class="tit_nav"  style="position: relative;">
+                    <span data-target="#editorConponentModal" data-key="nav_links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                    <a  v-for="linkData in nav_links" :href="linkData.link">{{ linkData.name }}</a>
+                  </div>
+                </div>
+                <div class="mc fn-clear">
+                  <div class="block block18" style="width:280px;height:483px;">
+                    <div class="blueberry">
+                      <ul class="slides">
+                        <li v-for="(item, index) in img_items1">
+                          <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items1[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                          <span :data-key="'img_items1'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                          <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="280" height="483"  /></a>
+
+                          <span  class="label label-info item_add"  data-key="img_items1"  :data-pm_id="pm_id" data-imgsize="280x483"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="block block19" style="width:654px;height:483px;">
+                    <div class="block20" style="width:326px;height:241px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner1.url"><img :alt="banner1.name" :src="banner1.picimg" width="326" height="241" /></a>
+                    </div>
+                    <div class="block21" style="width:326px;height:241px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner2.url"><img :alt="banner2.name" :src="banner2.picimg" width="326" height="241" /></a>
+                    </div>
+                    <div class="block22" style="width:326px;height:241px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner3.url"><img :alt="banner3.name" :src="banner3.picimg" width="326" height="241" /></a>
+                    </div>
+                    <div class="block23" style="width:326px;height:241px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner4.url"><img :alt="banner4.name" :src="banner4.picimg" width="326" height="241" /></a>
+                    </div>
+                  </div>
+                  <div class="block block24" style="width:262px;height:483px;">
+                    <div class="block25" style="width:262px;height:120px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner5.url"><img :alt="banner5.name" :src="banner5.picimg" width="262" height="120" /></a>
+                    </div>
+                    <div class="block26" style="width:262px;height:120px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner6'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner6.url"><img :alt="banner6.name" :src="banner6.picimg" width="262" height="120" /></a>
+                    </div>
+                    <div class="block27" style="width:262px;height:120px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner7'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner7.url"><img :alt="banner7.name" :src="banner7.picimg" width="262" height="120" /></a>
+                    </div>
+                    <div class="block28" style="width:262px;height:120px;position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner8'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="banner8.url"><img :alt="banner8.name" :src="banner8.picimg" width="262" height="120" /></a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/x-template" id="module_id_1012-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+
+            <div class="floor_theme3 floor1"   id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <div class="floor_icon" :style="'background: url(' +  floor.picimg + ');'"></div>
+              <div class="floor_left">
+                <div class="floor_tit"   style="position: relative;">
+                  <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info" style="left:80px;height: 20px;line-height: 20px;width: 80px;"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                  <i class="J_floorId hide"></i>
+                  <h2 class="J_floorName">{{ floor.name }}</h2>
+                  <p class="more"><a href="javascript:void();">MORE</a></p>
+                  <p class="floor_tit_bg"></p>
+                  <p class="floor_tit_icon"></p>
+                </div>
+                <div class="floor_more st" style="height: 139px;position: relative;">
+                  <span data-target="#editorConponentModal" data-key="links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                  <a v-for="linkData in links" href="#">{{ linkData.name }}</a>
+                </div>
+                <div class="floor_left_pic-1" style="width: 200px;height: 200px;">
+                  <div class="blueberry">
+                    <ul class="slides" style="position: relative">
+                      <li v-for="(item, index) in img_items1">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items1[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <span :data-key="'img_items1'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                        <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="200" height="200"  /></a>
+
+                        <span  class="label label-info item_add"  data-key="img_items1"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="floor_con">
+                <div class="floor_con_pic">
+                  <div class="blueberry">
+                    <ul class="slides" style="position: relative">
+                      <li v-for="(item, index) in img_items3">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items3[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <span :data-key="'img_items3'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                        <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="390" height="210"  /></a>
+
+                        <span  class="label label-info item_add"  data-key="img_items3"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="floor_con_pic0">
+                  <ul>
+                    <li>
+                      <div class="con" style="margin-top: 0px;position: relative;">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <p class="pic0"><a href="#" target="_blank"><img :src="banner1.picimg" alt="" style="display: inline-block;"></a></p>
+                        <p class="bg"></p>
+                        <p class="text">
+                          <a target="_blank" href="#"><span class="fz14">{{banner1.name}}</span></a>
+                          <a target="_blank" href="#">{{banner1.desc}}</a>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="con">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <p class="pic0"><a href="#" target="_blank"><img :src="banner2.picimg" alt="" style="display: inline-block;"></a></p>
+                        <p class="bg"></p>
+                        <p class="text">
+                          <a target="_blank" href="#"><span class="fz14">{{banner2.name}}</span></a>
+                          <a target="_blank" href="#">{{banner2.desc}}</a>
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="floor_pic">
+                <div class="blueberry">
+                  <ul class="slides" style="position: relative">
+                    <li v-for="(item, index) in img_items2">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items2[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <span :data-key="'img_items2'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                      <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="400" height="430"  /></a>
+
+                      <span  class="label label-info item_add"  data-key="img_items2"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="floor_pic0">
+                <ul>
+                  <li>
+                    <div class="con" style="margin-top: 0px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <p class="pic0"><a href="#" target="_blank"><img :src="banner3.picimg" alt="" style="display: inline-block;"></a></p>
+                      <p class="bg"></p>
+                      <p class="text">
+                        <a target="_blank" href="#"><span class="fz14">{{banner3.name}}</span></a>
+                        <a target="_blank" href="#">{{banner3.desc}}</a>
+                      </p>
+                      <p class="floor_new">NEW</p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="con">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <p class="pic0"><a href="#" target="_blank"><img :src="banner4.picimg" alt="" style="display: inline-block;"></a></p>
+                      <p class="bg"></p>
+                      <p class="text">
+                        <a target="_blank" href="#"><span class="fz14">{{banner4.name}}</span></a>
+                        <a target="_blank" href="#">{{banner4.desc}}</a>
+                      </p>
+                      <p class="floor_hot">HOT</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1011-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify  label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify enable label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+
+            <div class="floor_theme3 floor1"   id="pm_id_%d"  :class="setting.className"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <div class="floor_icon" :style="'background: url(' +  floor.picimg + ');'"></div>
+              <div class="floor_left">
+                <div class="floor_tit"   style="position: relative;">
+                  <span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info" style="left:80px;height: 20px;line-height: 20px;width: 80px;"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                  <i class="J_floorId hide"></i>
+                  <h2 class="J_floorName">{{ floor.name }}</h2>
+                  <p class="more"><a href="javascript:void();">MORE</a></p>
+                  <p class="floor_tit_bg"></p>
+                  <p class="floor_tit_icon"></p>
+                </div>
+                <div class="floor_more st" style="height: 139px;position: relative;">
+                  <span data-target="#editorConponentModal" data-key="links" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                  <a v-for="linkData in links" href="#">{{ linkData.name }}</a>
+                </div>
+                <div class="floor_left_pic-1" style="width: 200px;height: 200px;">
+                  <div class="blueberry">
+                    <ul class="slides" style="position: relative">
+                      <li v-for="(item, index) in img_items1">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items1[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <span :data-key="'img_items1'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                        <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="200" height="200"  /></a>
+
+                        <span  class="label label-info item_add"  data-key="img_items1"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="floor_pic">
+                <div class="blueberry">
+                  <ul class="slides" style="position: relative">
+                    <li v-for="(item, index) in img_items2">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items2[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <span :data-key="'img_items2'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                      <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="400" height="430"  /></a>
+
+                      <span  class="label label-info item_add"  data-key="img_items2"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="floor_con">
+                <div class="floor_con_pic">
+                  <div class="blueberry">
+                    <ul class="slides" style="position: relative">
+                      <li v-for="(item, index) in img_items3">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'img_items3[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <span :data-key="'img_items3'"  :data-index="index" :data-pm_id="pm_id" class="modify item_remove label label-danger"  style="right: 60px;"><i class="glyphicon glyphicon-remove"></i></span>
+                        <a :href="item.url"><img :alt="item.name" :src="item.picimg" width="390" height="210"  /></a>
+
+                        <span  class="label label-info item_add"  data-key="img_items3"  :data-pm_id="pm_id" data-imgsize="326x360"  style="cursor: pointer; position: absolute;top:2px;"><i class="glyphicon glyphicon-edit"></i>  添加 </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="floor_con_pic0">
+                  <ul>
+                    <li>
+                      <div class="con" style="margin-top: 0px;position: relative;">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <p class="pic0"><a href="#" target="_blank"><img :src="banner1.picimg" alt="" style="display: inline-block;"></a></p>
+                        <p class="bg"></p>
+                        <p class="text">
+                          <a target="_blank" href="#"><span class="fz14">{{banner1.name}}</span></a>
+                          <a target="_blank" href="#">{{banner1.desc}}</a>
+                        </p>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="con">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                        <p class="pic0"><a href="#" target="_blank"><img :src="banner2.picimg" alt="" style="display: inline-block;"></a></p>
+                        <p class="bg"></p>
+                        <p class="text">
+                          <a target="_blank" href="#"><span class="fz14">{{banner2.name}}</span></a>
+                          <a target="_blank" href="#">{{banner2.desc}}</a>
+                        </p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="floor_pic0">
+                <ul>
+                  <li>
+                    <div class="con" style="margin-top: 0px;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <p class="pic0"><a href="#" target="_blank"><img :src="banner3.picimg" alt="" style="display: inline-block;"></a></p>
+                      <p class="bg"></p>
+                      <p class="text">
+                        <a target="_blank" href="#"><span class="fz14">{{banner3.name}}</span></a>
+                        <a target="_blank" href="#">{{banner3.desc}}</a>
+                      </p>
+                      <p class="floor_new">NEW</p>
+                    </div>
+                  </li>
+                  <li>
+                    <div class="con">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <p class="pic0"><a href="#" target="_blank"><img :src="banner4.picimg" alt="" style="display: inline-block;"></a></p>
+                      <p class="bg"></p>
+                      <p class="text">
+                        <a target="_blank" href="#"><span class="fz14">{{banner4.name}}</span></a>
+                        <a target="_blank" href="#">{{banner4.desc}}</a>
+                      </p>
+                      <p class="floor_hot">HOT</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/x-template" id="module_id_1101-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <!-- Baner bottom -->
+          <div class="row banner-bottom"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="col-sm-12">
+              <div class="banner-boder-zoom">
+                <span  class="modify item_modify label label-info add-rd"  :data-pm_id="pm_id" style="right:70px;" v-if="false"><i class="glyphicon glyphicon-edit"></i>  编辑热点</span>
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="banner1.url"><img :alt="banner1.name"  class="img-responsive" :src="banner1.picimg" /></a>
+              </div>
+            </div>
+          </div>
+          <!-- end banner bottom -->
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1102-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <!-- Baner bottom -->
+          <div class="row banner-bottom"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="col-sm-6">
+              <div class="banner-boder-zoom">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="banner1.url"><img :alt="banner1.name"  class="img-responsive" :src="banner1.picimg" /></a>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="banner-boder-zoom">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="banner2.url"><img :alt="banner2.name"  class="img-responsive" :src="banner2.picimg" /></a>
+              </div>
+            </div>
+          </div>
+          <!-- end banner bottom -->
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+<script type="text/x-template" id="module_id_1103-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <div class="block-group-banner-top"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="item banner-img">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner1.url"><img :alt="banner1.name"  class="img-responsive" :src="banner1.picimg" /></a>
+                </div>
+                <div class="item banner-img">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner2.url"><img :alt="banner2.name"  class="img-responsive" :src="banner2.picimg" /></a>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="item banner-img">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner3.url"><img :alt="banner3.name"  class="img-responsive" :src="banner3.picimg" /></a>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="item banner-img">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner4.url"><img :alt="banner4.name"  class="img-responsive" :src="banner4.picimg" /></a>
+                </div>
+                <div class="item banner-img">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="banner5.url"><img :alt="banner5.name"  class="img-responsive" :src="banner5.picimg" /></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_id_1104-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <div class="trend" id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+            <!-- trend_tit -->
+            <div class="trend_tit">
+              <ul>
+                <li class="cur">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner_nav1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <div v-html="banner_nav1.name"></div>
+                </li>
+                <li class="">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner_nav2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <div v-html="banner_nav2.name"></div>
+                </li>
+                <li class="l">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner_nav3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <div v-html="banner_nav3.name"></div>
+                </li>
+              </ul>
+            </div>
+            <!-- trend_con -->
+            <div class="trend_con" style="display: block;">
+              <div class="trend_new_pic">
+                <p class="pic" style="position:relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_1.url"><img   class="img-responsive" :src="nb1_1.picimg" /></a>
+                </p>
+                <p class="pic0" style="position:relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_2.url"><img   class="img-responsive" :src="nb1_2.picimg" /></a>
+                </p>
+              </div>
+              <div class="trend_new_pic0">
+                <div class="pic" style="position:relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_3.url"><img   class="img-responsive" :src="nb1_3.picimg" /></a>
+                </div>
+                <div class="trend_new_text">
+                  <dl>
+                    <dt style="position:relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb1_4.url"><img   class="img-responsive" :src="nb1_4.picimg" /></a>
+                    </dt>
+                    <dd style="position:relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <p class="zhe"><span>
+											{{nb1_5.name}}</span>
+                      </p>
+                      <p>{{nb1_5.desc}}</p>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+              <div class="trend_new_pic">
+                <p class="pic" style="position: relative">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_6'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_6.url"><img   class="img-responsive" :src="nb1_6.picimg" /></a>
+                </p>
+                <p class="pic0" style="position: relative">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_7'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_7.url"><img   class="img-responsive" :src="nb1_7.picimg" /></a>
+                </p>
+              </div>
+              <div class="trend_pic" style="position: relative">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_8'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="nb1_8.url"><img   class="img-responsive" :src="nb1_8.picimg" /></a>
+              </div>
+            </div>
+            <div class="trend_con" style="display: none;">
+              <div class="trend_hot">
+                <ul>
+                  <li>
+                    <p class="n1" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_1.url"><img  width="290" height="320" class="img-responsive" :src="nb2_1.picimg" /></a>
+                    </p>
+                    <p class="n2" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_1.url"><img  width="290" height="320" class="img-responsive" :src="nb2_1.picimg" /></a>
+                    </p>
+                  </li>
+                  <li>
+                    <p class="n1" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_2.url"><img   class="img-responsive" :src="nb2_2.picimg" /></a>
+                    </p>
+                    <p class="n2" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_2.url"><img   class="img-responsive" :src="nb2_2.picimg" /></a>
+                    </p>
+                  </li>
+                  <li>
+                    <p class="n1" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_3.url"><img   class="img-responsive" :src="nb2_3.picimg" /></a>
+                    </p>
+                    <p class="n2" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_3.url"><img   class="img-responsive" :src="nb2_3.picimg" /></a>
+                    </p>
+                  </li>
+                  <li>
+                    <p class="n1" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_4.url"><img   class="img-responsive" :src="nb2_4.picimg" /></a>
+                    </p>
+                    <p class="n2" style="position: relative;">
+                      <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb2_4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                      <a :href="nb2_4.url"><img   class="img-responsive" :src="nb2_4.picimg" /></a>
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              <div class="trend_hot_con">
+                <span class="hot_pre"></span>
+                <span class="hot_next"></span>
+                <div class="trend_hot_con0">
+                  <ul>
+                    <li>
+                      <p><a href="//test.shopsuite.cn" target="_blank"><img src="//test.shopsuite.cn/image.php/shop/data/upload/media/plantform/image/20180622/1529656115887425.jpg"></a></p>
+                      <p><a href="//test.shopsuite.cn" target="_blank"><img src="//test.shopsuite.cn/image.php/shop/data/upload/media/plantform/image/20180622/1529656115887425.jpg"></a></p>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="trend_con" style="display: none;">
+              <div class="trend_zhuan">
+                <ul>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_1.url"><img   class="img-responsive" :src="nb3_1.picimg" /></a>
+                  </li>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_2.url"><img   class="img-responsive" :src="nb3_2.picimg" /></a>
+                  </li>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_3.url"><img   class="img-responsive" :src="nb3_3.picimg" /></a>
+                  </li>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_4.url"><img   class="img-responsive" :src="nb3_4.picimg" /></a>
+                  </li>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_5.url"><img   class="img-responsive" :src="nb3_5.picimg" /></a>
+                  </li>
+                  <li style="position: relative;">
+                    <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_6'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                    <a :href="nb3_6.url"><img   class="img-responsive" :src="nb3_6.picimg" /></a>
+                  </li>
+                </ul>
+              </div>
+              <div class="trend_pic" style="position: relative;">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb3_7'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="nb3_7.url"><img   class="img-responsive" :src="nb3_7.picimg" /></a>
+              </div>
+            </div>
+          </div>
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+
+<script type="text/x-template" id="module_item_img-template">
+  <div id="manage-wrap"   style="max-height:600px; overflow-y: scroll">
+    <div class="manage-edit-box">
+      <div class="box-main">
+        <form method="post" enctype="multipart/form-data" id="manage-form" name="manage-form">
+
+          <!-- 广告图片编辑 -->
+          <div class="form-section" v-if="typeof className !== 'undefined'">
+            <label class="input-label">使用Class</label>
+            <input type="text" class="input-text form-control" name="className" placeholder="名称" v-model="className"  />
+            <p class="help-block" v-if="typeof classSelect !== 'undefined'">可选用class : {{classSelect}}</p>
+          </div>
+
+
+          <div class="form-section" v-if="typeof showMegamenus !== 'undefined'">
+            <label class="input-label">显示菜单</label>
+            <input type="text" class="input-text form-control" name="showMegamenus" placeholder="名称" v-model="showMegamenus"  />
+            <p class="help-block">1:显示  0:不显示</p>
+          </div>
+
+          <div class="form-section" v-if="typeof showFloorName !== 'undefined'">
+            <label class="input-label">是否显示楼层名称</label>
+            <input type="text" class="input-text form-control" name="showFloorName" placeholder="1-显示  0-不显示" v-model="showFloorName"  />
+            <p class="help-block">1-显示  0-不显示</p>
+          </div>
+
+
+          <div class="form-section" v-if="typeof bgColor !== 'undefined'">
+            <label class="input-label">背景颜色</label>
+            <input type="text" class="input-text form-control" name="bgColor" placeholder="名称" v-model="bgColor"  />
+          </div>
+
+
+          <div class="form-section" v-if="typeof name !== 'undefined' && operationType !== 'links'">
+            <label class="input-label">名称</label>
+            <input type="text" class="input-text form-control" name="name" placeholder="名称" v-model="name"  />
+          </div>
+
+          <div class="form-section" v-if="typeof desc !== 'undefined' && operationType !== 'links'">
+            <label class="input-label">描述</label>
+            <input type="text" class="input-text form-control" name="desc" placeholder="描述" v-model="desc"  />
+          </div>
+
+          <div class="form-section" v-if="typeof picimg !== 'undefined'">
+            <label class="input-label">图片</label>
+            <a href="#"  data-toggle="image" class="img-thumbnail picture_upload_replace" id="picture_upload_category_image">
+              <input type="hidden" class="input-text form-control" name="picimg" :value="picimg" @click="function(e){var event=window.event||e;event.stopImmediatePropagation();event.preventDefault();picimg = event.target.value;}" />
+              <img  :src="picimg" :width="imgWidth" :height="imgHeight" /><em class="pur-edit"></em>
+            </a>
+          </div>
+
+          <div class="form-section" v-if="typeof picimg !== 'undefined' && typeof imgSize !== 'undefined'">
+            <span class="label label-info">图片尺寸：{{ imgSize }}</span>
+          </div>
+
+
+          <div class="form-section" v-if="typeof url !== 'undefined'">
+            <label class="input-label">链接</label>
+            <input type="text" class="input-text form-control" name="url" placeholder="名称" v-model="url"  />
+          </div>
+
+
+          <!-- 广告图片编辑 -->
+
+          <!-- 链接列表编辑 -->
+          <div v-if="operationType === 'links'">
+            <div v-for="(linkData, index) in links" >
+              <div class="form-section form-section-active">
+                <label class="input-label" :for="'link-name-' + index">链接名称{{ index+1 }}</label>
+                <input type="text" :id="'link-name-' + index" :placeholder="'链接名称' + (index+1)" :value="linkData.name" class="input-text form-control" v-model="linkData.name">
+              </div>
+              <div class="form-section form-section-active">
+                <label class="input-label" :for="'link-url-' + index">链接地址{{ index+1 }}</label>
+                <input type="text" :id="'link-url-' + index" :placeholder="'链接地址' + (index+1)" :value="linkData.link" class="input-text form-control" v-model="linkData.link">
+              </div>
+            </div>
+            <div class="form-group col-xs-12">
+              <div class="col-xs-12">
+                <a href="javascript:"class="btn btn-primary btn-single btn-block btn-icon btn-icon-standalone" :data-link-index="linkCount" v-on:click="addLInk"><i class="fa fa-pencil"></i>
+                  <span>添加</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- 链接列表编辑 -->
+
+          <!-- 链接列表编辑 -->
+          <div v-if="operationType === 'nav_links'">
+            <div v-for="(linkData, index) in nav_links" >
+              <div class="form-section form-section-active">
+                <label class="input-label" :for="'link-name-' + index">链接名称{{ index+1 }}</label>
+                <input type="text" :id="'link-name-' + index" :placeholder="'链接名称' + (index+1)" :value="linkData.name" class="input-text form-control" v-model="linkData.name">
+              </div>
+              <div class="form-section form-section-active">
+                <label class="input-label" :for="'link-url-' + index">链接地址{{ index+1 }}</label>
+                <input type="text" :id="'link-url-' + index" :placeholder="'链接地址' + (index+1)" :value="linkData.link" class="input-text form-control" v-model="linkData.link">
+              </div>
+            </div>
+            <div class="form-group col-xs-12">
+              <div class="col-xs-12">
+                <a href="javascript:"class="btn btn-primary btn-single btn-block btn-icon btn-icon-standalone" :data-link-index="linkNavCount" v-on:click="addNavLInk"><i class="fa fa-pencil"></i>
+                  <span>添加</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <!-- 链接列表编辑 -->
+
+
+
+          <div class="row" v-if="typeof tabs !== 'undefined'">
+            <div class="form-group-separator"></div>
+            <div class="col-sm-12"  v-for="(tab, index) in tabs">
+              <div class="form-section" v-if="typeof tab.name !== 'undefined'">
+                <label class="input-label">名称</label>
+                <input type="text" class="input-text form-control" name="name" placeholder="名称" v-model="tab.name"  />
+              </div>
+
+              <div class="form-section" v-if="typeof tab.picimg !== 'undefined'">
+                <label class="input-label">图片</label>
+                <a href="#"  data-toggle="image" class="img-thumbnail  picture_upload_replace" :id="'upload_image-tab-' + index + ''">
+                  <input type="hidden" class="input-text form-control" name="picimg" :value="tab.picimg" @click="function(e){var event=window.event||e;event.stopImmediatePropagation();event.preventDefault();tab.picimg = event.target.value;}" />
+                  <img  :src="tab.picimg"  width="320" height="100" /><em class="pur-edit"></em>
+                </a>
+              </div>
+
+              <div class="form-section" v-if="typeof tab.url !== 'undefined'">
+                <label class="input-label">链接</label>
+                <input type="text" class="input-text form-control" name="url" placeholder="名称" v-model="tab.url"  />
+              </div>
+
+
+              <div class="row" v-if="typeof tab.items !== 'undefined'">
+                <div class="form-group-separator"></div>
+
+                <div class="col-sm-12"  v-for="(item, index) in tab.items">
+                  <div class="form-section" v-if="typeof item.name !== 'undefined'">
+                    <label class="input-label">名称</label>
+                    <input type="text" class="input-text form-control" name="name" placeholder="名称" v-model="item.name"  />
+                  </div>
+
+                  <div class="form-section" v-if="typeof item.picimg !== 'undefined'">
+                    <label class="input-label">图片</label>
+                    <a href="#"  data-toggle="image" class="img-thumbnail  picture_upload_replace" :id="'upload_image-tab-' + index + ''">
+                      <input type="hidden" class="input-text form-control" name="picimg" :value="item.picimg" @click="function(e){var event=window.event||e;event.stopImmediatePropagation();event.preventDefault();item.picimg = event.target.value;}" />
+                      <img  :src="item.picimg"  width="320" height="100" /><em class="pur-edit"></em>
+                    </a>
+                  </div>
+
+                  <div class="form-section" v-if="typeof item.url !== 'undefined'">
+                    <label class="input-label">链接</label>
+                    <input type="text" class="input-text form-control" name="url" placeholder="名称" v-model="item.url"  />
+                  </div>
+                </div>
+
+
+                <div class="form-group">
+                  <div class="col-sm-4"></div>
+                  <div class="col-sm-4">
+                    <button  class="btn btn-primary btn-single btn-block btn-icon btn-icon-standalone" v-on:click="addItem()">
+                      <i class="fa fa-pencil"></i>
+                      <span>添加</span>
+                    </button>
+                  </div>
+                  <div class="col-sm-4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" v-if="typeof items !== 'undefined' || operationType === 'productItems'">
+            <div class="form-group-separator"></div>
+
+            <div class="col-sm-4  product-container"  v-for="(item, index) in items">
+
+              <div class="products-block-left">
+                <img :src="item.picimg">
+                <p class="product-name">
+                  {{item.name}}
+                </p>
+                <p class="product-price">0.00</p>
+                <a v-on:click="removeItem" href="javascript:;" :data-key="index">删除</a>
+              </div>
+
+              <div class="form-section hidden" v-if="typeof item.item_id !== 'undefined'">
+                <label class="input-label">商品编号</label>
+                <input type="text" class="input-text form-control" name="item_id" placeholder="名称" v-model="item.item_id"  />
+              </div>
+
+              <div class="form-section hidden" v-if="typeof item.name !== 'undefined'">
+                <label class="input-label">名称</label>
+                <input type="text" class="input-text form-control" name="name" placeholder="名称" v-model="item.name"  />
+              </div>
+
+              <div class="form-section hidden" v-if="typeof item.picimg !== 'undefined'">
+                <label class="input-label">图片</label>
+                <a href="#"  data-toggle="image" class="img-thumbnail" :class="{ picture_upload_replace: isUploadImg }" :id="'upload_image-tab-' + index + ''">
+                  <input type="hidden" class="input-text form-control" name="picimg" :value="item.picimg" @click="function(e){var event=window.event||e;event.stopImmediatePropagation();event.preventDefault();item.picimg = event.target.value;}" />
+                  <img  :src="item.picimg"  width="320" height="100" /><em class="pur-edit"></em>
+                </a>
+              </div>
+
+              <div class="form-section hidden" v-if="typeof item.url !== 'undefined'">
+                <label class="input-label">链接</label>
+                <input type="text" class="input-text form-control" name="url" placeholder="名称" v-model="item.url"  />
+              </div>
+            </div>
+
+            <div class="form-group col-xs-12">
+              <div class="col-xs-12">
+                <a  href="javascript:"  class="btn btn-primary btn-single btn-block btn-icon btn-icon-standalone" v-on:click="addItem">
+                  <i class="fa fa-pencil"></i>
+                  <span>添加</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+
+
+        </form>
+      </div>
+    </div>
+  </div>
+</script>
+
+<style>
+
+</style>
+<script type="text/x-template" id="module_id_1105-template">
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <a  class="modify label label-info" data-target="#editorConponentModal" data-key="setting"  data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</a>
+    <a  class="modify  enable  label label-warning JS_pm_enable" data-key="$data"  data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i>  %s</a>
+    <div class="view" style="margin-top: 10px;">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;margin-top: 30px;"">
+          <!-- 内容开始 -->
+          <div class="mainPages"  id="pm_id_%d"   :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') " style="padding-left: 0">
+            <div class="autowidth">
+              <div class="paddingTop3 paddingBot15 flex flexbt flexat">
+                <h6 class="font24"  style="position:relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner_nav1'"  :data-pm_id="pm_id" data-toggle="modal" style="right: -20px;top:-10px;"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <div v-html="banner_nav1.name"></div>
+                </h6>
+
+                <div style="position:relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'banner_nav2'"  :data-pm_id="pm_id" data-toggle="modal" style="right: -20px;top:-10px;"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a class="color666 hovers" :href="banner_nav2.url">
+                    {{banner_nav2.name}} <span class="fa fa-arrow-circle-o-right iconfont color888 trans5" style="font-size: 20px;line-height: 20px;"></span>
+                  </a>
+                </div>
+              </div>
+              <dl class="flex flexwp pdList">
+                <dt>
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_1'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_1.url" :style="'background: url(' + nb1_1.picimg + ') no-repeat center;'"></a>
+                </dt>
+
+                <dd style="position: relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_2'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_2.url">
+                    <div class="imgSf"><img
+                      :src="nb1_2.picimg"
+                      :alt="nb1_2.name"></div>
+                    <p class="singleTxt">{{nb1_2.name}}</p>
+                  </a>
+                </dd>
+                <dd style="position: relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_3'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_3.url">
+                    <div class="imgSf"><img
+                      :src="nb1_3.picimg"
+                      :alt="nb1_3.name"></div>
+                    <p class="singleTxt">{{nb1_3.name}}</p>
+                  </a>
+                </dd>
+                <dd style="position: relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_4'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_4.url">
+                    <div class="imgSf"><img
+                      :src="nb1_4.picimg"
+                      :alt="nb1_4.name"></div>
+                    <p class="singleTxt">{{nb1_4.name}}</p>
+                  </a>
+                </dd>                                <dd style="position: relative;">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_5'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="nb1_5.url">
+                  <div class="imgSf"><img
+                    :src="nb1_5.picimg"
+                    :alt="nb1_5.name"></div>
+                  <p class="singleTxt">{{nb1_5.name}}</p>
+                </a>
+              </dd>                                <dd style="position: relative;">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_6'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="nb1_6.url">
+                  <div class="imgSf"><img
+                    :src="nb1_6.picimg"
+                    :alt="nb1_6.name"></div>
+                  <p class="singleTxt">{{nb1_6.name}}</p>
+                </a>
+              </dd>                                <dd style="position: relative;">
+                <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_7'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                <a :href="nb1_7.url">
+                  <div class="imgSf"><img
+                    :src="nb1_7.picimg"
+                    :alt="nb1_7.name"></div>
+                  <p class="singleTxt">{{nb1_7.name}}</p>
+                </a>
+              </dd>
+                <dd style="position: relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_8'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_8.url">
+                    <div class="imgSf"><img
+                      :src="nb1_8.picimg"
+                      :alt="nb1_8.name"></div>
+                    <p class="singleTxt">{{nb1_8.name}}</p>
+                  </a>
+                </dd>
+                <dd style="position: relative;">
+                  <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'nb1_9'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i>  编辑</span>
+                  <a :href="nb1_9.url">
+                    <div class="imgSf"><img
+                      :src="nb1_9.picimg"
+                      :alt="nb1_9.name"></div>
+                    <p class="singleTxt">{{nb1_9.name}}</p>
+                  </a>
+                </dd>
+              </dl>
+
+            </div>
+
+          </div>
+          <!-- 内容结束 -->
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+</script>
+<!-- Bottom Scripts -->
+
+<script src="./static/admin/common/js/plugins/jquery.dialog.js?v=2.0.277?self=false"></script>
+
+<script type="text/javascript" src="./static/admin/default/js/controllers/page/page_layout.js?v=2.0.277"></script>
+
+
+<script type="text/javascript">
+  downloadLayoutSrc();
+</script>
+
+<script type="text/javascript">
+  /*
+  $(document).ready(function ()
+  {
+      return;
+      $.each([5, 10],function(index,pm_id){
+
+          //命名固定，img  img   label items url
+          var module_id = 1001;
+          var pm_data = {
+              "navClass": "nav-menu-green",
+              "floor": {
+                  "name": "FURNITURE",
+                  "url": "https://dev.suteshop.com/",
+                  "img": "http://dev.43390.com/https://dev.suteshop.com/assets/data/furniture.png"
+              },
+              "banner1": {
+                  "name": "FURNITURE",
+                  "url": "https://dev.suteshop.com/",
+                  "img": "https://dev.43390.com/https://dev.suteshop.com/assets/data/ads2.jpg"
+              },
+              "banner2": {
+                  "name": "FURNITURE",
+                  "url": "https://dev.suteshop.com/",
+                  "img": "https://dev.43390.com/https://dev.suteshop.com/assets/data/ads3.jpg"
+              },
+              "banner3": {
+                  "name": "FURNITURE",
+                  "url": "https://dev.suteshop.com/",
+                  "img": "http://dev.43390.com/https://dev.suteshop.com/assets/data/f1.jpg"
+              },
+              "tabs": [
+                  {
+                      "name": "秋季秋季",
+                      "items": [
+                          {
+                              "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                              "img": "https://dev.43390.com/https://dev.suteshop.com/assets/data/01_blue-dress.jpg",
+                              "name": "加入购物车"
+                          },
+                          {
+                              "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                              "img": "https://dev.43390.com/https://dev.suteshop.com/assets/data/02_yellow-dress.jpg",
+                              "name": "加入购物车"
+                          }
+                      ]
+                  },
+                  {
+                      "name": "冬季冬季",
+                      "items": [
+                          {
+                              "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                              "img": "//dev.43390.com/image.php/shop/data/upload/media/plantform/image/20170705/1499244723478508.jpg!800x800.jpg",
+                              "name": "加入购物车"
+                          },
+                          {
+                              "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                              "img": "https://store.shopsuite.cn/https://dev.suteshop.com/assets/data/p15.jpg",
+                              "name": "加入购物车"
+                          }
+                      ]
+                  }
+              ],
+              "items": [
+                  {
+                      "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                      "img": "//dev.43390.com/image.php/shop/data/upload/media/plantform/image/20170705/1499244723478508.jpg!800x800.jpg",
+                      "name": "加入购物车"
+                  },
+                  {
+                      "url": "https://store.shopsuite.cn/index.php/Product/detail/item_id/1025",
+                      "img": "//dev.43390.com/image.php/shop/data/upload/media/plantform/image/20170705/1499244723478508.jpg!800x800.jpg",
+                      "name": "加入购物车"
+                  }
+              ]
+          };
+
+
+          $('.demo').append(sprintf($('#module_id_' + module_id + '-template').html(), pm_id, pm_id, pm_id));
+
+          window['pm_id_' + pm_id] = new Vue({
+              el:'#pm_id_' + pm_id,
+              data: pm_data
+          })
+
+                  window['pm_id_' + pm_id].items.push({
+                      url:'https://store.shopsuite.cn/index.php/Product/detail/item_id/1025',
+                      img:'//dev.43390.com/image.php/shop/data/upload/media/plantform/image/20170705/1499244723478508.jpg!800x800.jpg',
+                      label:'加入购物车'
+                  });
+
+
+                  window['pm_id_' + pm_id].items.push({
+                      url:'https://store.shopsuite.cn/index.php/Product/detail/item_id/1025',
+                      img:'//dev.43390.com/image.php/shop/data/upload/media/plantform/image/20170705/1499244723478508.jpg!800x800.jpg',
+                      label:'加入购物车'
+                  });
+
+                  //服务端存入的数据
+                  window['pm_id_' + pm_id].$data;
+      });
+  });
+  */
+</script>
+
+
+
+<script type="text/javascript">
+  var header_auth_token = '';
+
+  if (localStorage.getItem("ukey")) {
+    header_auth_token = "Bearer " + localStorage.getItem("ukey");
+  }
+
+
+  var module_data = {};
+
+  $(document).ready(function() {
+    $.ajaxSetup({
+      headers : {
+        'Authorization' : header_auth_token
+
+      }
+    });
+
+    $.get(url_module_tpl_list, {}, function(result){
+      if ( result.status == 200 ) {
+        if ( result.data.items && result.data.items.length > 0 ) {
+
+          for(var i=0; i<result.data.items.length; i++) {
+
+            module_data[result.data.items[i]['module_id']] = result.data.items[i];
+          }
+
+          new Vue({
+            el:'#add-conponent-module-body',
+            data:result.data
+          })
+
+          $(".J_chooseProList li").on("click", function ()
+          {
+            $(this).addClass("selected").siblings().removeClass("selected");
+          })
+
+        } else {
+          alert('暂无数据！')
+        }
+
+      } else {
+        alert('读取数据失败!')
+      }
+    });
+  });
+
+
+  var page_id = 1002;
+
+  //manage
+  if ($.getUrlParam('page_id')) {
+    page_id = $.getUrlParam('page_id');
+  }
+  else
+  {
+
+  }
+
+  api_url = $.getUrlParam('api_url');
+
+
+  var $layout_container = $('.demo');
+
+  //页面的完整数据
+  var page_data = {};
+
+  var url_module_tpl_list =  api_url + "/manage/sys/pageModule/listTpl";
+  var url_item_list =  api_url + "/manage/sys/pageModule/list";
+  var url_item_add =  api_url + "/manage/sys/pageModule/add";
+  var url_item_del =  api_url + "/manage/sys/pageModule/remove";
+  var url_item_sort = api_url + "/manage/sys/pageModule/sort";
+  var url_item_edit = api_url + "/manage/sys/pageModule/edit";
+  var url_item_manage = api_url + "?ctl=Page_Module&met=manage&typ=e";
+  var url_item_enable = api_url + "/manage/sys/pageModule/enable";
+
+
+  $(document).ready(function(){
+    window.list_pm = function ()
+    {
+      $.ajaxSetup({
+        headers : {
+          'Authorization' : header_auth_token
+
+        }
+      });
+
+      $.get(url_item_list, {page_id:page_id}, function(result){
+        if ( result.status == 200 ) {
+          if ( result.data.items && result.data.items.length > 0 ) {
+            var item_list = result.data.items;
+
+            for(var i=0; i<item_list.length; i++) {
+              createLayoutHtml(item_list[i]);
+
+              page_data[item_list[i].pm_id] = item_list[i];
+            }
+
+            //$layout_container.append(list_html);
+          } else {
+            alert('暂无数据， 右上角添加按钮可添加模块！')
+          }
+
+        } else {
+          alert('读取数据失败！')
+        }
+      });
+    }
+
+    list_pm();
+
+
+    function createLayoutHtml(pm_row) {
+      var default_img = 'https://store.shopsuite.cn/shop_admin/static/src/common/images/' + '/image.png';
+      switch (pm_row.module_id) {
+        case 'adv_list':
+          break;
+        case 'home1':
+          break;
+        case 'home2':
+          break;
+        case 'home3' :
+          break;
+        case 'home4' :
+        case 'goods' :
+          break;
+      }
+
+
+      var pm_id = pm_row.pm_id;
+      var module_id = pm_row.module_id;
+
+
+      pm_row.pm_json['module_id'] = pm_row.module_id;
+      pm_row.pm_json['pm_id'] = pm_row.pm_id;
+      //pm_row.pm_enable = 1; // 默认启用
+
+      var module_template_id = '#module_id_' + module_id + '-template';
+      var pm_box_id = '#pm_id_' + pm_id;
+
+      //alert(module_template_id)
+      $layout_container.append(sprintf($(module_template_id).html(), pm_id, pm_id, pm_id, pm_row.pm_enable ? '禁用' : '启用', pm_id));
+
+      pm_row.pm_json.pm_enable = pm_row.pm_enable;
+
+      window['pm_id_' + pm_id] = new Vue({
+        el:pm_box_id,
+        data: pm_row.pm_json,
+        computed: {
+          pmId: function () {
+            return pm_row.pm_id;
+          }
+        },
+        methods: {
+          getTabId: function (index, link = false) {
+            var link = link === true ? "#" : "";
+            return link + "tab-" + pm_row.pm_id + "-" + index;
+          }
+        }
+      })
+
+      $.common.initEvent($(pm_box_id).parent());
+    }
+
+
+
+    $('.item_modify').on('click', function() {
+      alert(99999)
+    })
+
+    //添加模块
+    $('#saveAddConponentContent').on('click', function() {
+
+      var module_id = '';
+      var pm_row  = {};
+      $(".J_chooseProList li").each(function ()
+      {
+        if ( $(this).hasClass("selected"))
+        {
+          module_id = $(this).data('module_id');
+
+        }
+      })
+
+      $.ajaxSetup({
+        headers : {
+          'Authorization' : header_auth_token
+
+        }
+      });
+
+      var data = {}
+      data['page_id'] = page_id;
+      data['module_id'] = module_id;
+
+      data['pm_json'] = module_data[module_id]['module_config'];
+
+      $.getJSON(url_item_add, data, function(data) {
+        if(data.status == 200) {
+          //添加数据
+
+          data.data.pm_json = JSON.parse(data.data.pm_json);
+          page_data[data.data.pm_id] = data.data;
+
+          createLayoutHtml(data.data);
+        } else {
+          alert(data.msg)
+        }
+      });
+    });
+
+    //删除模块
+    window.remove_pm = function (pm_id)
+    {
+      delete page_data[pm_id];
+      delete window['pm_id_' + pm_id];
+
+
+      //是否发送ajax,立马删除
+      $.ajaxSetup({
+        headers : {
+          'Authorization' : header_auth_token
+
+        }
+      });
+
+      var send_data =  {}
+      send_data['pm_id'] = pm_id;
+      $.getJSON(url_item_del, send_data, function (data)
+      {
+        if (data && data.status == 200)
+        {
+        }
+        else
+        {
+          alert(data.msg);
+        }
+      });
+    }
+
+    //编辑模块
+    window.edit_item = function(pm_id, module_id) {
+      $.ajaxSetup({
+        headers : {
+          'Authorization' : header_auth_token
+        }
+      });
+
+      //是否发送ajax,立马删除
+      var send_data =  {}
+      var pm_json_str = page_data[pm_id]["pm_json"];
+
+      send_data = JSON.parse(JSON.stringify(page_data[pm_id]))
+      send_data["pm_json"] = JSON.stringify(send_data["pm_json"])
+
+
+      delete send_data.pm_utime;
+
+      $.getJSON(url_item_edit, send_data, function (data)
+      {
+        if (data && data.status == 200)
+        {
+        }
+        else
+        {
+          alert(data.msg);
+        }
+      });
+    };
+
+
+    window.update_item_sort = function(pm_ids) {
+      $.ajaxSetup({
+        headers : {
+          'Authorization' : header_auth_token
+        }
+      });
+
+      var pm_id_string = '';
+      pm_id_string = pm_ids.join(",");
+
+      $.post(url_item_sort, {page_id: page_id, pm_id_string: pm_id_string}, function(data) {
+        if(data.status != 200) {
+          alert(data.msg);
+        }
+      }, 'json');
+    };
+
+    //启用/禁用控制
+    $(document).on('click', '.JS_pm_enable', function() {
+      var pm_id =  $(this).data('pm_id');
+      var usable = ''
+
+      if(page_data[pm_id].pm_enable) {
+        page_data[pm_id].pm_enable = 0;
+        page_data[pm_id].pm_json.pm_enable = 0;
+        usable = 'unusable';
+
+        $(this).html('<i class="fa fa-toggle-on"></i>启用');
+      } else {
+        page_data[pm_id].pm_enable = 1;
+        page_data[pm_id].pm_json.pm_enable = 1;
+        usable = 'usable';
+
+        $(this).html('<i class="fa fa-toggle-off"></i>禁用');
+      }
+
+      $.post(url_item_enable, {pm_id: pm_id, usable: usable, page_id: page_id}, function(data) {
+        if(data.status != 200) {
+          alert(data.msg);
+        }
+      }, 'json');
+    });
+
+    $(document).on('click', '.add-rd', function(e) {
+      console.log(e.target.dataset.pm_id)
+      var pm_id = e.target.dataset.pm_id;
+
+      // window.location.href=api_url +'?mdu=&ctl=Page_Base&met=hotspot&typ=e&key=' + key + '&pm_id='+ pm_id;
+      window.open(api_url +'?mdu=&ctl=Page_Base&met=hotspot&typ=e&pm_id=' + pm_id);
+    });
+
+  });
+</script>
+
+<script>
+  //启用/禁用控制
+  $('.page-container').on('click', 'a:not(.btn)', function(e) {
+    e.preventDefault();
+  });
+
+  $.common = {
+    initEvent: function ($dom)
+    {
+      if ($('.parallax', $dom).length > 0)
+      {
+        $('.parallax', $dom).each(function ()
+        {
+          $(this).parallax("50%", 0.1);
+        })
+      }
+
+
+      /** OWL CAROUSEL**/
+      $(".owl-carousel", $dom).each(function (index, el)
+      {
+        var config = $(this).data();
+        config.navText = ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'];
+        config.smartSpeed = "300";
+        if ($(this).hasClass('owl-style2'))
+        {
+          config.animateOut = "fadeOut";
+          config.animateIn = "fadeIn";
+        }
+        $(this).owlCarousel(config);
+      });
+
+      $(".owl-carousel-vertical", $dom).each(function (index, el)
+      {
+        var config = $(this).data();
+        config.navText = ['<span class="icon-up"></spam>', '<span class="icon-down"></span>'];
+        config.smartSpeed = "900";
+        config.animateOut = "";
+        config.animateIn = "fadeInUp";
+        $(this).owlCarousel(config);
+      });
+
+
+      /** HOME SLIDE**/
+      if ($('.home-slider', $dom).length > 0 && $('#contenhomeslider', $dom).length > 0)
+      {
+        var slider = $('#contenhomeslider', $dom).bxSlider(
+          {
+            nextText: '<i class="fa fa-angle-right"></i>',
+            prevText: '<i class="fa fa-angle-left"></i>',
+            auto: true,
+          }
+        );
+      }
+
+      /** Custom page sider**/
+      if ($('.home-slider', $dom).length > 0 && $('#contenhomeslider-customPage', $dom).length > 0)
+      {
+        var slider = $('#contenhomeslider-customPage', $dom).bxSlider(
+          {
+            nextText: '<i class="fa fa-angle-right"></i>',
+            prevText: '<i class="fa fa-angle-left"></i>',
+            auto: true,
+            pagerCustom: '#bx-pager',
+            nextSelector: '#bx-next',
+            prevSelector: '#bx-prev',
+          }
+        );
+      }
+
+      if ($('.home-slider', $dom).length > 0 && $('#slide-background', $dom).length > 0)
+      {
+        var slider = $('#slide-background', $dom).bxSlider(
+          {
+            nextText: '<i class="fa fa-angle-right"></i>',
+            prevText: '<i class="fa fa-angle-left"></i>',
+            auto: true,
+            onSlideNext: function ($slideElement, oldIndex, newIndex)
+            {
+              var corlor = $($slideElement).data('background');
+              $('.home-slider').css('background', corlor);
+            },
+            onSlidePrev: function ($slideElement, oldIndex, newIndex)
+            {
+              var corlor = $($slideElement).data('background');
+              $('.home-slider').css('background', corlor);
+            }
+          }
+        );
+        //slider.goToNextSlide();
+      }
+
+      // CATEGORY FILTER
+      $('.slider-range-price', $dom).each(function ()
+      {
+        var min = $(this).data('min');
+        var max = $(this).data('max');
+        var unit = $(this).data('unit');
+        var value_min = $(this).data('value-min');
+        var value_max = $(this).data('value-max');
+        var label_reasult = $(this).data('label-reasult');
+        var t = $(this);
+
+        $(this).slider({
+          range: true,
+          min: min,
+          max: max,
+          values: [value_min, value_max],
+          slide: function (event, ui)
+          {
+            var result = label_reasult + " " + unit + ui.values[0] + ' - ' + unit + ui.values[1];
+            console.log(t);
+            t.closest('.slider-range').find('.amount-range-price').html(result);
+          }
+        });
+      })
+
+
+      //商品详情页面
+      // OWL Product thumb
+      $dom.find('.product-img-thumb .owl-carousel').owlCarousel(
+        {
+          dots: false,
+          nav: true,
+          navText: ['<i class="fa fa-angle-left"></i>', '<i class="fa fa-angle-right"></i>'],
+          margin: 21,
+          responsive: {
+            // breakpoint from 0 up
+            0: {
+              items: 2,
+            },
+            // breakpoint from 480 up
+            480: {
+              items: 2,
+            },
+            // breakpoint from 768 up
+            768: {
+              items: 2,
+            },
+            1000: {
+              items: 3,
+            }
+          }
+        }
+      );
+
+
+
+      $(".box-main .form-section:has(label)", $dom).each(function(i, el)
+      {
+        var $this = $(el),
+          $label = $this.find('label'),
+          $input = $this.find('.form-control');
+
+        $input.on('focus', function()
+        {
+          $this.addClass('form-section-active');
+          $this.addClass('form-section-focus');
+        });
+
+        $input.on('keydown', function()
+        {
+          $this.addClass('form-section-active');
+          $this.addClass('form-section-focus');
+        });
+
+        $input.on('blur', function()
+        {
+          $this.removeClass('form-section-focus');
+
+          if(!$.trim($input.val()))
+          {
+            $this.removeClass('form-section-active');
+          }
+        });
+
+        $label.on('click', function()
+        {
+          $input.focus();
+        });
+
+        if($.trim($input.val()))
+        {
+          $this.addClass('form-section-active');
+        }
+      });
+
+
+      $('[data-toggle="tooltip"]', $dom).each(function(i, el)
+      {
+        var $this = $(el),
+          placement = attrDefault($this, 'placement', 'top'),
+          trigger = attrDefault($this, 'trigger', 'hover'),
+          tooltip_class = $this.get(0).className.match(/(tooltip-[a-z0-9]+)/i);
+
+        if ($this.is('img') && $this.parent().length > 0 && $this.parent().hasClass('picture_upload_replace'))
+        {
+          if (!$this.prop('title'))
+          {
+            if ($this.data('title'))
+            {
+              $this.prop('title',  __(sprintf('<p style="min-width: 100px;color:white;padding: 10px;">尺寸 %s </p>', $this.data('title'))));
+
+            }
+            else
+            {
+              $this.prop('title',  __(sprintf('<p style="min-width: 100px;color:white;padding: 10px;">尺寸 %d * %d</p>', $this.width(), $this.height())));
+            }
+          }
+
+          placement = 'right'
+        }
+
+        $this.tooltip({
+          placement: placement,
+          trigger: trigger,
+          html : true
+        });
+
+        if(tooltip_class)
+        {
+          $this.removeClass(tooltip_class[1]);
+
+          $this.on('show.bs.tooltip', function(ev)
+          {
+            setTimeout(function()
+            {
+              var $tooltip = $this.next();
+              $tooltip.addClass(tooltip_class[1]);
+
+            }, 0);
+          });
+        }
+      });
+
+      if ($.isFunction($.fn.blueberry))
+      {
+        $(".blueberry").blueberry();
+      }
+
+      //潮流新品
+      $('.trend_tit ul li').hover(function(){
+        $(this).addClass('cur').siblings().removeClass('cur');
+        $('.trend_con').eq($(this).index()).show().siblings('.trend_con').hide();
+      })
+    }
+  };
+
+  $(function ()
+  {
+    //$.common.initEvent($('.demo'));
+  })
+
+</script>
+
+</body>
+</html>

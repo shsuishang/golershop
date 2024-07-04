@@ -277,5 +277,18 @@ func (s *sProductType) Info(ctx context.Context, id any) (out *model.ProductType
 		item.Items = specMap[item.SpecId]
 	}
 
+	//默认空数组
+	if len(out.Brands) == 0 {
+		out.Brands = make([]*entity.ProductBrand, 0)
+	}
+
+	if len(out.Assists) == 0 {
+		out.Assists = make([]*model.AssistVo, 0)
+	}
+
+	if len(out.Specs) == 0 {
+		out.Specs = make([]*model.SpecVo, 0)
+	}
+
 	return out, nil
 }

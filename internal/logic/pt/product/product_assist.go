@@ -24,11 +24,13 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 type sProductAssist struct{}
@@ -78,6 +80,53 @@ func (s *sProductAssist) Find(ctx context.Context, in *do.ProductAssistListInput
 // List 分页读取
 func (s *sProductAssist) List(ctx context.Context, in *do.ProductAssistListInput) (out *do.ProductAssistListOutput, err error) {
 	out, err = dao.ProductAssist.List(ctx, in)
+
+	return out, err
+}
+
+// Tree 查询数据
+func (s *sProductAssist) Tree(ctx context.Context) (out []*model.ProductAssistTreeVo, err error) {
+	// 获取配置列表
+	var productAssistList, error = service.ProductAssist().Find(ctx, &do.ProductAssistListInput{
+		BaseList: ml.BaseList{
+			Sidx: dao.ProductAssist.Columns().AssistId,
+			Sort: "ASC"},
+	})
+
+	if error != nil {
+		err = error
+	}
+
+	//过滤分类编号
+	categoryList := array.Column(productAssistList, dao.ProductAssist.Columns().CategoryId)
+
+	var productCategory, errorType = service.ProductCategory().Gets(ctx, categoryList)
+
+	if errorType != nil {
+		err = errorType
+	}
+
+	out = make([]*model.ProductAssistTreeVo, 0)
+	for _, v := range productCategory {
+		categoryId := v.CategoryId
+		it := &model.ProductAssistTreeVo{}
+		it.AssistId = v.CategoryId
+		it.AssistName = v.CategoryName
+
+		// 查询配置项列表
+		itemList := make([]*entity.ProductAssist, 0)
+		for _, v := range productAssistList {
+			if categoryId == v.CategoryId {
+				itemList = append(itemList, v)
+			}
+		}
+
+		if len(itemList) > 0 {
+			it.Children = itemList
+			// 加入数组
+			out = append(out, it)
+		}
+	}
 
 	return out, err
 }

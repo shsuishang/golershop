@@ -59,6 +59,23 @@ func (c *cProductCategory) Tree(ctx context.Context, req *pt.ProductCategoryTree
 	return
 }
 
+// List 分类列表
+func (c *cProductCategory) List(ctx context.Context, req *pt.ProductCategoryListReq) (res pt.ProductCategoryListRes, err error) {
+
+	input := do.ProductCategoryListInput{}
+	input.Where.CategoryParentId = req.CategoryParentId
+
+	var result, error = service.ProductCategory().List(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	gconv.Scan(result, &res)
+
+	return
+}
+
 // Add 新增分类
 func (c *cProductCategory) Add(ctx context.Context, req *pt.ProductCategoryAddReq) (res *pt.ProductCategoryEditRes, err error) {
 

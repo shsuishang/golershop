@@ -3,6 +3,7 @@ package pt
 import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mallsuite/gocore/core/ml"
+	"golershop.cn/internal/model"
 )
 
 // start fo front
@@ -55,6 +56,12 @@ type ProductAssistListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type ProductAssistTreeReq struct {
+	g.Meta `path:"/manage/pt/productAssist/tree" tags:"属性管理" method:"get" summary:"属性树形接口"`
+}
+
+type ProductAssistTreeRes []*model.ProductAssistTreeVo
 
 // ---------------------------- 属性项 -------------------------------
 

@@ -33,6 +33,7 @@ type (
 		GetRelease(data *ml.ReleaseDto, releaseType string) (string, error)
 		GetDistrict(serviceUserId int, serviceAppKey string) (map[string]interface{}, error)
 		GetLicence(serviceUserId int, serviceAppKey string) (string, error)
+		ListSmsRecords(smsDto *ml.SmsDto, page, rows int) (map[string]interface{}, error)
 	}
 )
 

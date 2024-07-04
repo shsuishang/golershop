@@ -126,7 +126,10 @@ var (
 					sys.Captcha,
 					sys.Upload,
 					sys.Page,
+					sys.PageModule,
 					sys.Release,
+					sys.PageCategoryNav,
+					sys.PagePcNav,
 					trade.Order,
 					trade.Cart,
 					trade.OrderBase,
@@ -134,6 +137,7 @@ var (
 					trade.OrderLogistics,
 					trade.OrderReturn,
 					trade.Return,
+					trade.OrderReturnReason,
 					analytics.Analytics,
 					analytics.AnalyticsReturn,
 				)

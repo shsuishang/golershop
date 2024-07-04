@@ -365,3 +365,36 @@ func (c *cConfig) CleanCache(ctx context.Context, req *sys.CleanCacheReq) (res s
 	_, err = service.ConfigBase().CleanCache(ctx)
 	return res, err
 }
+
+func (c *cConfig) GetDetail(ctx context.Context, req *sys.GetDetailReq) (res *sys.GetDetailRes, err error) {
+
+	result, err := service.ConfigBase().Get(ctx, req.ConfigKey)
+
+	res = &sys.GetDetailRes{}
+	gconv.Scan(result, res)
+	return res, err
+}
+
+// SmsRecord 消息模板表-分页列表查询
+func (c *cConfig) SmsRecord(ctx context.Context, req *sys.SmsRecordReq) (res *sys.SmsRecordRes, err error) {
+	// 获取配置信息
+	serviceUserId := service.ConfigBase().GetStr(ctx, "service_user_id", "")
+	serviceAppKey := service.ConfigBase().GetStr(ctx, "service_app_key", "")
+
+	// 创建SmsDto
+	smsDto := &ml.SmsDto{
+		ServiceUserId: gconv.Int(serviceUserId),
+		ServiceAppKey: serviceAppKey,
+	}
+
+	// 调用云服务获取短信记录列表
+	smsRecords, err := service.Cloud().ListSmsRecords(smsDto, req.Page, req.Rows)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构造返回结果
+	res = &sys.SmsRecordRes{}
+	gconv.Scan(smsRecords, res)
+	return res, nil
+}

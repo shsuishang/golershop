@@ -384,6 +384,18 @@ type (
 		// Remove 删除多条记录模式
 		RemoveWhere(ctx context.Context, where *do.OrderInvoiceListInput) (affected int64, err error)
 	}
+	IOrderReturnReason interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderReturnReasonListInput) (out []*entity.OrderReturnReason, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderReturnReasonListInput) (out *do.OrderReturnReasonListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderReturnReason) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderReturnReason) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
 )
 
 var (
@@ -403,6 +415,7 @@ var (
 	localStockBill             IStockBill
 	localDistributionOrderItem IDistributionOrderItem
 	localOrderData             IOrderData
+	localOrderReturnReason     IOrderReturnReason
 )
 
 func DistributionOrder() IDistributionOrder {
@@ -579,4 +592,14 @@ func OrderStateLog() IOrderStateLog {
 
 func RegisterOrderStateLog(i IOrderStateLog) {
 	localOrderStateLog = i
+}
+func OrderReturnReason() IOrderReturnReason {
+	if localOrderReturnReason == nil {
+		panic("implement not found for interface IOrderReturnReason, forgot register?")
+	}
+	return localOrderReturnReason
+}
+
+func RegisterOrderReturnReason(i IOrderReturnReason) {
+	localOrderReturnReason = i
 }

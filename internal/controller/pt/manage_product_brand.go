@@ -8,6 +8,7 @@ import (
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 var (
@@ -32,36 +33,12 @@ func (c *cProductBrand) Tree(ctx context.Context, req *pt.ProductBrandTreeReq) (
 	}
 
 	//过滤分类编号
-	var categoryList []uint
-
-	for _, v := range brandData {
-		categoryId := v.CategoryId
-		// 加入数组
-		categoryList = append(categoryList, categoryId)
-	}
-
+	categoryList := array.Column(brandData, dao.ProductBrand.Columns().CategoryId)
 	var productCategory, errorType = service.ProductCategory().Gets(ctx, categoryList)
 
 	if errorType != nil {
 		err = errorType
 	}
-
-	it := pt.ProductBrandTreeVoRes{}
-	it.BrandId = 0
-	it.BrandName = "未分类"
-	itemList := make([]map[string]interface{}, 0)
-	for _, v := range brandData {
-		if v.CategoryId == it.BrandId {
-
-			item := make(map[string]interface{})
-			item["brand_id"] = v.BrandId
-			item["brand_name"] = v.BrandName
-
-			itemList = append(itemList, item)
-		}
-	}
-	it.Children = itemList
-	res = append(res, it)
 
 	for _, v := range productCategory {
 		categoryId := v.CategoryId
@@ -81,9 +58,12 @@ func (c *cProductBrand) Tree(ctx context.Context, req *pt.ProductBrandTreeReq) (
 				itemList = append(itemList, item)
 			}
 		}
+
 		it.Children = itemList
-		// 加入数组
-		res = append(res, it)
+
+		if len(itemList) > 0 {
+			res = append(res, it)
+		}
 	}
 
 	return

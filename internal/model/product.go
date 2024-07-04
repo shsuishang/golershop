@@ -1,6 +1,8 @@
 package model
 
 import (
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 )
@@ -133,6 +135,33 @@ type PageMobileVo struct {
 	PageUpgrade    bool   `json:"IsUpgrade"     `    // 升级VIP(BOOL):0-否;1-是
 	PageMessage    bool   `json:"page_message"     ` // 信息发布(BOOL):0-否;1-是
 	PageRelease    bool   `json:"IsRelease"       `  // 是否发布
+}
+
+// PC端装修
+type PageModuleVo struct {
+	PmId       int         `json:"pm_id"         dc:"模块ID"`
+	PmName     string      `json:"pm_name"       dc:"模块名称"`                    // 模块名称
+	PageId     int64       `json:"page_id"       dc:"页面ID"`                    // 页面ID
+	UserId     int         `json:"user_id"       dc:"所属用户"`                    // 所属用户
+	PmColor    string      `json:"pm_color"      dc:"颜色"`                      // 颜色
+	PmType     string      `json:"pm_type"       dc:"所在页面"`                    // 所在页面
+	ModuleId   string      `json:"module_id"     dc:"模版"`                      // 模版
+	PmUtime    *gtime.Time `json:"pm_utime"      dc:"更新时间"`                    // 更新时间
+	PmOrder    int         `json:"pm_order"      dc:"排序"`                      // 排序
+	PmEnable   bool        `json:"pm_enable"     dc:"是否显示"`                    // 是否显示
+	PmHtml     string      `json:"pm_html"       dc:"模块html代码"`                // 模块html代码
+	PmJson     g.Map       `json:"pm_json"       dc:"模块JSON代码"`                // 模块JSON代码 (JSON)
+	SubsiteId  int         `json:"subsite_id"    dc:"所属分站Id"`                  // 所属分站Id:0-总站
+	PmPosition string      `json:"pm_position"   dc:"column_left:content_top"` // column_left:content_top
+}
+
+// PC端装修
+type PageModuleVoOutput struct {
+	Items   []*PageModuleVo `json:"items"    dc:"分页数据内容"`
+	Page    int             `json:"page"`    // 分页号码
+	Total   int             `json:"total"`   // 总页数
+	Records int             `json:"records"` // 数据总数
+	Size    int             `json:"size"`    // 单页数量
 }
 
 type ProductDateOutput struct {

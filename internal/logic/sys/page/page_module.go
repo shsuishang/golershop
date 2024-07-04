@@ -24,10 +24,13 @@ import (
 	"context"
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"golershop.cn/api/pt"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
@@ -42,6 +45,34 @@ func init() {
 
 func NewPageModule() *sPageModule {
 	return &sPageModule{}
+}
+
+// 读取商品分类
+func (s *sPageModule) Get(ctx context.Context, id any) (out *entity.PageModule, err error) {
+	var list []*entity.PageModule
+	list, err = s.Gets(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) > 0 {
+		return list[0], nil
+	}
+
+	return out, nil
+}
+
+// 读取多条记录模式
+func (s *sPageModule) Gets(ctx context.Context, id any) (list []*entity.PageModule, err error) {
+
+	err = dao.PageModule.Ctx(ctx).WherePri(id).Scan(&list)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
 }
 
 // Find 查询数据
@@ -182,4 +213,70 @@ func (s *sPageModule) FixPcPageModuleData(ctx context.Context, pageData []*entit
 	}
 
 	return data, nil
+}
+
+// GetModuleTpl 获取模块模板
+func (s *sPageModule) GetModuleTpl(ctx context.Context) (map[string]interface{}, error) {
+	// 获取配置 service_user_id
+	configBaseUserId, err := service.ConfigBase().Get(ctx, "service_user_id")
+	if err != nil {
+		return nil, gerror.New("获取配置 service_user_id 失败: " + err.Error())
+	}
+
+	// 获取配置 service_app_key
+	configBaseAppKey, err := service.ConfigBase().Get(ctx, "service_app_key")
+	if err != nil {
+		return nil, gerror.New("获取配置 service_app_key 失败: " + err.Error())
+	}
+
+	// 调用 cloundService 获取模块模板
+	moduleTpl, err := service.Cloud().GetModuleTpl(gconv.Int(configBaseUserId.ConfigValue), configBaseAppKey.ConfigValue)
+	if err != nil {
+		return nil, gerror.New("获取模块模板失败: " + err.Error())
+	}
+
+	return moduleTpl, nil
+}
+
+// GetLists 获取页面模块列表
+func (s *sPageModule) GetLists(ctx context.Context, req *do.PageModuleListInput) (pageModuleVo *model.PageModuleVoOutput, err error) {
+	// 初始化返回的分页数据结构
+	pageModuleVo = &model.PageModuleVoOutput{}
+
+	// 查询条件
+	pageModuleQueryWrapper := &do.PageModuleListInput{
+		Where: do.PageModule{PageId: req.Where.PageId},
+	}
+
+	// 获取页面模块列表，分页查询
+	modulePage, err := s.List(ctx, pageModuleQueryWrapper)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将 modulePage 的分页数据复制到 pageModuleVo
+	gconv.Scan(modulePage.Items, &pageModuleVo)
+
+	// 初始化页面模块 VO 列表
+	pageModuleVos := make([]*model.PageModuleVo, 0)
+
+	// 判断 modulePage 是否为空
+	if !g.IsEmpty(modulePage.Items) {
+		for _, pageModule := range modulePage.Items {
+			// 创建单个页面模块 VO
+			moduleVo := &model.PageModuleVo{}
+			gconv.Scan(pageModule, moduleVo)
+
+			// 解析 JSON 数据并设置到 VO 中
+			parse := gjson.New(pageModule.PmJson)
+			moduleVo.PmJson = parse.Map()
+
+			// 添加到页面模块 VO 列表
+			pageModuleVos = append(pageModuleVos, moduleVo)
+		}
+		// 设置分页数据中的记录
+		pageModuleVo.Items = pageModuleVos
+	}
+
+	return pageModuleVo, nil
 }

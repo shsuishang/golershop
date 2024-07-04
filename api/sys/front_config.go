@@ -26,3 +26,17 @@ type TranslateLangReq struct {
 
 type TranslateLangRes struct {
 }
+type GetPcHelpReq struct {
+	g.Meta `path:"/front/sys/config/getPcHelp" tags:"站点帮助" method:"get" summary:"站点帮助"`
+}
+
+type GetPcHelpRes struct {
+	PagePcHelp string `json:"page_pc_help"  `
+}
+type SavePcHelpReq struct {
+	g.Meta `path:"/manage/sys/config/savePcHelp" tags:"站点帮助" method:"post" summary:"站点帮助"`
+	PcHelp string `json:"pc_help"  `
+}
+
+type SavePcHelpRes struct {
+}

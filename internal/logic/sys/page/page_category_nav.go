@@ -95,7 +95,7 @@ func (s *sPageCategoryNav) GetPcLayout(ctx context.Context) (resultSlice []inter
 	pageCategoryNavs, err := dao.PageCategoryNav.Find(ctx, &do.PageCategoryNavListInput{
 		Where: do.PageCategoryNav{CategoryNavEnable: true},
 		BaseList: ml.BaseList{
-			Sort: "asc",
+			Sort: ml.ORDER_BY_ASC,
 			Sidx: dao.PageCategoryNav.Columns().CategoryNavOrder,
 		},
 	})
@@ -132,10 +132,11 @@ func (s *sPageCategoryNav) GetPcLayout(ctx context.Context) (resultSlice []inter
 		}
 	}
 
-	input := &model.PageCategoryNavVo{}
 	for i := range pageCategoryNavs {
 		item := pageCategoryNavs[i]
+		input := &model.PageCategoryNavVo{}
 		gconv.Scan(item, input)
+
 		// 处理分类编号
 		if input.CategoryNavType == 1 {
 			categoryId := gconv.Uint(input.CategoryIds)

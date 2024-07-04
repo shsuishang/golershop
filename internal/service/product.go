@@ -179,6 +179,7 @@ type (
 		Find(ctx context.Context, in *do.ProductAssistListInput) (out []*entity.ProductAssist, err error)
 		// List 分页读取
 		List(ctx context.Context, in *do.ProductAssistListInput) (out *do.ProductAssistListOutput, err error)
+		Tree(ctx context.Context) (out []*model.ProductAssistTreeVo, err error)
 		// Add 新增
 		Add(ctx context.Context, in *do.ProductAssist) (lastInsertId int64, err error)
 		// Edit 编辑

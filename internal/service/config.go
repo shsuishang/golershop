@@ -64,6 +64,7 @@ type (
 		GetNextReturnStateId(ctx context.Context, returnStateId uint) (uint, error)
 		// GetPaymentChannelList 取得支付渠道
 		GetPaymentChannelList(ctx context.Context) (optionsList []*model.SelectVo, err error)
+		// GetPaymentChannelCode 读取配置，根据paymentChannelId读取paymentChannelCode
 		GetPaymentChannelCode(ctx context.Context, paymentChannelId uint) (string, error)
 		// GetReturnStateList 读取订单状态选项
 		GetReturnStateList(ctx context.Context) (optionsList []*model.SelectVo, err error)
@@ -83,6 +84,15 @@ type (
 		GetSiteInfo(ctx context.Context, sourceUccCode string) (res map[string]interface{}, err error)
 		// CleanCache 清理缓存
 		CleanCache(ctx context.Context) (res bool, err error)
+		// ifIm
+		IfIm(ctx context.Context) (res bool)
+		IfB2B(ctx context.Context) (res bool)
+		IfChain(ctx context.Context) (res bool)
+		IfEdu(ctx context.Context) (res bool)
+		IfB2bHall(ctx context.Context) (res bool)
+		IfMultilang(ctx context.Context) (res bool)
+		IfSns(ctx context.Context) (res bool)
+		IfSubsite(ctx context.Context) (res bool)
 	}
 	IConfigType interface {
 		// Find 查询数据
@@ -99,8 +109,8 @@ type (
 )
 
 var (
-	localConfigType IConfigType
 	localConfigBase IConfigBase
+	localConfigType IConfigType
 )
 
 func ConfigBase() IConfigBase {

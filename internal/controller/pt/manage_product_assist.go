@@ -63,6 +63,18 @@ func (c *cProductAssist) ListAssist(ctx context.Context, req *pt.ProductAssistLi
 	return
 }
 
+func (c *cProductAssist) Tree(ctx context.Context, req *pt.ProductAssistTreeReq) (res pt.ProductAssistTreeRes, err error) {
+	var result, error = service.ProductAssist().Tree(ctx)
+
+	if error != nil {
+		err = error
+	}
+
+	gconv.Struct(result, &res)
+
+	return
+}
+
 // Add 添加属性分类
 func (c *cProductAssist) AddAssist(ctx context.Context, req *pt.ProductAssistAddReq) (res *pt.ProductAssistEditRes, err error) {
 	input := do.ProductAssist{}

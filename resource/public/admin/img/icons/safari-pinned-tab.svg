@@ -1,0 +1,19 @@
+<svg data-v-4f752934="" version="1.0"
+     xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 120.000000 120.000000" preserveAspectRatio="xMidYMid meet" color-interpolation-filters="sRGB" class="el-tooltip" style="margin: auto;">
+
+    <g>
+        <svg x="0" y="0" width="120" height="120">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 341.38 341.38">
+                <defs>
+                    <linearGradient id="a1a9fc257-90d2-4279-9ce4-ad2f91041dd1" x1="22.1" y1="319.28" x2="319.28" y2="22.1" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#ff6700"></stop>
+                        <stop offset="1" stop-color="#ff6700"></stop>
+                    </linearGradient>
+                </defs>
+                <g>
+                    <path d="M280.75 82.88H137.61a50.52 50.52 0 1 0 0 101h62.55a24.06 24.06 0 1 1 0 48.11h-62.55a98.63 98.63 0 1 1 0-197.27h191.87A75.33 75.33 0 0 0 266 0H75.41A75.41 75.41 0 0 0 0 75.41V258.5h203.77a50.52 50.52 0 1 0 0-101h-62.55a24.06 24.06 0 0 1 0-48.11h62.55a98.63 98.63 0 0 1 0 197.27H11.9a75.33 75.33 0 0 0 63.5 34.77H266A75.41 75.41 0 0 0 341.38 266V82.88z" fill="url(#a1a9fc257-90d2-4279-9ce4-ad2f91041dd1)"></path>
+                </g>
+            </svg>
+        </svg>
+    </g>
+</svg>

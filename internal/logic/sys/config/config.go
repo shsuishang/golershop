@@ -711,7 +711,7 @@ func (s *sConfigBase) IfSupplierMarket(ctx context.Context) (res bool) {
 // GetSiteInfo 初始化
 func (s *sConfigBase) GetSiteInfo(ctx context.Context, sourceUccCode string) (res map[string]interface{}, err error) {
 
-	keyStr := "site_name,site_meta_keyword,site_meta_description,site_version,copyright,icp_number,site_company_name,site_address,site_tel,account_login_bg,site_admin_logo,site_mobile_logo,site_pc_logo,date_format,time_format,cache_enable,cache_expire,site_status,advertisement_open,wechat_connect_auto,wechat_app_id,product_spec_edit,default_image,product_salenum_flag,b2b_flag,hall_b2b_enable,product_ziti_flag,plantform_fx_enable,plantform_fx_gift_point,plantform_fx_withdraw_min_amount,plantform_poster_bg,plantform_commission_withdraw_mode,product_poster_bg,live_mode_xcx,kefu_type_id,withdraw_received_day,withdraw_monthday,default_shipping_district,points_enable,voucher_enable,b2b_enable,chain_enable,edu_enable,hall_enable,multilang_enable,sns_enable,subsite_enable,supplier_enable,im_enable,chat_global,wechat_mp_qrcode"
+	keyStr := "site_name,site_meta_keyword,site_meta_description,site_version,copyright,icp_number,site_company_name,site_address,site_tel,account_login_bg,site_admin_logo,site_mobile_logo,site_pc_logo,date_format,time_format,cache_enable,cache_expire,site_status,advertisement_open,wechat_connect_auto,wechat_app_id,product_spec_edit,default_image,product_salenum_flag,b2b_flag,hall_b2b_enable,product_ziti_flag,plantform_fx_enable,plantform_fx_gift_point,plantform_fx_withdraw_min_amount,plantform_poster_bg,plantform_commission_withdraw_mode,product_poster_bg,live_mode_xcx,kefu_type_id,withdraw_received_day,withdraw_monthday,default_shipping_district,points_enable,voucher_enable,b2b_enable,chain_enable,edu_enable,hall_enable,multilang_enable,sns_enable,subsite_enable,supplier_enable,im_enable,chat_global,service_qrcode,wechat_mp_qrcode,chain_enable,baidu_client_ak"
 	keyIds := gstr.Split(keyStr, ",")
 
 	var list, error = service.ConfigBase().Find(ctx, &do.ConfigBaseListInput{Where: do.ConfigBase{ConfigKey: keyIds}})
@@ -805,4 +805,37 @@ func (s *sConfigBase) CleanCache(ctx context.Context) (res bool, err error) {
 	//}
 
 	return
+}
+
+// ifIm
+func (s *sConfigBase) IfIm(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "im_enable", false)
+}
+
+func (s *sConfigBase) IfB2B(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "b2b_enable", false)
+}
+
+func (s *sConfigBase) IfChain(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "chain_enable", false)
+}
+
+func (s *sConfigBase) IfEdu(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "edu_enable", false)
+}
+
+func (s *sConfigBase) IfB2bHall(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "hall_enable", false)
+}
+
+func (s *sConfigBase) IfMultilang(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "multilang_enable", false)
+}
+
+func (s *sConfigBase) IfSns(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "sns_enable", false)
+}
+
+func (s *sConfigBase) IfSubsite(ctx context.Context) (res bool) {
+	return s.GetBool(ctx, "subsite_enable", false)
 }

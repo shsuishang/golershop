@@ -1,0 +1,43 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>发现</title>
+
+  <link rel="stylesheet" href="../../../layui.css">
+	<script language="javascript">
+    function getUrlParam(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]); return null;
+    }
+
+    api_url = getUrlParam('api_url');
+	</script>
+</head>
+<body>
+
+<div style="margin: 15px;">
+</div>
+
+
+<script src="../../../../../config.js"></script>
+<script src="../../../../libs3.6.0.min.js"></script>
+<script src="../../../../layui.js"></script>
+<script>
+layui.use(['layim', 'laypage'], function(){
+  var layim = layui.layim
+  ,layer = layui.layer
+  ,laytpl = layui.laytpl
+  ,$ = layui.jquery
+  ,laypage = layui.laypage;
+
+  //一些添加好友请求之类的交互参见文档
+
+});
+</script>
+</body>
+</html>

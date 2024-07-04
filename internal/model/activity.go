@@ -94,6 +94,15 @@ type GiftbagVo struct {
 type GroupbuyVo struct {
 	// Define the structure based on your actual requirements.
 	// You may need to replace it with the correct types.
+
+	GroupBuyLimit     int     `json:"group_buy_limit"    dc:"每人限购"` // 每人限购
+	GroupQuantity     int     `json:"group_quantity"    dc:""`      // 团购数量
+	GroupSaleQuantity int     `json:"group_sale_quantity" dc:""`    // 团购销售数量
+	GroupSalePrice    float64 `json:"group_sale_price"   dc:""`     // 团购销售价格
+	ProductId         uint64  `json:"product_id"         dc:"产品编号"` // 产品编号
+	ProductUnitPrice  float64 `json:"product_unit_price" dc:""`     // 产品单价
+	ProductImage      string  `json:"product_image"      dc:"商品主图"` // 商品主图
+
 }
 
 // MarketingVo 结构体
@@ -186,4 +195,19 @@ type ActivityListOutput struct {
 	Total   int               `json:"total"`   // 总页数
 	Records int               `json:"records"` // 数据总数
 	Size    int               `json:"size"`    // 单页数量
+}
+
+type ActivityGroupookingVo struct {
+	entity.ActivityGroupbooking
+	UserNickname string `json:"user_nickname"` // 买家昵称
+	UserAvatar   string `json:"user_avatar"`   // 用户头像
+}
+
+type ActivityGroupbookingHistoryVo struct {
+	entity.ActivityGroupbookingHistory
+	UserNickname string `json:"user_nickname"` // 买家昵称
+}
+type ActivityCutpriceVo struct {
+	entity.ActivityCutprice
+	UserNickname string `json:"user_nickname"` // 买家昵称
 }

@@ -55,6 +55,10 @@ type ProductCategoryListReq struct {
 	g.Meta `path:"/manage/pt/productCategory/list" tags:"商品分类" method:"get" summary:"商品分类列表接口"`
 	Page   int `json:"page"  d:"1"  v:"min:0#分页号码错误"  dc:"分页号码"`
 	Size   int `json:"size" d:"10" v:"max:500#分页数量最大500条"  dc:"分页数量"`
+
+	CategoryParentId uint   `json:"category_parent_id"  d:"0"  v:"min:0#分页号码错误"  dc:"分类父编号"`
+	CategoryName     string `json:"category_name"  dc:"搜索关键词"`
+	CategoryIsEnable bool   `json:"category_is_enable"  dc:"是否启用"`
 }
 
 type ProductCategoryListRes struct {
@@ -67,7 +71,7 @@ type ProductCategoryListRes struct {
 
 type ProductCategoryTreeReq struct {
 	g.Meta       `path:"/manage/pt/productCategory/tree" tags:"商品分类" method:"get" summary:"后台商品分类Tree"`
-	CategoryName string `json:"category_name"  d:""  dc:"搜索关键词"`
+	CategoryName string `json:"category_name"  dc:"搜索关键词"`
 }
 
 //type ProductCategoryTreeRes model.TreeNode

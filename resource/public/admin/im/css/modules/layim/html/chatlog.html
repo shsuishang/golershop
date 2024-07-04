@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>聊天记录</title>
+
+    <link rel="stylesheet" href="../../../layui.css">
+    <style>
+        body .layim-chat-main {
+            height: auto;
+        }
+    </style>
+	<script language="javascript">
+    function getUrlParam(name) {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]); return null;
+    }
+
+    api_url = getUrlParam('api_url');
+	</script>
+</head>
+<body>
+
+<div class="layim-chat-main">
+    <ul id="LAY_view"></ul>
+</div>
+
+<div id="LAY_page" style="margin: 0 10px;"></div>
+
+
+<textarea title="消息模版" id="LAY_tpl" style="display:none;">
+{{# layui.each(d.data, function(index, item){
+  if(item.message_kind == 1){ }}
+    <li class="layim-chat-mine"><div class="layim-chat-user"><img src="{{ item.user_avatar }}"><cite><i>{{ layui.data.date(item.message_time) }}</i>{{ item.user_nickname }}</cite></div><div
+            class="layim-chat-text">{{ layui.layim.content(item.message_content + " ") }}</div></li>
+  {{# } else { }}
+    <li><div class="layim-chat-user"><img src="{{ item.user_other_avatar }}"><cite>{{ item.user_other_nickname }}<i>{{ layui.data.date(item.message_time) }}</i></cite></div><div
+            class="layim-chat-text">{{ layui.layim.content(item.message_content + " ") }}</div></li>
+  {{# }
+}); }}
+</textarea>
+
+<!--
+上述模版采用了 laytpl 语法，不了解的同学可以去看下文档：http://www.layui.com/doc/modules/laytpl.html
+
+-->
+
+<script src="../../../../../config.js"></script>
+<script src="../../../../libs3.6.0.min.js"></script>
+<script src="../../../../layui.js"></script>
+<script>
+  //扩展对象方法
+  $.extend({
+    //为对象新增ajaxPost方法
+    request: function (ajaxOpts) {
+      var opts = {
+        type: "POST",
+        dataType: "json",
+        timeout: 50000,
+        loading: true,
+        data: {
+          typ: 'json'
+        },
+        success: function (data, status) {
+        },
+
+        error: function (err, status) {
+          console.info(err)
+          Public.tipMsg(__('操作无法成功，请稍后重试！'));
+        },
+
+        beforeSend: function (request) {
+          // 规范写法 不可随意自定义
+          if (localStorage.getItem("ukey")) {
+            request.setRequestHeader("Authorization", "Bearer " + localStorage.getItem("ukey"));
+          }
+        }
+      };
+
+      $.extend(true, opts, ajaxOpts);
+
+      if (opts.loading) {    //loading
+        //var $this = $(this);
+        var loading;
+        //var myTimer;
+        //var preventTooFast = 'ui-btn-dis';
+
+        $.extend(true, opts, {
+          beforeSend: function () {
+            //loading = $.dialog.tips('提交中，请稍候...', 1000, 'loading.gif', true);
+          },
+          complete: function () {
+            //loading.close();
+          }
+        });
+
+        /*
+         if ($this.hasClass(preventTooFast))
+         {
+         return;
+         }
+         */
+      }
+
+
+      var successCallback = opts.success;
+      var errorCallback = opts.error;
+
+      opts.success = function (data, status) {
+        /*if(data.status != 200){
+         var defaultPage = Public.getDefaultPage();
+         var msg = data.msg || '出错了=. =||| ,请点击这里拷贝错误信息 :)';
+         var errorStr = msg;
+         if(data.data.error){
+         var errorStr = '<a id="myText" href="javascript:window.clipboardData.setData("Text",data.error);alert("详细信息已经复制到剪切板，请拷贝给管理员！");"'+msg+'</a>'
+         }
+         defaultPage.Public.tips({type:1, content:errorStr});
+         return;
+         }*/
+        successCallback && successCallback(data, status);
+      }
+
+      opts.error = function (err, ms) {
+        var content = __('服务端响应错误！')
+        if (ms === 'timeout') {
+          content = __('请求超时！');
+        }
+
+        Public.tipMsg(content);
+        errorCallback && errorCallback(err);
+      }
+
+      $.ajax(opts);
+    }
+  });
+
+
+  $.extend({
+    //为对象新增ajaxPost方法
+    send: function (url, data, callback, type) {
+      // shift arguments if data argument was omitted
+      if (jQuery.isFunction(data)) {
+        type = type || callback;
+        callback = data;
+        data = undefined;
+      }
+
+      // The url can be an options object (which then must have .url)
+      return $.request(jQuery.extend({
+        url: url,
+        type: 'GET',
+        dataType: type,
+        data: data,
+        loading: false,
+        success: callback
+      }, jQuery.isPlainObject(url) && url));
+    }
+  });
+</script>
+<script>
+  var render_data = [];
+  var is_loading = false;
+  var top = 0;
+  var pre_height = 0;
+
+  var url = '';
+  var params = {};
+  var page = 1;
+  var total = 1;
+  var loading_index = null;
+
+  $(window).scroll(function() {
+    //离顶部的距离=0
+    //方法一：var isTop=$(this).scrollTop();
+    //方法二：var isTop=$(document).scrollTop();
+    //var isTop=$("body").scrollTop();//ie错误
+    //var isTop=$(document.body).scrollTop();//ie错误
+    //可视窗口大小+离顶部距离-文档高度>=0
+    //方法一：var isBottom=$(this).height()+isTop-$("body").height();
+    //方法二：var isBottom=$(this).height()+isTop-$(document).height();
+    //方法三：var isBottom=$(this).height()+isTop-$(document.body).height();
+    //var isBottom=$(this).height()+isTop-$("body").height();//错误
+
+    var isTop = $(this).scrollTop();
+
+    if (isTop == 0)
+    {
+      if (!is_loading && total > page)
+      {
+        pre_height = $(document).height();
+
+        is_loading = true;
+
+        loading_index = layui.layer.load(2); //添加laoding,0-2两种方式
+
+        page = page + 1;
+        loadLog(page);
+      }
+
+      //alert('已经到达顶部');
+    }
+
+    var isBottom = $(this).height() + isTop - $('body').height();
+
+    if (isBottom >= 0)
+    {
+      //alert('已经到达底部');
+    }
+  });
+
+  function loadLog(page)
+  {
+
+    if ('group' == $.getUrlParam('type'))
+    {
+      url = SYS.CONFIG.zonemsg_lists
+      params = {zone_id: $.getUrlParam('id'), type: $.getUrlParam('type'), page: page};
+    }
+    else
+    {
+      url = SYS.CONFIG.msg_chathistory_lists;
+      //php保留
+      params = {user_other_id: $.getUrlParam('id'), type: $.getUrlParam('type'), page: page};
+      //params = {receiver: $.getUrlParam('id'), type: $.getUrlParam('type'), pageNum: page};
+    }
+    $.send(url, params, function(res) {
+      total = res.data.total;
+      layui.use(['layim', 'laypage'], function() {
+        var layim = layui.layim
+            , layer = layui.layer
+            , laytpl = layui.laytpl
+            , $ = layui.jquery
+            , laypage = layui.laypage;
+
+        //聊天记录的分页此处不做演示，你可以采用laypage，不了解的同学见文档：http://www.layui.com/doc/modules/laypage.html
+
+
+        //开始请求聊天记录
+        var param = location.search; //获得URL参数。该窗口url会携带会话id和type，他们是你请求聊天记录的重要凭据
+
+        //实际使用时，下述的res一般是通过Ajax获得，而此处仅仅只是演示数据格式
+        //            var res = {
+        //                    code: 0
+        //                    ,msg: ''
+        //                    ,data: [{
+        //                        username: '纸飞机'
+        //                        ,id: 100000
+        //                        ,avatar: 'http://tva3.sinaimg.cn/crop.0.0.512.512.180/8693225ajw8f2rt20ptykj20e80e8weu.jpg'
+        //                        ,timestamp: 1480897882000
+        //                        ,content: 'face[抱抱] face[心] 你好啊小美女'
+        //                    }, {
+        //                        username: 'Z_子晴'
+        //                        ,id: 108101
+        //                        ,avatar: 'http://tva3.sinaimg.cn/crop.0.0.512.512.180/8693225ajw8f2rt20ptykj20e80e8weu.jpg'
+        //                        ,timestamp: 1480897892000
+        //                        ,content: '你没发错吧？face[微笑]'
+        //                    },{
+        //                        username: 'Z_子晴'
+        //                        ,id: 108101
+        //                        ,avatar: 'http://tva3.sinaimg.cn/crop.0.0.512.512.180/8693225ajw8f2rt20ptykj20e80e8weu.jpg'
+        //                        ,timestamp: 1480897898000
+        //                        ,content: '你是谁呀亲。。我爱的是贤心！我爱的是贤心！我爱的是贤心！重要的事情要说三遍~'
+        //                    },{
+        //                        username: 'Z_子晴'
+        //                        ,id: 108101
+        //                        ,avatar: 'http://tva3.sinaimg.cn/crop.0.0.512.512.180/8693225ajw8f2rt20ptykj20e80e8weu.jpg'
+        //                        ,timestamp: 1480897908000
+        //                        ,content: '注意：这些都是模拟数据，实际使用时，需将其中的模拟接口改为你的项目真实接口。\n该模版文件所在目录（相对于layui.js）：\n/css/modules/layim/html/chatlog.html'
+        //                    }]
+        //                }
+
+        //console.log(param)
+        res.data.items.reverse();
+
+        if ('group' == $.getUrlParam('type'))
+        {
+          for (i in res.data.items)
+          {
+
+            if (res.data.items[i]['user_id'] == $.cookie('uid'))
+            {
+              res.data.items[i]['message_kind'] = 1;
+              res.data.items[i]['user_avatar'] = res.data.items[i]['user_avatar'];
+              res.data.items[i]['user_nickname'] = res.data.items[i]['user_nickname'];
+            }
+            else
+            {
+              res.data.items[i]['message_kind'] = 2;
+              res.data.items[i]['user_other_avatar'] = res.data.items[i]['user_avatar'];
+              res.data.items[i]['user_other_nickname'] = res.data.items[i]['user_nickname'];
+            }
+
+            res.data.items[i]['message_content'] = res.data.items[i]['zone_message_content'];
+            res.data.items[i]['message_time'] = res.data.items[i]['zone_message_time'] * 1000;
+          }
+        }
+        else
+        {
+          for (i in res.data.items)
+          {
+            res.data.items[i]['message_time'] = res.data.items[i]['message_time'];
+          }
+        }
+
+        render_data = res.data.items.concat(render_data);
+
+        console.info(render_data);
+
+        var html = laytpl(LAY_tpl.value).render({
+          data: render_data,
+        });
+
+        $('#LAY_view').html(html);
+
+        var diff_top = $(document).height() - pre_height;
+        if (diff_top > 10)
+        {
+          $(document).scrollTop(diff_top - 30);
+        }
+
+        layui.layer.close(loading_index);    //返回数据关闭loading
+        is_loading = false;
+
+      });
+    });
+
+  }
+
+  $(function() {
+    loadLog(page);
+  });
+
+</script>
+</body>
+</html>

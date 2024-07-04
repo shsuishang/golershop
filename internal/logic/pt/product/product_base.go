@@ -39,7 +39,6 @@ import (
 	"golershop.cn/utility/array"
 	"sort"
 	"strings"
-	"time"
 )
 
 type sProductBase struct{}
@@ -118,9 +117,14 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 			//in.ProductIndex.ProductSaleTime
 		}
 
+		if in.ProductIndex.ProductStateId == consts.PRODUCT_STATE_NORMAL {
+			in.ProductIndex.ProductSaleTime = gtime.Now().TimestampMilli()
+		}
+
 		in.ProductIndex.ProductSpEnable = 0   //供应商是否允许批发市场分销
 		in.ProductIndex.ProductDistEnable = 1 //是否允许三级分销
-		in.ProductIndex.ProductAddTime = gtime.Timestamp()
+		in.ProductIndex.ProductAddTime = gtime.Now().TimestampMilli()
+
 		in.ProductIndex.ProductFrom = 1000
 
 	} else {
@@ -579,7 +583,7 @@ func (s *sProductBase) checkSingleActivity(ctx context.Context, activityTypeId u
 
 // BatchEditState 批量编辑商品状态
 func (s *sProductBase) BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error) {
-	var productSaleTime time.Time
+	var productSaleTime *gtime.Time
 
 	for _, productId := range productIds {
 		productBase, err := dao.ProductBase.Get(ctx, productId)
@@ -626,9 +630,9 @@ func (s *sProductBase) BatchEditState(ctx context.Context, productIds []uint64, 
 				}
 			}
 
-			productSaleTime = time.Now()
+			productSaleTime = gtime.Now()
 		case consts.PRODUCT_STATE_OFF_THE_SHELF:
-			productSaleTime = time.Now().AddDate(10, 0, 0) // 待上架时间，此处添加了10年
+			productSaleTime = gtime.Now().AddDate(10, 0, 0) // 待上架时间，此处添加了10年
 		case consts.PRODUCT_STATE_ILLEGAL:
 			// 违规下架
 			/* messageId := "illegal-commodity-shelves"
@@ -641,7 +645,7 @@ func (s *sProductBase) BatchEditState(ctx context.Context, productIds []uint64, 
 		}
 
 		productIndex.ProductStateId = productStateId
-		productIndex.ProductSaleTime = uint64(productSaleTime.Unix())
+		productIndex.ProductSaleTime = uint64(productSaleTime.TimestampMilli())
 
 		newProductIndex := &do.ProductIndex{}
 		gconv.Scan(productIndex, newProductIndex)

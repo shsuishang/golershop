@@ -196,7 +196,7 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"is_show":    true,
 		"cat":        1,
 		"color":      "#ffc333",
-		"icon":       "icon-edit",
+		"icon":       "zc zc-qiandao",
 		"featureKey": "MemSign",
 		"url":        "/member/member/sign",
 	}
@@ -285,6 +285,18 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"url":        "/member/fans/index",
 	}
 	list = append(list, menu14)
+
+	menu24 := map[string]interface{}{
+		"id":         21,
+		"name":       "学习中心",
+		"is_show":    service.ConfigBase().IfEdu(ctx),
+		"cat":        1,
+		"color":      "#ffc333",
+		"icon":       "zc zc-xuexishuben",
+		"featureKey": "CourseStudy",
+		"url":        "/edu/course/study",
+	}
+	list = append(list, menu24)
 
 	menu17 := map[string]interface{}{
 		"id":         32,

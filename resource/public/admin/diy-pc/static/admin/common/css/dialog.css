@@ -1,0 +1,773 @@
+@charset "utf-8";
+
+.fancybox-thumbs > ul, .m-media-box-info, .nav-tabs, ol, ul {
+  list-style: none
+}
+
+.fancybox-infobar__body, .fancybox-thumbs > ul > li > img {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -ms-user-select: none
+}
+
+.fancybox-infobar__body, .fancybox-slide {
+  -webkit-tap-highlight-color: transparent;
+  text-align: center
+}
+
+
+.fancybox-enabled {
+  overflow: hidden;
+  -ms-touch-action: none;
+  touch-action: none
+}
+
+.fancybox-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99993;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden
+}
+
+.fancybox-bg, .fancybox-controls {
+  -webkit-backface-visibility: hidden;
+  right: 0;
+  position: absolute;
+  top: 0;
+  left: 0
+}
+
+.fancybox-container ~ .fancybox-container {
+  z-index: 99992
+}
+
+.fancybox-bg {
+  bottom: 0;
+  background: #0f0f11;
+  opacity: 0;
+  transition-timing-function: cubic-bezier(.55, .06, .68, .19);
+  backface-visibility: hidden
+}
+
+.fancybox-container--ready .fancybox-bg {
+  opacity: .87;
+  transition-timing-function: cubic-bezier(.22, .61, .36, 1)
+}
+
+.fancybox-controls {
+  text-align: center;
+  opacity: 0;
+  z-index: 99994;
+  transition: opacity .1s;
+  pointer-events: none;
+  backface-visibility: hidden
+}
+
+.fancybox-show-controls .fancybox-controls {
+  opacity: 1
+}
+
+.fancybox-infobar {
+  display: none
+}
+
+.fancybox-show-infobar .fancybox-infobar {
+  display: inline-block;
+  pointer-events: all
+}
+
+.fancybox-infobar__body {
+  display: inline-block;
+  width: 70px;
+  line-height: 44px;
+  font-size: 13px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #ddd;
+  background-color: rgba(30, 30, 30, .7);
+  pointer-events: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-font-smoothing: subpixel-antialiased
+}
+
+.fancybox-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: none;
+  pointer-events: all
+}
+
+.fancybox-show-buttons .fancybox-buttons {
+  display: block
+}
+
+.fancybox-slider-wrap {
+  overflow: hidden
+}
+
+.fancybox-slider, .fancybox-slider-wrap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  z-index: 99993;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden
+}
+
+.fancybox-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  outline: 0;
+  white-space: normal;
+  box-sizing: border-box;
+  z-index: 99994;
+  -webkit-overflow-scrolling: touch
+}
+
+.fancybox-content, .fancybox-slide > * {
+  position: relative;
+  text-align: left;
+  box-sizing: border-box
+}
+
+.fancybox-slide::before {
+  content: '';
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+  width: 0
+}
+
+.fancybox-slide > * {
+  display: inline-block;
+  padding: 24px;
+  margin: 44px 0;
+  border-width: 0;
+  vertical-align: middle;
+  background-color: #fff;
+  overflow: auto
+}
+
+#msk_qrcode_img, .fancybox-slide--image, .fancybox-thumbs > ul > li, .info_warp, .m_data_img, .minLabel, .pagexd .liPlace, .ui_loading, .ui_lock_scroll body, .ui_max b, .ui_min b, .ui_res_b, .ui_res_t, .ui_state_tips .ui_dialog, .ui_title, .weui-grid__label, .weui-grids {
+  overflow: hidden
+}
+
+.fancybox-content, .fancybox-thumbs {
+  -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent
+}
+
+.fancybox-slide--image::before {
+  display: none
+}
+
+.fancybox-content {
+  display: inline-block;
+  margin: 44px auto;
+  padding: 0;
+  border: 0;
+  width: 80%;
+  height: calc(100% - 88px);
+  vertical-align: middle;
+  line-height: normal;
+  white-space: normal;
+  outline: 0;
+  font-size: 16px;
+  font-family: Arial, sans-serif
+}
+
+.fancybox-iframe {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff
+}
+
+.fancybox-slide--video .fancybox-content, .fancybox-slide--video .fancybox-iframe {
+  background: 0 0
+}
+
+.fancybox-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  z-index: 99995;
+  background: no-repeat;
+  cursor: default;
+  overflow: visible;
+  -webkit-transform-origin: top left;
+  -ms-transform-origin: top left;
+  transform-origin: top left;
+  background-size: 100% 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden
+}
+
+.fancybox-image, .fancybox-spaceball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  max-width: none;
+  max-height: none;
+  background: 0 0;
+  background-size: 100% 100%
+}
+
+.fancybox-controls--canzoomOut .fancybox-placeholder {
+  cursor: -webkit-zoom-out;
+  cursor: zoom-out
+}
+
+.fancybox-controls--canzoomIn .fancybox-placeholder {
+  cursor: -webkit-zoom-in;
+  cursor: zoom-in
+}
+
+.fancybox-controls--canGrab .fancybox-placeholder {
+  cursor: -webkit-grab;
+  cursor: grab
+}
+
+.fancybox-controls--isGrabbing .fancybox-placeholder {
+  cursor: -webkit-grabbing;
+  cursor: grabbing
+}
+
+.fancybox-spaceball {
+  z-index: 1
+}
+
+.fancybox-tmp {
+  position: absolute;
+  top: -9999px;
+  left: -9999px;
+  visibility: hidden
+}
+
+.fancybox-error {
+  position: absolute;
+  margin: 0;
+  padding: 40px;
+  top: 50%;
+  left: 50%;
+  width: 380px;
+  max-width: 100%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  background: #fff;
+  cursor: default
+}
+
+.fancybox-button, .fancybox-close-small {
+  cursor: pointer;
+  box-sizing: border-box;
+  margin: 0
+}
+
+.fancybox-error p {
+  margin: 0;
+  padding: 0;
+  color: #444;
+  font: 16px/20px "Helvetica Neue", Helvetica, Arial, sans-serif
+}
+
+.fancybox-close-small {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  font: 21px/1 Arial, "Helvetica Neue", Helvetica, sans-serif;
+  color: #888;
+  font-weight: 300;
+  text-align: center;
+  border-radius: 50%;
+  border-width: 0;
+  background: #fff;
+  transition: background .2s;
+  z-index: 2
+}
+
+.fancybox-close-small:focus {
+  outline: #888 dotted 1px
+}
+
+.fancybox-slide--video .fancybox-close-small {
+  top: -36px;
+  right: -36px;
+  background: 0 0
+}
+
+.fancybox-close-small:hover {
+  color: #555;
+  background: #eee
+}
+
+.fancybox-caption-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 60px 30px 0;
+  z-index: 99998;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  box-sizing: border-box;
+  background: linear-gradient(to bottom, transparent 0, rgba(0, 0, 0, .1) 20%, rgba(0, 0, 0, .2) 40%, rgba(0, 0, 0, .6) 80%, rgba(0, 0, 0, .8) 100%);
+  opacity: 0;
+  transition: opacity .2s;
+  pointer-events: none
+}
+
+.fancybox-show-caption .fancybox-caption-wrap {
+  opacity: 1
+}
+
+.fancybox-caption {
+  padding: 30px 0;
+  border-top: 1px solid rgba(255, 255, 255, .4);
+  font-size: 14px;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #fff;
+  line-height: 20px;
+  -webkit-text-size-adjust: none
+}
+
+.fancybox-caption a, .fancybox-caption button {
+  pointer-events: all
+}
+
+.fancybox-caption a {
+  color: #fff;
+  text-decoration: underline
+}
+
+.fancybox-button {
+  display: inline-block;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  padding: 0;
+  border: 0;
+  color: #fff;
+  vertical-align: top;
+  outline: 0
+}
+
+.fancybox-button--disabled {
+  cursor: default
+}
+
+.fancybox-button, .fancybox-infobar__body {
+  background: rgba(30, 30, 30, .6)
+}
+
+.fancybox-button:hover {
+  background: rgba(0, 0, 0, .8)
+}
+
+.fancybox-button::after, .fancybox-button::before {
+  content: '';
+  pointer-events: none;
+  position: absolute;
+  border-color: #fff;
+  background-color: currentColor;
+  color: currentColor;
+  opacity: .9;
+  box-sizing: border-box;
+  display: inline-block
+}
+
+.fancybox-button--left::after {
+  left: 20px;
+  top: 18px;
+  width: 6px;
+  height: 6px;
+  background: 0 0;
+  border-top: solid 2px currentColor;
+  border-right: solid 2px currentColor;
+  -webkit-transform: rotate(-135deg);
+  -ms-transform: rotate(-135deg);
+  transform: rotate(-135deg)
+}
+
+.fancybox-button--right::after {
+  right: 20px;
+  top: 18px;
+  width: 6px;
+  height: 6px;
+  background: 0 0;
+  border-top: solid 2px currentColor;
+  border-right: solid 2px currentColor;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg)
+}
+
+.fancybox-button--left {
+  border-bottom-left-radius: 5px
+}
+
+.fancybox-button--right {
+  border-bottom-right-radius: 5px
+}
+
+.fancybox-button--close {
+  float: right
+}
+
+.fancybox-button--close::after, .fancybox-button--close::before {
+  content: '';
+  display: inline-block;
+  position: absolute;
+  height: 2px;
+  width: 16px;
+  top: calc(50% - 1px);
+  left: calc(50% - 8px)
+}
+
+.fancybox-button--close::before {
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg)
+}
+
+.fancybox-button--close::after {
+  -webkit-transform: rotate(-45deg);
+  -ms-transform: rotate(-45deg);
+  transform: rotate(-45deg)
+}
+
+.fancybox-loading {
+  border: 6px solid rgba(100, 100, 100, .4);
+  border-top: 6px solid rgba(255, 255, 255, .6);
+  border-radius: 100%;
+  height: 50px;
+  width: 50px;
+  -webkit-animation: fancybox-rotate .6s infinite linear;
+  animation: fancybox-rotate .6s infinite linear;
+  background: 0 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: -25px;
+  margin-left: -25px;
+  z-index: 99999
+}
+
+@-webkit-keyframes fancybox-rotate {
+  from {
+    -webkit-transform: rotate(0);
+    transform: rotate(0)
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg)
+  }
+}
+
+@keyframes fancybox-rotate {
+  from {
+    -webkit-transform: rotate(0);
+    transform: rotate(0)
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+    transform: rotate(359deg)
+  }
+}
+
+@media all and (max-width: 800px) {
+  .fancybox-controls {
+    text-align: left
+  }
+
+  .fancybox-button--left, .fancybox-button--right, .fancybox-buttons button:not(.fancybox-button--close) {
+    display: none !important
+  }
+
+  .fancybox-caption {
+    padding: 20px 0;
+    margin: 0
+  }
+}
+
+.fancybox-button--fullscreen::before {
+  width: 15px;
+  height: 11px;
+  left: 15px;
+  top: 16px;
+  border: 2px solid;
+  background: 0 0
+}
+
+.fancybox-button--play::before {
+  top: 16px;
+  left: 18px;
+  width: 0;
+  height: 0;
+  border-top: 6px inset transparent;
+  border-bottom: 6px inset transparent;
+  border-left: 10px solid;
+  border-radius: 1px;
+  background: 0 0
+}
+
+.fancybox-button--pause::before {
+  top: 16px;
+  left: 18px;
+  width: 7px;
+  height: 11px;
+  border-style: solid;
+  border-width: 0 2px;
+  background: 0 0
+}
+
+.fancybox-button--thumbs span {
+  font-size: 23px
+}
+
+.fancybox-button--thumbs::before {
+  top: 20px;
+  left: 21px;
+  width: 3px;
+  height: 3px;
+  box-shadow: 0 -4px 0, -4px -4px 0, 4px -4px 0, 0 0 0 32px inset, -4px 0 0, 4px 0 0, 0 4px 0, -4px 4px 0, 4px 4px 0
+}
+
+.fancybox-container--thumbs .fancybox-caption-wrap, .fancybox-container--thumbs .fancybox-controls, .fancybox-container--thumbs .fancybox-slider-wrap {
+  right: 220px
+}
+
+.fancybox-thumbs {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
+  width: 220px;
+  margin: 0;
+  padding: 5px 5px 0 0;
+  background: #fff;
+  z-index: 99993;
+  word-break: normal;
+  box-sizing: border-box
+}
+
+.fancybox-thumbs > ul {
+  position: absolute;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-size: 0
+}
+
+.fancybox-thumbs > ul > li {
+  float: left;
+  max-width: 50%;
+  padding: 0;
+  margin: 0;
+  width: 105px;
+  height: 75px;
+  position: relative;
+  cursor: pointer;
+  outline: 0;
+  border: 5px solid #fff;
+  border-top-width: 0;
+  border-right-width: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  box-sizing: border-box
+}
+
+li.fancybox-thumbs-loading {
+  background: rgba(0, 0, 0, .1)
+}
+
+.fancybox-thumbs > ul > li > img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  max-height: none;
+  -moz-user-select: none;
+  user-select: none
+}
+
+.fancybox-thumbs > ul > li:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 2px;
+  border: 4px solid #4ea7f9;
+  z-index: 99991;
+  opacity: 0;
+  transition: all .2s cubic-bezier(.25, .46, .45, .94)
+}
+
+.fancybox-thumbs > ul > li.fancybox-thumbs-active:before {
+  opacity: 1
+}
+
+@media all and (max-width: 800px) {
+  .fancybox-thumbs {
+    display: none !important
+  }
+
+  .fancybox-container--thumbs .fancybox-caption-wrap, .fancybox-container--thumbs .fancybox-controls, .fancybox-container--thumbs .fancybox-slider-wrap {
+    right: 0
+  }
+}
+
+
+/*==================制作新皮肤从这里开始复制==================*/
+/*基本重置*/
+body{ _margin:0; }/*IE6 BUG*/
+.ui_lock_scroll{ *overflow:hidden; }
+.ui_lock_scroll body{ overflow:hidden; }
+
+/*结构层*/
+.ui_content,.ui_title,.ui_buttons input{ font:12px/1.333 tahoma,arial,\5b8b\4f53,sans-serif; }
+table.ui_border,table.ui_dialog{ width:auto;border-spacing:0;*border-collapse:collapse; }
+.ui_border td,.ui_dialog td{ padding:0; }
+.ui_dialog{ background:#FFF; }
+
+/*标题部分开始*/
+.ui_title{ overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;cursor:move;background:#DDD;-moz-user-select:none;-webkit-user-select:none;padding:0 100px 0 0; }
+.ui_title_buttons{ position:absolute;cursor:pointer;font-size:0;letter-spacing:-.5em; }
+
+/*对齐自适应*/
+.ui_main{ min-width:6em;min-width:0\9;text-align:center; }
+.ui_content{ display:inline-block;*display:inline;zoom:1;text-align:left; font-size:14px; line-height: 1.8; }
+.ui_content.ui_state_full{ display:block;width:100%;height:100%;margin:0;padding:0!important; }
+.ui_content.ui_state_full iframe{ border-radius:0 0 2px 2px; }
+.ui_loading{ width:96px;height:32px;text-align:left;text-indent:-9999em;overflow:hidden;background:url(../images/dialog/icons/loading.gif) no-repeat center center; }
+.ui_icon_bg{ margin:20px 5px 20px 15px; }
+.ui_icon{vertical-align: top;}
+.ui_icon img{ width:48px; height:48px; }
+
+/*标题纯CSS按钮开始 min 最小化，max最大化，res还原，rese恢复，close关闭*/
+.ui_min,.ui_max,.ui_close,.ui_res{ position:relative;text-decoration:none;letter-spacing:normal;text-align:center;display:inline-block;*display:inline;zoom:1;vertical-align:top;font-family:tahoma,arial,\5b8b\4f53,sans-serif; }
+.ui_min b,.ui_max b,.ui_res_t,.ui_res_b{ display:block;position:absolute;overflow:hidden;cursor:pointer; }
+.ui_close{ font-weight:500;text-decoration:none;outline:0 none; }
+.ui_close:hover{ text-decoration:none; }
+
+/*Tips部分*/
+.ui_state_tips .ui_main{ min-width:3em; }
+.ui_state_tips .ui_content{ margin-top:-2px;padding:8px 10px!important; }
+.ui_state_tips .ui_icon_bg{ margin:11px 0 6px 9px; width:28px; height:28px; }
+.ui_state_tips .ui_title,.ui_state_tips .ui_title_buttons,.ui_res{ display:none; } /* 还原按钮也在这里隐藏，这样可节省代码，注间这段一定要写在上面那段代码的下面*/
+
+#ldg_lockmask{ background:#000;filter:alpha(opacity=30);opacity:.3; }
+/*==================制作新皮肤到这里结束复制==================*/
+
+/*样式层开始*/
+.ui_dialog{ border:1px solid #AAA; border-radius:5px;box-shadow:0 1px 6px rgba(0,0,0,.3);}
+.ui_state_lock .ui_dialog{ box-shadow:0 3px 18px rgba(0,0,0,.3); }/*锁屏时遮罩*/
+.ui_state_drag .ui_dialog,.ui_state_lock.ui_state_drag .ui_dialog { box-shadow:none; }/*拖动时隐藏阴影，通过css3实现渐变动画*/
+.ui_state_focus .ui_title{ color:#505050; }
+
+.ui_lb,.ui_rb,.ui_lt,.ui_rt{ width:0;height:0;*width:1px;*height:1px; }/*隐藏边框*/
+.ui_rb{ display:block;width:12px;height:12px;position:absolute;bottom:0;right:0;background:none; }/*重新显示右下角拖动，设为负值会造成浏览器显示滚动条*/
+
+/*标题栏样式*/
+.ui_title_bar{ position:relative;height:100%;border-bottom:1px solid #DDD; }
+.ui_title{ font-size:14px;font-weight:bold;height:30px;line-height:30px;color:#666;
+    background: #fafafa;
+    background: -moz-linear-gradient(top, #fcfcfc, #f4f4f4);
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#fcfcfc), to(#f4f4f4));
+    background: -o-linear-gradient(top, #fcfcfc, #f4f4f4);
+    background: -ms-linear-gradient(top, #fcfcfc 0%,#f4f4f4 100%);
+    background: linear-gradient(top, #fcfcfc, #f4f4f4);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcfcfc', endColorstr='#f4f4f4');
+    border-top:1px solid #f5f5f5;border-bottom:1px solid #f5f5f5;border-radius:2px 2px 0 0;padding-left:10px; }
+.ui_state_drag .ui_title {
+    background: #fafafa;
+    background: -moz-linear-gradient(top, #f4f4f4, #fcfcfc);
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#f4f4f4), to(#fcfcfc));
+    background: -o-linear-gradient(top, #f4f4f4, #fcfcfc);
+    background: -ms-linear-gradient(top, #f4f4f4 0%,#fcfcfc 100%);
+    background: linear-gradient(top, #f4f4f4, #fcfcfc);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f4f4f4', endColorstr='#fcfcfc');}
+
+/*标题纯CSS按钮定位部分*/
+.ui_title_buttons{ top:7px;right:5px; }
+.ui_min,.ui_max,.ui_close,.ui_res{ color:#aaa;font-size:18px;width:20px;height:20px;line-height:18px; }
+.ui_min_b{ top:10px;left:5px;width:10px;height:2px;border-bottom:2px solid #aaa; }
+.ui_max_b{ top:5px;left:5px;width:10px;height:7px; }
+.ui_res_t,.ui_res_b{ top:8px;left:3px;width:10px;height:5px; }
+.ui_res_b{ top:4px;left:6px; }
+.ui_res_t,.ui_res_b,.ui_max_b{ border:1px solid #aaa;border-top-width:3px; }
+.ui_res_t{ background:#fafafa; }/*还原按钮底部框背景与标题背景融合*/
+.ui_close{ vertical-align:baseline;_line-height:22px; }/*IE6关闭按钮垂直居中*/
+.ui_close:hover,.ui_close:focus{ color:#bf160b; }
+.ui_min:hover b,.ui_max:hover b,.ui_res:hover b{ border-color:#2492FF; }
+
+/*按钮结构部分*/
+.ui_buttons{ padding:4px 8px;text-align:right;white-space:nowrap;
+    border-top:1px solid #ececec;border-radius:0 0 2px 2px;
+    background: #fcfcfc;
+    background: -moz-linear-gradient(top, #fcfcfc, #f4f4f4);
+    background: -webkit-gradient(linear, 0 0, 0 100%, from(#fcfcfc), to(#f4f4f4));
+    background: -o-linear-gradient(top, #fcfcfc, #f4f4f4);
+    background: -ms-linear-gradient(top, #fcfcfc 0%,#f4f4f4 100%);
+    background: linear-gradient(top, #fcfcfc, #f4f4f4);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcfcfc', endColorstr='#f4f4f4');}
+.ui_buttons input::-moz-focus-inner{ border:0;padding:0;margin:0; }
+
+.ui_buttons input{display:inline-block;*display:inline;zoom:1;margin-left:10px;padding:0 16px;height:24px;border:1px solid #c1c1c1;border-radius:2px;box-shadow:0 1px 1px rgba(0,0,0,0.15);background: #ffffff;background: -moz-linear-gradient(top, #ffffff, #f4f4f4); background: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f4f4f4)); background: -o-linear-gradient(top, #ffffff, #f4f4f4);background: -ms-linear-gradient(top, #ffffff 0%,#f4f4f4 100%); background: linear-gradient(top, #ffffff, #f4f4f4); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f4f4f4');font:12px \5b8b\4f53;color:#555;vertical-align:middle;cursor:pointer;}
+.ui_buttons input:hover{ filter:progid:DXImageTransform.Microsoft.Gradient(enabled=false);background:#f4f4f4;color:#555; }
+.ui_buttons input:active{ background: #fbfbfb;background: -moz-linear-gradient(top, #e8e8e8, #fbfbfb); background: -webkit-gradient(linear, 0 0, 0 100%, from(#e8e8e8), to(#fbfbfb)); background: -o-linear-gradient(top, #e8e8e8, #fbfbfb);background: -ms-linear-gradient(top, #e8e8e8 0%,#fbfbfb 100%); background: linear-gradient(top, #e8e8e8, #fbfbfb); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#e8e8e8', endColorstr='#fbfbfb');}
+
+input.ui_state_highlight{ border:1px solid #3279a0;box-shadow:0 1px 1px rgba(0,0,0,0.3);background: #337fa9;background: -moz-linear-gradient(top, #4994be, #337fa9); background: -webkit-gradient(linear, 0 0, 0 100%, from(#4994be), to(#337fa9)); background: -o-linear-gradient(top, #4994be, #337fa9);background: -ms-linear-gradient(top, #4994be 0%,#337fa9 100%); background: linear-gradient(top, #4994be, #337fa9); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#4994be', endColorstr='#337fa9');font-weight:bold;color:#fff;text-shadow:0 2px 2px rgba(0,0,0,0.22); }
+input.ui_state_highlight:hover{ filter:progid:DXImageTransform.Microsoft.Gradient(enabled=false);background:#3286b4;color:#fff; }
+input.ui_state_highlight:active{ background: #2b6c90;background: -moz-linear-gradient(top, #2b6c90, #4994be); background: -webkit-gradient(linear, 0 0, 0 100%, from(#2b6c90), to(#4994be)); background: -o-linear-gradient(top, #2b6c90, #4994be);background: -ms-linear-gradient(top, #2b6c90 0%,#4994be 100%); background: linear-gradient(top, #2b6c90, #4994be); filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#2b6c90', endColorstr='#4994be'); }
+
+/*Tips 部分开始*/
+/*基本重置*/
+.ui_state_tips ,.ui_state_tips .ui_inner,.ui_state_tips .ui_dialog,.ui_state_tips .ui_title_bar{ border:0 none;background:none;box-shadow:none;border-radius:0;filter:none; }
+.ui_state_tips .ui_content{ font-weight:bold;font-size:14px;color:#323232;text-align:center; }
+/*Tips(图片背景，IE6也支持圆角) End*/
+.ui_state_tips .ui_dialog,.ui_state_tips .ui_l,.ui_state_tips .ui_r{ background-image:url(../images/dialog/icons/gb_tip_layer.png);_background-image:url(../images/dialog/icons/gb_tip_layer_ie6.png);background-repeat:no-repeat; }/*共用背景图片*/
+.ui_state_tips .ui_l{ background-position:-6px 0;width:5px; }/*左侧背景侧样式*/
+.ui_state_tips .ui_r{ background-position:0 0;width:5px; }/*右侧背景样式*/
+.ui_state_tips .ui_dialog{ background-position: 0 -54px;background-repeat:repeat-x;height:54px;overflow:hidden; }/*主体内容背景*/

@@ -50,6 +50,8 @@ type (
 		GetDataInfo(ctx context.Context, pageDataReq *sys.PageBaseGetDataInfoReq) (*sys.PageBaseGetDataInfoRes, error)
 	}
 	IPageModule interface {
+		Get(ctx context.Context, id any) (out *entity.PageModule, err error)
+		Gets(ctx context.Context, id any) (list []*entity.PageModule, err error)
 		// Find 查询数据
 		Find(ctx context.Context, in *do.PageModuleListInput) (out []*entity.PageModule, err error)
 		// List 分页读取
@@ -62,6 +64,10 @@ type (
 		Remove(ctx context.Context, id any) (affected int64, err error)
 		// FixPcPageModuleData
 		FixPcPageModuleData(ctx context.Context, pageData []*entity.PageModule) ([]map[string]interface{}, error)
+		// GetModuleTpl
+		GetModuleTpl(ctx context.Context) (map[string]interface{}, error)
+		// GetLists
+		GetLists(ctx context.Context, req *do.PageModuleListInput) (pageModuleVo *model.PageModuleVoOutput, err error)
 	}
 	IPageCategoryNav interface {
 		// Find 查询数据

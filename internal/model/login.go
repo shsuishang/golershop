@@ -23,6 +23,8 @@ type RegisterInput struct {
 	SourceUccCode string `json:"source_ucc_code"   dc:"渠道码"                           ` // 渠道码
 	BindType      uint   `json:"bind_type"         dc:"注册方式=>"         `                // 注册方式
 	RoleId        uint   `json:"role_id"           dc:"角色编号:0-用户;2-商家;3-门店;9-平台;"`      // 角色编号
+	StoreId       uint   `json:"store_id"         dc:"店铺编号"         `                   // 店铺编号
+	ChainId       uint   `json:"chain_id"         dc:"门店编号"         `                   // 门店编号
 }
 
 type LoginOutput struct {

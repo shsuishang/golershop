@@ -425,7 +425,13 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 	if err != nil {
 		return nil, err
 	}
-	out.Contracts = contractTypes
+
+	//空数据返回 []
+	if len(contractTypes) == 0 {
+		out.Contracts = make([]*entity.ContractType, 0)
+	} else {
+		out.Contracts = contractTypes
+	}
 
 	// 商品评论
 	commentInput := &do.ProductCommentListInput{

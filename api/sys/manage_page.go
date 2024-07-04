@@ -73,8 +73,12 @@ type MobileEditRes struct {
 type PageBaseEditStateReq struct {
 	g.Meta `path:"/manage/sys/pageBase/editState" tags:"页面" method:"post" summary:"页面编辑接口"`
 
-	PageId    uint `json:"page_id"   v:"required#请输入页面编号"    dc:"页面编号"     `
-	PageIndex bool `json:"page_index"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageId       uint `json:"page_id"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageIndex    bool `json:"page_index"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageGb       bool `json:"page_gb"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageActivity bool `json:"page_activity"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PagePoint    bool `json:"page_point"   v:"required#请输入页面编号"    dc:"页面编号"     `
+	PageGbs      bool `json:"page_gbs"   v:"required#请输入页面编号"    dc:"页面编号"     `
 }
 
 type PageBaseEditStateRes struct {
@@ -96,9 +100,4 @@ type PageBaseGetDataInfoRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
-}
-type PageModuleReq struct {
-	g.Meta `path:"/manage/sys/pageModule/listTpl" tags:"PC楼层模板" method:"get" summary:"PC楼层模板接口"`
-}
-type PageModuleRes struct {
 }

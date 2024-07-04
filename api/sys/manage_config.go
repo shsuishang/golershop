@@ -145,3 +145,25 @@ type CleanCacheReq struct {
 
 type CleanCacheRes struct {
 }
+type GetDetailReq struct {
+	g.Meta    `path:"/manage/sys/config/getDetail" tags:"系统参数设置表-详细配置" method:"get" summary:"系统参数设置表-详细配置"`
+	ConfigKey string `json:"config_key"   dc:"配置编码"`
+}
+
+type GetDetailRes struct {
+	entity.ConfigBase
+}
+
+type SmsRecordReq struct {
+	g.Meta `path:"/manage/sys/config/smsRecord" tags:"消息模板表" method:"get" summary:"消息模板表"`
+	Page   int `json:"page"  d:"1"  v:"min:0#分页号码错误"  dc:"分页号码"`
+	Rows   int `json:"rows" d:"10" v:"max:500#分页数量最大500条"  dc:"分页数量"`
+}
+
+type SmsRecordRes struct {
+	Items   interface{} `json:"items"    dc:"配置列表页"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}

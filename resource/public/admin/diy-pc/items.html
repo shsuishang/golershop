@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN" dropEffect="none" class="no-js">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="renderer" content="webkit" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta name="description" content="Qianyi Boostrap Admin Panel" />
+  <meta name="author" content="" />
+
+  <title>平台 管理中心 - shopsuite随商商城系统</title>
+
+  <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Arimo:400,700,400italic">-->
+
+  <link rel="stylesheet" href="../static/css/zerocons/css/zerocons.css">
+  <link rel="stylesheet" href="./static/admin/common/css/bootstrap.min.css">
+  <link rel="stylesheet" href="./static/admin/common/css/qianyi-core.min.css">
+  <link rel="stylesheet" href="./static/admin/common/css/qianyi-forms.min.css">
+  <link rel="stylesheet" href="./static/admin/common/css/qianyi-components.min.css">
+  <link rel="stylesheet" href="./static/admin/common/css/qianyi-skins.min.css">
+
+  <link rel="stylesheet" href="./static/admin/common/css/default.min.css">
+
+<!--  <link rel="shortcut icon" href="../static/1618295612543845.ico" type="image/x-icon" />-->
+
+  <script type="text/javascript">
+    window.SYS = {CONFIG:{}, URL:{}};
+    window.zIndex = 2976;
+
+
+    SYS.CONFIG['static_url'] = '/diy-pc/static/admin'
+    SYS.LD = {lang:'zh_CN', currency_id:86, symbol:'￥', symbol_right:'RMB'};
+  </script>
+
+
+  <script type="text/javascript" src="../config.js"></script>
+  <script src="./static/admin/common/js/libs.min.js?self=false"></script>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+  <script src="./static/admin/common/js/html5shiv.js"></script>
+  <script src="./static/admin/common/js/respond.min.js"></script>
+  <![endif]-->
+</head>
+<body class="page-body skin-default user-info-navbar-skin-default"> <!-- navy watermelon facebook  green-->
+
+<link rel="stylesheet" href="./static/admin/common/ztree/css/zTreeStyle/zTreeStyle.css">
+<script src="./static/admin/common/ztree/js/jquery.ztree.all-3.5.js"></script>
+<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+  <div class="main-content">
+    <div class="row" id="search_box">
+      <div class="col-sm-12">
+        <form id="grid-search-form">
+          <span id="user"></span>
+          <input type="text" id="product_name" name="product_name" class="ui-input form-control ui-input-ph" style="width: 120px;" placeholder="输入商品名称"   autocomplete="off" >
+          <input type="text" id="product_id" name="product_id" class="ui-input form-control ui-input-ph" style="width: 80px;" placeholder="商品编号"   autocomplete="off" >
+          <style>
+            .select2-container--bootstrap{
+              display: inline-block;
+            }
+          </style>
+<!--          <select class="input_txt form-inline title-form form-control select2" style="width: 100px;display: inline-block;" id="brand_id" name="brand_id" placeholder="请输入品牌名称" >
+            <option value="0" selected>全部品牌</option>
+          </select>-->
+          <span ><span id="category_id"></span></span>
+
+
+          <a class="btn btn-default btn-single" data-color="blue" data-style="slide-left" id="search"><i class="fa fa-search" aria-hidden="true"></i> 查询</a>
+        </form>
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <div class="grid-wrap">
+        <table id="grid"></table>
+        <div id="grid-pager"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var header_auth_token = '';
+
+  if (localStorage.getItem("ukey")) {
+    header_auth_token = "Bearer " + localStorage.getItem("ukey");
+  }
+</script>
+<script src="./static/shop/default/js/product_item.js"></script>
+
+<div class="page-loading-overlay">
+  <div class="loader-2"></div>
+</div>
+
+
+
+</body>
+</html>
