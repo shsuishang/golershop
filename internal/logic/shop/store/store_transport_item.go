@@ -63,7 +63,7 @@ func (s *sStoreTransportItem) Add(ctx context.Context, in *do.StoreTransportItem
 
 // Edit 编辑
 func (s *sStoreTransportItem) Edit(ctx context.Context, in *do.StoreTransportItem) (affected int64, err error) {
-	_, err = dao.StoreTransportItem.Edit(ctx, in.TransportTypeId, in)
+	_, err = dao.StoreTransportItem.Edit(ctx, in.TransportItemId, in)
 
 	if err != nil {
 		return 0, err

@@ -335,28 +335,41 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 
 // RemoveProdcut 删除商品
 func (s *sProductBase) RemoveProdcut(ctx context.Context, id any) (affected int64, err error) {
+	//开启事务
+	err = dao.ProductBase.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		affected, err = dao.ProductInfo.Remove(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	affected, err = dao.ProductInfo.Remove(ctx, id)
+		affected, err = dao.ProductIndex.Remove(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	affected, err = dao.ProductIndex.Remove(ctx, id)
+		var productImageListInput = &do.ProductImageListInput{}
+		productImageListInput.Where.ProductId = id
+		affected, err = dao.ProductImage.RemoveWhere(ctx, productImageListInput)
+		if err != nil {
+			return err
+		}
 
-	var ProductImage = &do.ProductImageListInput{}
-	ProductImage.Where.ProductId = id
-	imageId, err := dao.ProductImage.FindFields(ctx, dao.ProductImage.Columns().ProductImageId, ProductImage)
-	affected, err = dao.ProductImage.Remove(ctx, imageId)
+		var productItemListInput = &do.ProductItemListInput{}
+		productItemListInput.Where.ProductId = id
 
-	var ProductItem = &do.ProductItemListInput{}
-	ProductItem.Where.ProductId = id
-	itemId, err := dao.ProductItem.FindFields(ctx, dao.ProductItem.Columns().ItemId, ProductItem)
-	affected, err = dao.ProductItem.Remove(ctx, itemId)
+		affected, err = dao.ProductItem.RemoveWhere(ctx, productItemListInput)
+		if err != nil {
+			return err
+		}
 
-	affected, err = dao.ProductBase.Remove(ctx, id)
+		affected, err = dao.ProductBase.Remove(ctx, id)
+		if err != nil {
+			return err
+		}
 
-	if err != nil {
-		return 0, err
-	}
-
-	_, err = dao.ProductValidPeriod.Remove(ctx, id)
+		_, err = dao.ProductValidPeriod.Remove(ctx, id)
+		return err
+	})
 
 	return affected, err
 }

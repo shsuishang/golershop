@@ -307,6 +307,9 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 	if err != nil {
 		return nil, err
 	}
+   
+    //兼容开源版
+	productItem.AvailableQuantity = productItem.ItemQuantity - productItem.ItemQuantityFrozen
 
 	out.ItemRow = productItem
 

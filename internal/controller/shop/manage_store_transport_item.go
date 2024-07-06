@@ -117,7 +117,12 @@ func (c *cStoreTransportItem) Add(ctx context.Context, req *shop.StoreTransportI
 func (c *cStoreTransportItem) Edit(ctx context.Context, req *shop.StoreTransportItemEditReq) (res *shop.StoreTransportItemEditRes, err error) {
 
 	input := do.StoreTransportItem{}
-	gconv.Scan(req, &input)
+	if req.TransportItemDefaultNum == 0 && req.TransportItemDefaultPrice == 0 && req.TransportItemAddNum == 0 && req.TransportItemAddPrice == 0 {
+		input.TransportItemId = req.TransportItemId
+		input.TransportItemCityIds = req.TransportItemCityIds
+	} else {
+		gconv.Scan(req, &input)
+	}
 
 	var result, error = service.StoreTransportItem().Edit(ctx, &input)
 	//var result, error = service.StoreTransportItem().Edit(ctx, req)
