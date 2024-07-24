@@ -28,7 +28,25 @@ func (c *cUserPointsHistory) List(ctx context.Context, req *pay.UserPointsHistor
 		err = error
 	}
 
-	gconv.Scan(result, &res)
+	if result != nil && len(result.Items) > 0 {
+		historyList := result.Items
+
+		resultItems := make([]map[string]interface{}, len(historyList))
+
+		for i, userPointsHistory := range historyList {
+			resultItem := gconv.Map(userPointsHistory)
+
+			resultItems[i] = resultItem
+		}
+
+		res = &pay.UserPointsHistoryListRes{
+			Items:   resultItems,
+			Page:    result.Page,
+			Total:   result.Total,
+			Records: result.Records,
+			Size:    result.Size,
+		}
+	}
 
 	return
 }

@@ -185,18 +185,6 @@ func (s *sProductIndex) ListItem(ctx context.Context, req *pt.ItemListReq) (out 
 	// 参加活动产品及数量 - 使用活动信息
 	itemNumVoMap := make(map[uint64]*model.ItemNumVo)
 	if !g.IsEmpty(req.ActivityId) {
-		activityBase, _ := dao.ActivityBase.Get(ctx, req.ActivityId)
-
-		if activityBase != nil {
-			activityRule := activityBase.ActivityRule
-
-			if activityRule != "" {
-				itemNumVoMap, err = service.ActivityBase().GetActivityItemNum(ctx, activityBase)
-			}
-
-			req.ItemId = activityBase.ActivityItemIds
-			output.ActivityBase = activityBase
-		}
 	}
 
 	lists, err := service.ProductItem().ListItemKey(ctx, req)
@@ -307,8 +295,8 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 	if err != nil {
 		return nil, err
 	}
-   
-    //兼容开源版
+
+	//兼容开源版
 	productItem.AvailableQuantity = productItem.ItemQuantity - productItem.ItemQuantityFrozen
 
 	out.ItemRow = productItem

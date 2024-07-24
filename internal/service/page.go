@@ -22,6 +22,7 @@ package service
 
 import (
 	"context"
+
 	"golershop.cn/api/sys"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
@@ -46,28 +47,8 @@ type (
 		GetUserCenterMenu(ctx context.Context) (out map[string]interface{}, err error)
 		// Detail 获取页面详情
 		Detail(ctx context.Context, pageId any) (out *model.PageDetail, err error)
-		// GetDataInfo
+		// GetDataInfo 获取数据信息
 		GetDataInfo(ctx context.Context, pageDataReq *sys.PageBaseGetDataInfoReq) (*sys.PageBaseGetDataInfoRes, error)
-	}
-	IPageModule interface {
-		Get(ctx context.Context, id any) (out *entity.PageModule, err error)
-		Gets(ctx context.Context, id any) (list []*entity.PageModule, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.PageModuleListInput) (out []*entity.PageModule, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.PageModuleListInput) (out *do.PageModuleListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.PageModule) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.PageModule) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// FixPcPageModuleData
-		FixPcPageModuleData(ctx context.Context, pageData []*entity.PageModule) ([]map[string]interface{}, error)
-		// GetModuleTpl
-		GetModuleTpl(ctx context.Context) (map[string]interface{}, error)
-		// GetLists
-		GetLists(ctx context.Context, req *do.PageModuleListInput) (pageModuleVo *model.PageModuleVoOutput, err error)
 	}
 	IPageCategoryNav interface {
 		// Find 查询数据
@@ -80,8 +61,30 @@ type (
 		Edit(ctx context.Context, in *do.PageCategoryNav) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
-		// GetPcLayout
+		// PcLayout PC头尾数据
 		GetPcLayout(ctx context.Context) (resultSlice []interface{}, err error)
+	}
+	IPageModule interface {
+		// 读取商品分类
+		Get(ctx context.Context, id any) (out *entity.PageModule, err error)
+		// 读取多条记录模式
+		Gets(ctx context.Context, id any) (list []*entity.PageModule, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.PageModuleListInput) (out []*entity.PageModule, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.PageModuleListInput) (out *do.PageModuleListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.PageModule) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.PageModule) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// FixPcPageModuleData 修复PC页面模块数据
+		FixPcPageModuleData(ctx context.Context, pageData []*entity.PageModule) ([]map[string]interface{}, error)
+		// GetModuleTpl 获取模块模板
+		GetModuleTpl(ctx context.Context) (map[string]interface{}, error)
+		// GetLists 获取页面模块列表
+		GetLists(ctx context.Context, req *do.PageModuleListInput) (pageModuleVo *model.PageModuleVoOutput, err error)
 	}
 	IPagePcNav interface {
 		// Find 查询数据
@@ -98,10 +101,10 @@ type (
 )
 
 var (
-	localPageBase        IPageBase
-	localPageModule      IPageModule
 	localPageCategoryNav IPageCategoryNav
+	localPageModule      IPageModule
 	localPagePcNav       IPagePcNav
+	localPageBase        IPageBase
 )
 
 func PageBase() IPageBase {
@@ -115,16 +118,6 @@ func RegisterPageBase(i IPageBase) {
 	localPageBase = i
 }
 
-func PageModule() IPageModule {
-	if localPageModule == nil {
-		panic("implement not found for interface IPageModule, forgot register?")
-	}
-	return localPageModule
-}
-
-func RegisterPageModule(i IPageModule) {
-	localPageModule = i
-}
 func PageCategoryNav() IPageCategoryNav {
 	if localPageCategoryNav == nil {
 		panic("implement not found for interface IPageCategoryNav, forgot register?")
@@ -135,6 +128,18 @@ func PageCategoryNav() IPageCategoryNav {
 func RegisterPageCategoryNav(i IPageCategoryNav) {
 	localPageCategoryNav = i
 }
+
+func PageModule() IPageModule {
+	if localPageModule == nil {
+		panic("implement not found for interface IPageModule, forgot register?")
+	}
+	return localPageModule
+}
+
+func RegisterPageModule(i IPageModule) {
+	localPageModule = i
+}
+
 func PagePcNav() IPagePcNav {
 	if localPagePcNav == nil {
 		panic("implement not found for interface IPagePcNav, forgot register?")

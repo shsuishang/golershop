@@ -3,6 +3,7 @@ package pt
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pt"
@@ -10,6 +11,8 @@ import (
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
+	"strings"
 )
 
 var (
@@ -51,10 +54,28 @@ func (c *cProduct) List(ctx context.Context, req *pt.ListReq) (res *pt.ListRes, 
 	}
 
 	req.ProductStateId = consts.PRODUCT_STATE_NORMAL
+	kindids := []uint{consts.PRODUCT_KIND_ENTITY, consts.PRODUCT_KIND_FUWU, consts.PRODUCT_KIND_CARD, consts.PRODUCT_KIND_WAIMAI}
+	req.KindId = gstr.JoinAny(kindids, ",")
+
+	// 指定优惠券跳转商品列表
+	if req.ItemIds != "" {
+		itemIds := gconv.SliceInt64(strings.Split(req.ItemIds, ","))
+
+		productItems, err := service.ProductItem().Gets(ctx, itemIds)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(productItems) > 0 {
+			productIds := array.Column(productItems, "ProductId")
+			//whereExt = append(whereExt, &ml.WhereExt{Column: dao.ProductIndex.Columns().ProductId, Val: productIds, Symbol: ml.IN})
+
+			req.ProductId = gstr.JoinAny(productIds, ",")
+		}
+	}
 
 	input := do.ProductIndexListInput{}
 	gconv.Scan(req, &input)
-
 	ml.ConvertReqToInput(req, &input.Where, &input.WhereExt)
 
 	var result, error = service.ProductIndex().GetList(ctx, &input)
@@ -140,4 +161,17 @@ func (c *cProductCategory) GetSearchFilter(ctx context.Context, req *pt.SearchFi
 	res, err = service.ProductCategory().GetSearchFilter(ctx, req.CategoryId)
 
 	return
+}
+
+// 商品品牌列表接口
+func (c *cProductCategory) GetBrand(ctx context.Context, req *pt.BrandTreeReq) (res []*pt.BrandTreeRes, err error) {
+	// 调用服务层获取商品品牌列表
+	commentRes, err := service.ProductBrand().GetTree(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	res = []*pt.BrandTreeRes{}
+
+	return commentRes, nil
 }

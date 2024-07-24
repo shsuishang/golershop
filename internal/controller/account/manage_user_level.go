@@ -40,7 +40,7 @@ func (c *cUserLevel) Add(ctx context.Context, req *account.UserLevelAddReq) (res
 
 	input := do.UserLevel{}
 	gconv.Scan(req, &input)
-	input.UserLevelTime = gtime.Now()
+	input.UserLevelTime = gtime.Now().TimestampMilli()
 
 	var result, error = service.UserLevel().Add(ctx, &input)
 	//var result, error = service.UserLevel().Edit(ctx, req)
@@ -61,7 +61,7 @@ func (c *cUserLevel) Edit(ctx context.Context, req *account.UserLevelEditReq) (r
 
 	input := do.UserLevel{}
 	gconv.Scan(req, &input)
-	input.UserLevelTime = gtime.Now()
+	input.UserLevelTime = gtime.Now().TimestampMilli()
 
 	var result, error = service.UserLevel().Edit(ctx, &input)
 	//var result, error = service.UserLevel().Edit(ctx, req)

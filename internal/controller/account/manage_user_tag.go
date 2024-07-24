@@ -195,3 +195,22 @@ func (c *cUserTagGroup) RemoveItem(ctx context.Context, req *account.UserTagBase
 
 	return
 }
+
+// EditState 编辑任务状态
+func (c *cUserTagGroup) EditState(ctx context.Context, req *account.UserTagBaseEditStateReq) (res *account.UserTagBaseEditStateRes, err error) {
+
+	input := do.UserTagBase{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.UserTagBase().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &account.UserTagBaseEditStateRes{
+		TagId: result,
+	}
+
+	return
+}

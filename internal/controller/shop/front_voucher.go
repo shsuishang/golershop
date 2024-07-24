@@ -50,3 +50,8 @@ func (c *cUserVoucher) GetEachVoucherNum(ctx context.Context, req *shop.GetVouch
 
 	return
 }
+
+// Add 领取代金券
+func (c *cUserVoucher) Add(ctx context.Context, req *shop.UserVoucherAddReq) (res *shop.UserVoucherAddRes, err error) {
+	return res, nil
+}

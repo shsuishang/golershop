@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/sys"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -38,6 +39,10 @@ func (c *cExpressBase) List(ctx context.Context, req *sys.ExpressBaseListReq) (r
 
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
+	input.BaseList = ml.BaseList{
+		Sidx: dao.ExpressBase.Columns().ExpressOrder,
+		Sort: ml.ORDER_BY_ASC,
+	}
 	var result, error = service.ExpressBase().List(ctx, &input)
 
 	if error != nil {
@@ -108,6 +113,24 @@ func (c *cExpressBase) Remove(ctx context.Context, req *sys.ExpressBaseRemoveReq
 	}
 
 	res = &sys.ExpressBaseRemoveRes{}
+
+	return
+}
+
+func (c *cExpressBase) EditState(ctx context.Context, req *sys.ExpressBaseEditStateReq) (res *sys.ExpressBaseEditStateRes, err error) {
+
+	input := do.ExpressBase{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.ExpressBase().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &sys.ExpressBaseEditStateRes{
+		ExpressId: result,
+	}
 
 	return
 }

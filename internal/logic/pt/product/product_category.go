@@ -263,7 +263,9 @@ func (s *sProductCategory) GetSearchFilter(ctx context.Context, categoryId uint)
 			return output, err
 		}
 
-		output.Assists = assists
+		if assists != nil {
+			output.Assists = assists
+		}
 
 		// 获取品牌
 		if len(productType.BrandIds) > 0 {
@@ -274,7 +276,9 @@ func (s *sProductCategory) GetSearchFilter(ctx context.Context, categoryId uint)
 				return output, err
 			}
 
-			output.Brands = brandList
+			if brandList != nil {
+				output.Brands = brandList
+			}
 		} else {
 			output.Brands = make([]*entity.ProductBrand, 0)
 		}

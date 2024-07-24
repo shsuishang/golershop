@@ -131,3 +131,14 @@ type UserTagBaseListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type UserTagBaseEditStateReq struct {
+	g.Meta `path:"/manage/account/userTagBase/editState" tags:"用户标签表" method:"post" summary:"用户标签表接口"`
+
+	TagId     int64 `json:"tag_id"       ` // 标签编码
+	TagEnable bool  `json:"tag_enable"   ` // 是否启用(BOOL):0-禁用;1-启用
+}
+
+type UserTagBaseEditStateRes struct {
+	TagId int64 `json:"tag_id"       ` // 标签编码
+}

@@ -17,7 +17,7 @@ type StoreTransportTypeAdd struct {
 	TransportTypePricingMethod uint        `json:"transport_type_pricing_method" ` // 计费规则(ENUM):1-按件数;2-按重量;3-按体积
 	TransportTypeFreightFree   float64     `json:"transport_type_freight_free"   ` // 免运费额度
 	TransportTypeBuildin       uint        `json:"transport_type_buildin"        ` // 系统内置(BOOL):0-非内置;1-内置
-	TransportTypeFree          uint        `json:"transport_type_free"           ` // 全免运费(BOOL):0-不全免;1-全免（不限制地区且免运费）
+	TransportTypeFree          bool        `json:"transport_type_free"           ` // 全免运费(BOOL):0-不全免;1-全免（不限制地区且免运费）
 	UpdateTime                 *gtime.Time `json:"update_time"                   ` // 编辑时间
 }
 type StoreTransportTypeEditReq struct {

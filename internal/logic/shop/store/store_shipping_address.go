@@ -22,6 +22,7 @@ package store
 
 import (
 	"context"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -68,6 +69,20 @@ func (s *sStoreShippingAddress) Edit(ctx context.Context, in *do.StoreShippingAd
 	if err != nil {
 		return 0, err
 	}
+
+	if in.SsIsDefault.(bool) {
+		var ext = []*ml.WhereExt{{
+			Column: dao.StoreShippingAddress.Columns().SsId, Val: in.SsId, Symbol: ml.NE,
+		}}
+
+		input := &do.StoreShippingAddressListInput{
+			Where:    do.StoreShippingAddress{SsIsDefault: true},
+			BaseList: ml.BaseList{WhereExt: ext},
+		}
+
+		dao.StoreShippingAddress.EditWhere(ctx, input, &do.StoreShippingAddress{SsIsDefault: false})
+	}
+
 	return
 }
 

@@ -142,7 +142,7 @@ func (s *sPageModule) FixPcPageModuleData(ctx context.Context, pageData []*entit
 
 			module["pm_json"] = pmJson
 
-			if gstr.InArray([]string{"1001", "1004", "1005", "1006"}, moduleId) {
+			if gstr.InArray([]string{"1001", "1004", "1005", "1006", "3002"}, moduleId) {
 				// 读取商品
 				tabs := pmJson.GetJsons("tabs")
 				if len(tabs) > 0 {

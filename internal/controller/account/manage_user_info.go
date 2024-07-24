@@ -24,10 +24,9 @@ type cUserInfo struct{}
 func (c *cUserInfo) List(ctx context.Context, req *account.UserInfoListReq) (res *account.UserInfoListRes, err error) {
 	input := do.UserInfoListInput{}
 	gconv.Scan(req, &input)
-
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
-	var result, error = service.UserInfo().List(ctx, &input)
+	var result, error = service.UserInfo().GetList(ctx, &input)
 
 	if error != nil {
 		err = error
@@ -67,10 +66,10 @@ func (c *cUserInfo) Add(ctx context.Context, req *account.UserInfoAddReq) (res *
 // Edit 编辑菜单
 func (c *cUserInfo) Edit(ctx context.Context, req *account.UserInfoEditReq) (res *account.UserInfoEditRes, err error) {
 
-	input := do.UserInfo{}
+	input := model.UserInfo{}
 	gconv.Scan(req, &input)
 
-	var result, error = service.UserInfo().Edit(ctx, &input)
+	var result, error = service.UserInfo().EditUser(ctx, &input)
 	//var result, error = service.UserInfo().Edit(ctx, req)
 
 	if error != nil {
@@ -139,6 +138,19 @@ func (c *cUserInfo) PassWordEdit(ctx context.Context, req *account.UserInfoPassW
 	res = &account.UserInfoPassWordEditRes{
 		UserId: result,
 	}
+
+	return
+}
+
+func (c *cUserInfo) AddTags(ctx context.Context, req *account.UserInfoAddTagsReq) (res *account.UserInfoAddTagsRes, err error) {
+
+	_, err = service.UserInfo().AddTags(ctx, req.UserIds, req.TagIds)
+
+	if err != nil {
+		return
+	}
+
+	res = &account.UserInfoAddTagsRes{}
 
 	return
 }

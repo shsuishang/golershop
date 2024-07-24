@@ -142,6 +142,10 @@ func (c *cAnalytics) GetUserTimeLine(ctx context.Context, req *analytics.UserTim
 
 	gconv.Struct(timelineRes, &res)
 
+	if res == nil {
+		res = make([]*model.TimelineOutput, 0)
+	}
+
 	return
 }
 
@@ -196,6 +200,10 @@ func (c *cAnalytics) GetSaleOrderAmount(ctx context.Context, req *analytics.Sale
 	}
 
 	gconv.Struct(amountRes, &res)
+
+	if res == nil {
+		res = make([]*model.TimelineOutput, 0)
+	}
 
 	return
 }

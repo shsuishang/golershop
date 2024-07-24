@@ -96,3 +96,23 @@ func (c *cStoreExpressLogistics) Remove(ctx context.Context, req *shop.StoreExpr
 
 	return
 }
+
+// EditState 修改状态
+func (c *cStoreExpressLogistics) EditState(ctx context.Context, req *shop.StoreExpressLogisticsEditStateReq) (res *shop.StoreExpressLogisticsEditStateRes, err error) {
+
+	input := do.StoreExpressLogistics{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.StoreExpressLogistics().Edit(ctx, &input)
+	//var result, error = service.StoreExpressLogistics().Edit(ctx, req)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &shop.StoreExpressLogisticsEditStateRes{
+		LogisticsId: result,
+	}
+
+	return
+}

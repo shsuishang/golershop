@@ -63,11 +63,12 @@ type OrderInvoiceListReq struct {
 	g.Meta `path:"/manage/trade/orderInvoice/list" tags:"发票管理" method:"get" summary:"发票管理列表接口"`
 	ml.BaseList
 
-	UserId        uint `json:"user_id"                   `        // 用户编号
-	InvoiceStatus uint `json:"invoice_status"                   ` // 状态
-
-	OrderId      string `json:"order_id"   type:"LIKE"       ` // 订单编号
-	InvoiceTitle string `json:"invoice_title"  type:"LIKE"   ` // 发票抬头
+	UserId              uint   `json:"user_id"                   `        // 用户编号
+	InvoiceStatus       uint   `json:"invoice_status"                   ` // 状态
+	InvoiceIsElectronic int    `json:"invoice_is_electronic"   `          // 电子发票(ENUM):0-纸质发票;1-电子发票
+	InvoiceType         int    `json:"invoice_type"            `          // 发票类型(ENUM):1-普通发票;2-增值税专用发票
+	OrderId             string `json:"order_id"   type:"LIKE"       `     // 订单编号
+	InvoiceTitle        string `json:"invoice_title"  type:"LIKE"   `     // 发票抬头
 }
 
 type OrderInvoiceListRes struct {

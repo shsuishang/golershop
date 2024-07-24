@@ -10,11 +10,12 @@ import (
 
 // start fo manage
 type ProductAssistAdd struct {
-	AssistId   uint   `json:"assist_id"   ` // 辅助属性编号
-	AssistName string `json:"assist_name" ` // 辅助属性名称
-	TypeId     uint   `json:"type_id"     ` // 所属类型编号
-	AssistItem string `json:"assist_item" ` // 辅助属性值(DOT)
-	AssistSort uint   `json:"assist_sort" ` // 排序
+	AssistId   uint   `json:"assist_id"   `     // 辅助属性编号
+	AssistName string `json:"assist_name" `     // 辅助属性名称
+	CategoryId uint   `json:"category_id"     ` // 所属分类
+	TypeId     uint   `json:"type_id"     `     // 所属类型编号
+	AssistItem string `json:"assist_item" `     // 辅助属性值(DOT)
+	AssistSort uint   `json:"assist_sort" `     // 排序
 }
 type ProductAssistEditReq struct {
 	g.Meta `path:"/manage/pt/productAssist/edit" tags:"属性管理" method:"post" summary:"属性编辑接口"`

@@ -88,9 +88,11 @@ func (s *sAnalyticsOrder) GetDashboardTimeLine(ctx context.Context, input *model
 }
 
 func (s *sAnalyticsOrder) GetSaleOrderAmount(ctx context.Context, input *model.TimelineInput) (out []*model.TimelineOutput, err error) {
+	out = make([]*model.TimelineOutput, 0)
+
 	saleOrderAmount, err := dao.AnalyticsOrder.GetSaleOrderAmount(ctx, input.Stime, input.Etime)
 	if err != nil {
-		return nil, err
+		return out, err
 	}
 
 	gconv.Struct(saleOrderAmount, &out)

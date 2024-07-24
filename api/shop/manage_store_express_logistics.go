@@ -57,7 +57,8 @@ type StoreExpressLogisticsListReq struct {
 	g.Meta `path:"/manage/shop/storeExpressLogistics/list" tags:"物流管理" method:"get" summary:"物流管理列表接口"`
 	ml.BaseList
 
-	LogisticsName string `json:"logistics_name"  type:"LIKE"     ` // 物流名称
+	LogisticsName     string `json:"logistics_name"  type:"LIKE"     ` // 物流名称
+	LogisticsIsEnable bool   `json:"logistics_is_enable"  `            // 是否启用(BOOL):1-启用;0-禁用
 }
 
 type StoreExpressLogisticsListRes struct {
@@ -66,4 +67,16 @@ type StoreExpressLogisticsListRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
+}
+
+type StoreExpressLogisticsEditStateReq struct {
+	g.Meta `path:"/manage/shop/storeExpressLogistics/editState" tags:"物流管理" method:"post" summary:"物流管理修改状态接口"`
+
+	LogisticsId        uint `json:"logistics_id"   `       // 物流管理编号`
+	LogisticsIsDefault bool `json:"logistics_is_default" ` // 是否为默认(BOOL):1-默认;0-非默认
+	LogisticsIsEnable  bool `json:"logistics_is_enable"  ` // 是否启用(BOOL):1-启用;0-禁用
+}
+
+type StoreExpressLogisticsEditStateRes struct {
+	LogisticsId interface{} `json:"logistics_id"   dc:"物流管理信息"`
 }

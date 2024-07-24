@@ -26,11 +26,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"github.com/shopspring/decimal"
+	"golershop.cn/api/shop"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
@@ -116,64 +116,6 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 	var activityBase *entity.ActivityBase
 
 	if !g.IsEmpty(in.ActivityId) {
-		// 参加活动 产品及数量 - 活动信息使用
-		itemNumVoMap := make(map[uint64]*model.ItemNumVo)
-
-		activityBase, err = dao.ActivityBase.Get(ctx, in.ActivityId)
-
-		if activityBase != nil {
-			if activityBase.ActivityState != consts.ACTIVITY_STATE_NORMAL {
-				return nil, errors.New("活动尚未开启！")
-			}
-
-			// 会员等级判断
-			_, err := s.checkoutLevel(ctx, activityBase.ActivityUseLevel, userInfo.UserLevelId)
-			if err != nil {
-				panic(err)
-			}
-
-			activityRule := activityBase.ActivityRule
-
-			if activityRule != "" {
-				itemNumVoMap, err = service.ActivityBase().GetActivityItemNum(ctx, activityBase)
-			}
-
-			// 礼包活动 必须套餐直接下单。
-			if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_GIFTBAG {
-				var items []*model.CheckoutItemVo
-
-				for itemId, itemNumVo := range itemNumVoMap {
-					item := &model.CheckoutItemVo{
-						ItemId:       itemId,
-						CartQuantity: itemNumVo.Num,
-						CartSelect:   true,
-						CartType:     1,
-					}
-					items = append(items, item)
-				}
-
-				in.Items = items
-			}
-
-			// 砍价活动
-			if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_CUTPRICE {
-				var items []*model.CheckoutItemVo
-
-				for itemId, itemNumVo := range itemNumVoMap {
-					item := &model.CheckoutItemVo{
-						ItemId:       itemId,
-						CartQuantity: itemNumVo.Num,
-						CartSelect:   true,
-						CartType:     1,
-					}
-					items = append(items, item)
-				}
-
-				in.Items = items
-			}
-		} else {
-			return nil, errors.New("非法活动参数！")
-		}
 	}
 
 	orderProductAmount := decimal.NewFromFloat(0) // 商品订单原价
@@ -266,30 +208,14 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 	//List<StoreBase> storeLists = storeBaseService.gets(storeIds);
 
 	//可用代金券列表
-	now := gtime.Now()
-	var ext = []*ml.WhereExt{{
-		Column: dao.UserVoucher.Columns().VoucherStartDate,
-		Val:    now,
-		Symbol: ml.GE,
-	}, {
-		Column: dao.UserVoucher.Columns().VoucherEndDate,
-		Val:    now,
-		Symbol: ml.LE,
-	}}
-
-	userVoucherListInput := &do.UserVoucherListInput{
-		BaseList: ml.BaseList{Page: 1,
-			Size:     consts.MAX_LIST_NUM,
-			WhereExt: ext,
-			Sidx:     dao.UserVoucher.Columns().UserVoucherTime,
-			Sort:     "DESC"},
-		Where: do.UserVoucher{
-			UserId:         in.UserId,
-			VoucherStateId: consts.VOUCHER_STATE_UNUSED,
-		},
-	}
-
-	userVoucherPage, _ := service.UserVoucher().GetList(ctx, userVoucherListInput)
+	UserVoucherReq := &shop.UserVoucherListReq{}
+	UserVoucherReq.Page = 1
+	UserVoucherReq.Size = consts.MAX_LIST_NUM
+	UserVoucherReq.Sidx = dao.UserVoucher.Columns().UserVoucherTime
+	UserVoucherReq.Sort = ml.ORDER_BY_DESC
+	UserVoucherReq.UserId = in.UserId
+	UserVoucherReq.VoucherStateId = consts.VOUCHER_STATE_UNUSED
+	userVoucherPage, _ := service.UserVoucher().GetLists(ctx, UserVoucherReq)
 	voucherItems := userVoucherPage.Items
 
 	// 店铺信息
@@ -666,12 +592,12 @@ func (s *sUserCart) checkoutLevel(ctx context.Context, activityUseLevel string, 
 		userLevels := gconv.SliceInt(gstr.Split(activityUseLevel, ","))
 		if len(userLevels) > 0 {
 			sort.Ints(userLevels)
-			userLevelList, err := dao.UserLevel.List(ctx, &do.UserLevelListInput{Where: do.UserLevel{UserLevelId: userLevels}})
+			userLevelList, err := dao.UserLevel.Gets(ctx, userLevels)
 			if err != nil {
 				return false, errors.New("等级信息不存在！")
 			}
 
-			if !array.InArray(userLevels, userLevelId) {
+			if !array.InArray(gconv.SliceUint(userLevels), userLevelId) {
 				names := array.Column(userLevelList, "UserLevelName")
 				return false, errors.New(fmt.Sprintf("活动商品会员等级为 %s ，用户等级未达到", gstr.JoinAny(names, "、")))
 			}
@@ -780,6 +706,20 @@ func (s *sUserCart) CalTransportFreight(ctx context.Context, storeItemVo *model.
 	}
 
 	out, _ = freight.Float64()
+
+	return out, err
+}
+
+// Find 查询数据
+func (s *sUserCart) Find(ctx context.Context, in *do.UserCartListInput) (out []*entity.UserCart, err error) {
+	out, err = dao.UserCart.Find(ctx, in)
+
+	return out, err
+}
+
+// Find 查询数据
+func (s *sUserCart) FindOne(ctx context.Context, in *do.UserCartListInput) (out *entity.UserCart, err error) {
+	out, err = dao.UserCart.FindOne(ctx, in)
 
 	return out, err
 }

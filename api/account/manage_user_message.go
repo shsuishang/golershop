@@ -88,3 +88,14 @@ type MessageNoticeRes struct {
 	Total int                    `json:"total"`                    // 消息数量
 }
 
+type UserMessageEditStateReq struct {
+	g.Meta `path:"/manage/account/userMessage/editState" tags:"短消息-聊天记录-状态修改" method:"post" summary:"短消息-聊天记录-状态修改接口"`
+
+	MessageId       uint `json:"message_id"          ` // 消息编号   `
+	MessageIsRead   bool `json:"message_is_read"     ` // 是否读取(BOOL):0-未读;1-已读
+	MessageIsDelete bool `json:"message_is_delete"   ` // 是否删除(BOOL):0-正常状态;1-删除状态
+}
+
+type UserMessageEditStateRes struct {
+	MessageId int64 `json:"message_id"          ` // 消息编号   `
+}

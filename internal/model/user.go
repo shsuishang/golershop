@@ -65,11 +65,27 @@ type UserVoucherRes struct {
 	ActivityRuleJson ActivityRuleVo `json:"activity_rule_json"`
 	ItemIds          []string       `json:"item_ids"`
 	ActivityState    uint           `json:"activity_state"`
+	VoucherUserWay   uint           `json:"voucher_user_way"`
 	VoucherEffect    bool           `json:"voucher_effect"`
 }
 
 type UserVoucherListOutput struct {
 	Items []*UserVoucherRes
+
+	Page    int // 分页号码
+	Total   int // 总页数
+	Records int // 数据总数
+	Size    int // 单页数量
+}
+
+type UserInfo struct {
+	entity.UserInfo
+	UserParentId uint `json:"user_parent_id"   dc:"上级用户编号"`
+	Puid         uint `json:"puid"   dc:"平台标识"`
+	Suid         uint `json:"suid"   dc:"用户标识"`
+}
+type UserInfoListOutput struct {
+	Items []*UserInfo
 
 	Page    int // 分页号码
 	Total   int // 总页数

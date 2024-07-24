@@ -34,7 +34,6 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/sys"
-	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
@@ -51,7 +50,6 @@ func (c *cPage) GetMobileIndexNav(ctx context.Context, req *sys.MobileIndexNavLi
 
 // GetMobilePage 读取移动页面
 func (c *cPage) GetMobilePage(ctx context.Context, req *sys.PageDetailReq) (out sys.PageDetailRes, err error) {
-	user := service.BizCtx().GetUser(ctx)
 
 	if req.PageId > 0 {
 		// 根据页面编号处理
@@ -111,24 +109,6 @@ func (c *cPage) GetMobilePage(ctx context.Context, req *sys.PageDetailReq) (out 
 	pageDetail, _ := service.PageBase().Detail(ctx, req.PageId)
 
 	if req.PageIndex != "" && req.PageIndex == "page_index" {
-		// 首页弹窗 新人优惠券
-		activityBaseListReq := &do.ActivityBaseListInput{}
-		activityBaseListReq.Where.ActivityState = consts.ACTIVITY_STATE_NORMAL
-		activityBaseListReq.Where.ActivityTypeId = consts.ACTIVITY_TYPE_POP
-		activityBaseResIPage, _ := service.ActivityBase().List(ctx, activityBaseListReq)
-
-		if activityBaseResIPage != nil && len(activityBaseResIPage.Items) > 0 {
-			activityList := activityBaseResIPage.Items
-
-			// 未登录
-			if user == nil {
-				pageDetail.PopUps = dealWithPopUp(ctx, activityList, nil)
-			} else {
-				// 已登录
-				userInfo, _ := service.UserInfo().Get(ctx, user.UserId)
-				pageDetail.PopUps = dealWithPopUp(ctx, activityList, userInfo)
-			}
-		}
 	}
 
 	gconv.Scan(pageDetail, &out)

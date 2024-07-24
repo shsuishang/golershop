@@ -216,11 +216,15 @@ secure:
     - "/front/pt/product/list"
     - "/front/pt/product/listItem"
     - "/front/pt/product/detail"
-
-    - "/front/marketing/activityBase/listVoucher"
+    - "/front/pt/product/getSearchFilter"
+    - "/front/pt/product/brand"
 
     - "/front/shop/mobile/getSearchInfo"
-    - "/front/pt/product/getSearchFilter"
+    - "/front/marketing/activityBase/listVoucher"
+
+    - "/front/cms/articleBase/listCategory"
+    - "/front/cms/articleBase/list"
+    - "/front/cms/articleBase/get"
 
 
 
@@ -247,5 +251,8 @@ shopSuite:
 
   cacheNamespace: "c:1001:"
 
+
+licence:
+  key: "vgXeg8yjgsIsv3DEXUvjX2bk/vdNJgmSypmBR14txRcXNXX5n0cP2uuFeWWb3Q7SnD2godlLLmPXCXonJRQ2KZK2mm/qByCnVMAm4P4B5Om2Wrekjjkoz8ReaRbg9OJaECjcmkttvGfvJMwDkzfyRJIeQDbiNPz1k+OdDiCnnqczLWiTKkpZKyB2bP26Pkqy/IYuaqxK+to2ThQMxu9tyGl2YlkdBqfgarTaJ70jQAHvocIz8b7FGxOurSC0jYpDQPLO74j6jbVrWfXWsAlspSERbCuptX6UYyLmoSWEW5tuORmmE8khKCOZA1Td+Bwu/yl1ovIgfRhRxVR2ypKgow=="
 
 

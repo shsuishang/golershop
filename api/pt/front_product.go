@@ -102,7 +102,7 @@ type ListReq struct {
 	g.Meta `path:"/front/pt/product/list" tags:"商品" method:"get" summary:"商品列表接口"`
 	ml.BaseList
 
-	ProductId                uint64  `json:"product_id"                  `                          // 产品编号:定为SPU编号
+	ProductId                string  `json:"product_id"      type:"IN_STR"            `             // 产品编号:定为SPU编号
 	ProductNumber            string  `json:"product_number"              `                          // SPU商家编码:货号
 	ProductName              string  `json:"product_name" type:"LIKE"    `                          // 产品名称
 	ProductNameIndex         string  `json:"keywords" type:"LIKE"     `                             // 名称索引关键字(DOT)
@@ -123,7 +123,7 @@ type ListReq struct {
 	ProductIsReturn          bool    `json:"product_is_return"           `                          // 允许退换货(BOOL): 1-是; 0-否
 	ProductIsRecommend       bool    `json:"product_is_recommend"        `                          // 商品推荐(BOOL):1-是; 0-否
 	ProductStockStatus       uint    `json:"product_stock_status"        `                          // 缺货状态(ENUM):1-有现货;2-预售商品;3-缺货;4-2至3天
-	KindId                   uint    `json:"kind_id"                     `                          // 商品种类:1201-实物;1202-虚拟
+	KindId                   string  `json:"kind_id"            type:"IN_STR"            `          // 商品种类:1201-实物;1202-虚拟
 	ActivityTypeIds          string  `json:"activity_type_ids"  type:"FIND_IN_SET_STR"           `  // 参与活动(DOT)
 	ContractTypeIds          string  `json:"contract_type_ids"  type:"FIND_IN_SET_STR"         `    // 消费者保障(DOT):由店铺映射到商品
 	ProductAssistData        string  `json:"product_assist_data"     type:"FIND_IN_SET_STR"      `  // 辅助属性值列(DOT):assist_item_id每个都不用 , setFilter(tagid, array(2,3,4));是表示含有标签值2,3,4中的任意一个即符合筛选，这里是or关系。 setFilter(‘tagid’, array(2)); setFilter(‘tagid’, array(3)); 形成and关系| msyql where FIND_IN_SET('1', product_assist_data)
@@ -154,6 +154,8 @@ type ListReq struct {
 	ProductIsLock            bool    `json:"product_is_lock"             `                          // 是否锁定(BOOL):0-未锁定; 1-锁定,参加团购的商品不予许修改
 	ProductInventoryLock     uint    `json:"product_inventory_lock"      `                          // 库存锁定(ENUM):1001-下单锁定;1002-支付锁定;
 	ProductFrom              uint    `json:"product_from"                `                          // 商品来源(ENUM):1000-发布;1001-天猫;1002-淘宝;1003-阿里巴巴;1004-京东;
+	ItemIds                  string  `json:"item_ids"                  `                            // 商品SKU编号
+	Assist                   string  `json:"assist"                      `                          // 辅助属性值列(DOT):assist_item_id每个都不用 , setFilter(tagid, array(2,3,4));是表示含有标签值2,3,4中的任意一个即符合筛选，这里是or关系。 setFilter(‘tagid’, array(2)); setFilter(‘tagid’, array(3)); 形成and关系| msyql where FIND_IN_SET('1', product_assist_data)
 }
 
 type ListRes model.ProductListOutput
@@ -195,3 +197,13 @@ type ProductDetailReq struct {
 }
 
 type ProductDetailRes model.ProductDetailOutput
+
+type BrandTreeReq struct {
+	g.Meta `path:"/front/pt/product/brand" tags:"商品品牌列表" method:"get" summary:"商品品牌列表"`
+}
+
+type BrandTreeRes struct {
+	BrandId   uint        `json:"brand_id"`
+	BrandName string      `json:"brand_name"`
+	Children  interface{} `json:"children"`
+}

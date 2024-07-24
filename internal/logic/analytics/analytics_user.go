@@ -83,6 +83,10 @@ func (s *sAnalyticsUser) GetUserTimeLine(ctx context.Context, input *model.Timel
 
 	gconv.Struct(userTimeLine, &out)
 
+	if out == nil {
+		out = make([]*model.TimelineOutput, 0)
+	}
+
 	return
 }
 

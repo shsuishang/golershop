@@ -751,88 +751,6 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 
 			//todo 处理店铺活动优惠
 
-			// 店铺活动
-			if storeItemVo.ActivityBase != nil {
-				activityBase := storeItemVo.ActivityBase
-				activityBaseDo := &do.ActivityBase{}
-
-				if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_GIFTBAG {
-					activityBase.ActivityEffectiveQuantity = activityBase.ActivityEffectiveQuantity + 1
-
-					gconv.Scan(activityBase, activityBaseDo)
-
-					if _, err := service.ActivityBase().Edit(ctx, activityBaseDo); err != nil {
-						return err
-					}
-
-				} else if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_CUTPRICE {
-					cutpriceQueryWrapper := do.ActivityCutpriceListInput{}
-					cutpriceQueryWrapper.Where.ActivityId = activityBase.ActivityId
-					cutpriceQueryWrapper.Where.UserId = userId
-					cutpriceQueryWrapper.Where.OrderId = ""
-
-					activityCutprice, _ := service.ActivityCutprice().FindOne(ctx, &cutpriceQueryWrapper)
-
-					if !g.IsEmpty(activityCutprice) {
-						panic(errors.New("该砍价订单已创建，请勿重复提交！"))
-					}
-
-					cutpriceQueryWrapper = do.ActivityCutpriceListInput{}
-					cutpriceQueryWrapper.Where.ActivityId = activityBase.ActivityId
-					cutpriceQueryWrapper.Where.UserId = userId
-
-					activityCutprice, _ = service.ActivityCutprice().FindOne(ctx, &cutpriceQueryWrapper)
-
-					//Float order_cutprice_time = configBaseService.getConfig("order_cutprice_time", 3f);
-					//  int second = NumberUtil.mul(order_cutprice_time, 24, 60, 60).intValue();
-					//  long time = DateUtil.offsetSecond(new Date(activityCutprice.getAcDatetime()), +second).getTime();
-					//
-					//  if (time < new Date().getTime()) {
-					//      throw new BusinessException(__("该砍价订单已失效！"));
-					//  }
-
-					activityCutprice.OrderId = orderId
-
-					activityCutpriceDo := &do.ActivityCutprice{}
-					gconv.Scan(activityCutprice, activityCutpriceDo)
-
-					_, err = service.ActivityCutprice().Edit(ctx, activityCutpriceDo)
-
-					if err != nil {
-						panic(errors.New("修改砍价记录失败！"))
-					}
-
-					activityBase.ActivityEffectiveQuantity = activityBase.ActivityEffectiveQuantity + 1
-
-					gconv.Scan(activityBase, activityBaseDo)
-
-					if _, err := service.ActivityBase().Edit(ctx, activityBaseDo); err != nil {
-						return err
-					}
-				}
-			}
-			//todo 满减活动
-			//
-			//   var itemShareGiftbag decimal.Decimal
-			//
-			//   //满减均摊
-			//   if len(reduction) > 0 {
-			//   	for ri := 0; ri < ddrLen; ri++ {
-			//   		value := discountDetailRows[ri]
-			//
-			//   		if containsIntList(value["item_ids"], item["item_id"]) {
-			//   			//数组最后一个用减法
-			//   			if ri+1 == len(itemsList) {
-			//   				itemShareGiftbag.Sub(Convert.ToBigDecimal(value["discount"]), reductionDiscount)
-			//   				reductionDiscount = BigDecimal.ZERO
-			//   			} else {
-			//   				itemShareGiftbag.Mul(NumberUtil.Div(Convert.ToBigDecimal(value["discount"]), Convert.ToBigDecimal(value["old_amount"])), Convert.ToBigDecimal(item["subtotal"]))
-			//   				reductionDiscount.Add(reductionDiscount, itemShareGiftbag)
-			//   			}
-			//   		}
-			//   	}
-			//   }
-
 			// 1、订单基础表
 			orderBase := &do.OrderBase{}
 
@@ -1068,25 +986,6 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 						if !g.IsEmpty(item.ActivityId) {
 							itemRow.ActivityTypeId = item.ActivityInfo.ActivityTypeId // 活动类型:0-默认;1101-加价购=搭配宝;1102-店铺满赠-小礼品;1103-限时折扣;1104-优惠套装;1105-店铺优惠券coupon优惠券;1106-拼团;1107-满减送;1108-阶梯价
 							itemRow.ActivityId = item.ActivityId                      // 促销活动Id:与activity_type_id搭配使用, 团购Id/限时折扣Id/优惠套装Id
-
-							// 参与拼团
-							if itemRow.ActivityTypeId.(uint) == consts.ACTIVITY_TYPE_GROUPBOOKING {
-								gbId, _ = service.ActivityGroupbooking().DoGroupbooking(ctx, orderId, userId, gbId, item.ActivityInfo)
-
-								// 修正订单同步状态:修改为延迟同步
-								orderInfoTmp := &do.OrderInfo{
-									OrderId:     orderId,
-									OrderIsSync: false,
-								}
-
-								if _, err := service.OrderInfo().Edit(ctx, orderInfoTmp); err != nil {
-									panic("修正订单同步状态!")
-								}
-							}
-
-							// 砍价订单
-							if itemRow.ActivityTypeId.(uint) == consts.ACTIVITY_TYPE_CUTPRICE {
-							}
 						}
 
 						itemRow.OrderItemDiscountAmount = item.ItemDiscountAmount // 优惠金额  负数
@@ -1609,45 +1508,8 @@ func (s *sOrder) SetPaidYes(ctx context.Context, orderId string) (flag bool, err
 		dao.OrderInvoice.EditWhere(ctx, queryWrapper, orderInvoice)
 
 		// 活动判断
-		// 拼团活动
-		if !g.IsEmpty(orderInfo.ActivityTypeId) {
-			activityTypeId := gconv.SliceUint(gstr.Split(orderInfo.ActivityTypeId, ","))
-
-			if array.InArray(activityTypeId, consts.ACTIVITY_TYPE_GROUPBOOKING) {
-				service.ActivityGroupbooking().SetPaidYes(ctx, orderId, orderBase.UserId)
-			}
-		}
 
 		// 推广
-		now := time.Now()
-		distributionOrder := &do.DistributionOrder{
-			UoIsPaid:  true,
-			UoPaytime: now.Unix(),
-		}
-
-		orderQueryWrapper := &do.DistributionOrderListInput{
-			Where: do.DistributionOrder{
-				OrderId: orderId,
-			},
-		}
-
-		dao.DistributionOrder.Edit(ctx, orderQueryWrapper, distributionOrder)
-
-		userOrderItem := &do.DistributionOrderItem{UoiIsPaid: true}
-		itemQueryWrapper := &do.DistributionOrderItemListInput{
-			Where: do.DistributionOrderItem{
-				OrderId: orderId,
-			},
-		}
-
-		dao.DistributionOrderItem.EditWhere(ctx, itemQueryWrapper, userOrderItem)
-
-		// 分销功能 - 发放佣金阶段判断
-		fxSettleType := service.ConfigBase().GetStr(ctx, "fx_settle_type", "receive")
-
-		if fxSettleType == "paid" {
-			service.DistributionOrderItem().SettleDistributionUserOrder(ctx, orderId)
-		}
 
 		// 读取订单商品，更新销量
 		for _, orderItem := range orderItemList {
@@ -2478,16 +2340,7 @@ func (s *sOrder) IfActivity(ctx context.Context, orderId string) bool {
 	orderInfo, _ := dao.OrderInfo.Get(ctx, orderId)
 
 	if len(orderInfo.ActivityTypeId) > 0 {
-		activityTypeId := gconv.SliceUint(gstr.Split(orderInfo.ActivityTypeId, ","))
 
-		if array.InArray(activityTypeId, consts.ACTIVITY_TYPE_GROUPBOOKING) {
-			// 拼团是否可以审核
-			b, _ := service.ActivityGroupbooking().CheckGroupbookingSuccess(ctx, orderId)
-
-			if !b {
-				panic("拼团订单未完成！")
-			}
-		}
 	}
 
 	return true

@@ -10,13 +10,14 @@ import (
 
 // start fo manage
 type UserLevelAdd struct {
-	UserLevelId        string      `json:"user_level_id"`                                 // 等级编号
-	UserLevelName      string      `json:"user_level_name" v:"required#请输入等级名称"         ` // 等级名称
-	UserLevelSpend     string      `json:"user_level_spend" v:"required#请输入累计消费" `        // 累计消费
-	UserLevelLogo      string      `json:"user_level_logo" v:"required#请上传等级图标"   `       // LOGO
-	UserLevelRate      string      `json:"user_level_rate"`                               // 折扣率百分比
-	UserLevelTime      *gtime.Time `json:"user_level_time"`                               // 修改时间
-	UserLevelIsBuildin bool        `json:"user_level_is_buildin"`                         // 系统内置(BOOL):0-否;1-是
+	UserLevelId        string      `json:"user_level_id"`                            // 等级编号
+	UserLevelName      string      `json:"user_level_name" v:"required#请输入等级名称"    ` // 等级名称
+	UserLevelExp       uint        `json:"user_level_exp"  v:"required#请输入升级经验值"   ` // 升级经验值
+	UserLevelSpend     string      `json:"user_level_spend" v:"required#请输入累计消费" `   // 累计消费
+	UserLevelLogo      string      `json:"user_level_logo" v:"required#请上传等级图标"   `  // LOGO
+	UserLevelRate      string      `json:"user_level_rate"`                          // 折扣率百分比
+	UserLevelTime      *gtime.Time `json:"user_level_time"`                          // 修改时间
+	UserLevelIsBuildin bool        `json:"user_level_is_buildin"`                    // 系统内置(BOOL):0-否;1-是
 }
 type UserLevelEditReq struct {
 	g.Meta `path:"/manage/account/userLevel/edit" tags:"会员等级" method:"post" summary:"等级编辑接口"`

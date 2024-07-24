@@ -53,7 +53,10 @@ func (c *cCart) Add(ctx context.Context, req *trade.UserCartAddReq) (*trade.User
 
 	_, err := service.UserCart().AddCart(ctx, userCart)
 
-	return &trade.UserCartAddRes{}, err
+	//获取下cart_id
+	cartItem, err := service.UserCart().FindOne(ctx, &do.UserCartListInput{Where: do.UserCart{ItemId: req.ItemId}})
+
+	return &trade.UserCartAddRes{CartId: cartItem.CartId}, err
 }
 
 // Edit 购物车编辑

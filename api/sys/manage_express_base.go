@@ -70,3 +70,15 @@ type GetExpressListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type ExpressBaseEditStateReq struct {
+	g.Meta `path:"/manage/sys/expressBase/editState" tags:"快递公司" method:"post" summary:"快递表-修改快递常用状态和启用状态"`
+
+	ExpressId     uint `json:"express_id"   `       // 快递公司编号`
+	ExpressIsFav  bool `json:"express_is_fav"     ` // 是否常用
+	ExpressEnable bool `json:"express_enable"     ` // 启用状态(BOOL):0-禁用;1-启用
+}
+
+type ExpressBaseEditStateRes struct {
+	ExpressId interface{} `json:"express_id"   dc:"快递公司信息"`
+}

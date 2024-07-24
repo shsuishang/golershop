@@ -28,7 +28,9 @@ type UserInfoAdd struct {
 type UserInfoEditReq struct {
 	g.Meta `path:"/manage/account/userInfo/edit" tags:"会员管理" method:"post" summary:"用户编辑接口"`
 
-	UserId uint `json:"user_id"   v:"required#请输入会员编号"    dc:"会员编号"     `
+	UserId       uint   `json:"user_id"   v:"required#请输入会员编号"   dc:"会员编号"     `
+	TagIds       string `json:"tag_ids"     dc:"会员标签"`
+	UserParentId uint   `json:"user_parent_id"   dc:"上级用户编号"`
 	UserInfoAdd
 }
 
@@ -62,6 +64,7 @@ type UserInfoListReq struct {
 	UserAccount  string `json:"user_account"   type:"LIKE"        ` // 用户账号
 	UserNickname string `json:"user_nickname"  type:"LIKE"        ` // 用户昵称
 	UserMobile   string `json:"user_mobile"    type:"LIKE"        ` //用户号码
+	TagIds       string `json:"tag_ids"        type:"FIND_IN_SET_STR"`
 }
 
 type UserInfoListRes struct {
@@ -92,3 +95,21 @@ type UserInfoPassWordEditReq struct {
 type UserInfoPassWordEditRes struct {
 	UserId interface{} `json:"user_id"   dc:"会员信息"`
 }
+
+type UserInfoAddTagsReq struct {
+	g.Meta `path:"/manage/account/userInfo/addTags" tags:"批量设置标签" method:"post" summary:"批量设置标签"`
+
+	UserIds string `json:"user_ids"   dc:"用户编号"`
+	TagIds  string `json:"tag_ids"    dc:"标签编号"`
+}
+
+type UserInfoAddTagsRes struct{}
+
+type UserInfoAddVouchersReq struct {
+	g.Meta `path:"/manage/account/userInfo/addVouchers" tags:"批量发放优惠券" method:"post" summary:"批量发放优惠券"`
+
+	UserIds    string `json:"user_ids"   dc:"用户编号"`
+	ActivityId uint   `json:"activity_id"    dc:"活动编号"`
+}
+
+type UserInfoAddVouchersRes struct{}

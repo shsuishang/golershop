@@ -2,12 +2,10 @@ package account
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/account"
-	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -24,15 +22,7 @@ func (c *cUserMessage) List(ctx context.Context, req *account.UserMessageListReq
 	input := do.UserMessageListInput{}
 	gconv.Scan(req, &input)
 
-	if !g.IsEmpty(req.MessageTitle) {
-		var likes = []*ml.WhereExt{{
-			Column: dao.UserMessage.Columns().MessageTitle,
-			Val:    "%" + req.MessageTitle + "%",
-			Symbol: ml.LIKE,
-		}}
-
-		input.WhereExt = likes
-	}
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
 	var result, error = service.UserMessage().List(ctx, &input)
 
@@ -114,6 +104,25 @@ func (c *cUserMessage) Remove(ctx context.Context, req *account.UserMessageRemov
 func (c *cUserMessage) MessageNoticeReq(ctx context.Context, req *account.MessageNoticeReq) (res *account.MessageNoticeRes, err error) {
 
 	res = &account.MessageNoticeRes{}
+
+	return
+}
+
+// EditState 编辑任务状态
+func (c *cUserMessage) EditState(ctx context.Context, req *account.UserMessageEditStateReq) (res *account.UserMessageEditStateRes, err error) {
+
+	input := do.UserMessage{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.UserMessage().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &account.UserMessageEditStateRes{
+		MessageId: result,
+	}
 
 	return
 }

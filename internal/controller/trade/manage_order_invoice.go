@@ -3,6 +3,7 @@ package trade
 import (
 	"context"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/trade"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -18,6 +19,8 @@ type cOrderInvoice struct{}
 func (c *cOrderInvoice) List(ctx context.Context, req *trade.OrderInvoiceListReq) (res *trade.OrderInvoiceListRes, err error) {
 	input := do.OrderInvoiceListInput{}
 	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
 	var result, error = service.OrderInvoice().List(ctx, &input)
 

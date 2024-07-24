@@ -24,10 +24,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/util/gutil"
+	"github.com/mallsuite/gocore/core/ml"
+	"golershop.cn/api/pt"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 type sProductBrand struct{}
@@ -120,4 +124,48 @@ func (s *sProductBrand) Remove(ctx context.Context, id any) (affected int64, err
 	}
 
 	return affected, err
+}
+
+// GetTree 获取商品品牌树
+func (s *sProductBrand) GetTree(ctx context.Context) (brandList []*pt.BrandTreeRes, err error) {
+	// 获取品牌列表并按brand_id升序排序
+	brandLists, err := dao.ProductBrand.Find(ctx, &do.ProductBrandListInput{
+		BaseList: ml.BaseList{
+			Sidx: dao.ProductBrand.Columns().BrandId,
+			Sort: ml.ORDER_BY_ASC,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// 提取category_id列表
+	categoryIds := array.Column(brandLists, "BrandId")
+
+	// 获取商品分类
+	categories, err := service.ProductCategory().Gets(ctx, categoryIds)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构建品牌树
+	for _, category := range categories {
+		var brands []*entity.ProductBrand
+		for _, brand := range brandLists {
+			if brand.CategoryId == category.CategoryId {
+				brands = append(brands, brand)
+			}
+		}
+
+		if !gutil.IsEmpty(brands) {
+			brandRe := &pt.BrandTreeRes{
+				BrandId:   category.CategoryId,
+				BrandName: category.CategoryName,
+				Children:  brands,
+			}
+			brandList = append(brandList, brandRe)
+		}
+	}
+
+	return brandList, nil
 }

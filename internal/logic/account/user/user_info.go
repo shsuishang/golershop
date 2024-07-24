@@ -22,6 +22,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
@@ -312,4 +313,91 @@ func GetMonthTimeRange() TimeRange {
 		Start: startUnixMilli,
 		End:   endUnixMilli,
 	}
+}
+
+// AddTags 批量设置标签
+func (s *sUserInfo) AddTags(ctx context.Context, userIds string, tagIds string) (bool, error) {
+	if g.IsEmpty(userIds) {
+		return false, errors.New("用户编号为空")
+	}
+
+	userIdList := gconv.SliceUint(gstr.SplitAndTrim(userIds, ","))
+
+	for _, userId := range userIdList {
+		userInfo := &do.UserInfo{
+			UserId: userId,
+			TagIds: tagIds,
+		}
+		_, err := s.Edit(ctx, userInfo)
+		if err != nil {
+			return false, err
+		}
+	}
+
+	return true, nil
+}
+
+// GetList 获取用户信息列表
+func (s *sUserInfo) GetList(ctx context.Context, in *do.UserInfoListInput) (out *model.UserInfoListOutput, err error) {
+	userPage, err := s.List(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	gconv.Scan(userPage, &out)
+
+	return out, nil
+}
+
+// EditUser 编辑用户
+func (s *sUserInfo) EditUser(ctx context.Context, userInfo *model.UserInfo) (affected int64, err error) {
+	in := &do.UserInfo{}
+	gconv.Scan(userInfo, in)
+	success, err := s.Edit(ctx, in)
+	if err != nil {
+		return 0, err
+	}
+
+	userParentId := userInfo.UserParentId
+
+	// 读取用户旧数据信息
+	userDistribution, err := dao.UserDistribution.Get(ctx, userInfo.UserId)
+	if err != nil {
+		return 0, err
+	}
+
+	oldUserParentId := uint(0)
+	if userDistribution != nil {
+		oldUserParentId = userDistribution.UserParentId
+	}
+
+	// 新增用户关系，初始化数据
+	if userParentId > 0 && userParentId != oldUserParentId {
+		// 查找合伙人
+		userParentRow, err := dao.UserDistribution.Get(ctx, userParentId)
+		if err != nil {
+			return 0, err
+		}
+
+		rootUserId := uint(0)
+		if userParentRow != nil {
+			if userParentRow.UserParentId > 0 {
+				rootUserId = userParentRow.UserParentId
+			}
+		}
+
+		userDistributionNew := &do.UserDistribution{
+			UserId:        userInfo.UserId,
+			UserParentId:  userParentId,
+			UserPartnerId: rootUserId,
+			UserTime:      uint(time.Now().Unix()),
+		}
+
+		// 添加用户关系
+		if !service.UserDistribution().AddPlantformUser(ctx, userDistributionNew) {
+			return 0, errors.New("添加用户关系失败！")
+		}
+	}
+
+	return success, nil
 }

@@ -4,6 +4,7 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/model"
+	"golershop.cn/internal/model/entity"
 )
 
 // UserVoucherListReq 用户优惠券表分页查询
@@ -11,8 +12,7 @@ type UserVoucherListReq struct {
 	g.Meta `path:"/front/shop/userVoucher/list" tags:"用户优惠券" method:"get" summary:"用户优惠券表分页查询"`
 	ml.BaseList
 
-	*model.UserVoucherRes
-	VoucherUserWay uint `form:"voucher_user_way"  dc:"使用方式"`
+	model.UserVoucherRes
 }
 
 type UserVoucherListRes struct {
@@ -37,4 +37,12 @@ type GetVoucherNumRes struct {
 	VoucherUnusedNum    int `json:"voucher_unused_num"   dc:"未使用优惠券"` // 未使用优惠券
 	VoucherUsedNum      int `json:"voucher_used_num"     dc:"已使用优惠券"` // 已使用优惠券
 	VoucherTimeoutNum   int `json:"voucher_timeout_num"  dc:"已过期优惠券"` // 已过期优惠券
+}
+type UserVoucherAddReq struct {
+	g.Meta `path:"/front/shop/userVoucher/add" tags:"领取代金券" method:"post" summary:"领取代金券"`
+
+	ActivityId uint `form:"activity_id"  dc:"活动id"`
+}
+type UserVoucherAddRes struct {
+	*entity.UserVoucher
 }

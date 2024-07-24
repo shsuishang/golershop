@@ -22,86 +22,26 @@ package service
 
 import (
 	"context"
-	"golershop.cn/api/marketing"
+
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 )
 
 type (
-	IActivityCutprice interface {
+	IActivityBase interface {
 		// Get 根据编号读取活动信息
-		Get(ctx context.Context, id any) (out *entity.ActivityCutprice, err error)
+		Get(ctx context.Context, id any) (out *entity.ActivityBase, err error)
 		// Gets 根据编号读取读取多条活动信息
-		Gets(ctx context.Context, id any) (list []*entity.ActivityCutprice, err error)
+		Gets(ctx context.Context, id any) (list []*entity.ActivityBase, err error)
 		// Find 查询活动数据
-		Find(ctx context.Context, in *do.ActivityCutpriceListInput) (out []*entity.ActivityCutprice, err error)
-		// FindOne 查询活动数据
-		FindOne(ctx context.Context, in *do.ActivityCutpriceListInput) (out *entity.ActivityCutprice, err error)
+		Find(ctx context.Context, in *do.ActivityBaseListInput) (out []*entity.ActivityBase, err error)
 		// List 分页读取活动
-		List(ctx context.Context, in *do.ActivityCutpriceListInput) (out *do.ActivityCutpriceListOutput, err error)
+		List(ctx context.Context, in *do.ActivityBaseListInput) (out *model.ActivityListOutput, err error)
 		// Add 新增活动
-		Add(ctx context.Context, in *do.ActivityCutprice) (lastInsertId int64, err error)
+		Add(ctx context.Context, in *do.ActivityBase) (lastInsertId int64, err error)
 		// Edit 编辑活动
-		Edit(ctx context.Context, in *do.ActivityCutprice) (affected int64, err error)
-		// Remove 删除活动记录
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IActivityCutpriceHistory interface {
-		// Get 根据编号读取活动信息
-		Get(ctx context.Context, id any) (out *entity.ActivityCutpriceHistory, err error)
-		// Gets 根据编号读取读取多条活动信息
-		Gets(ctx context.Context, id any) (list []*entity.ActivityCutpriceHistory, err error)
-		// Find 查询活动数据
-		Find(ctx context.Context, in *do.ActivityCutpriceHistoryListInput) (out []*entity.ActivityCutpriceHistory, err error)
-		// List 分页读取活动
-		List(ctx context.Context, in *do.ActivityCutpriceHistoryListInput) (out *do.ActivityCutpriceHistoryListOutput, err error)
-		// Add 新增活动
-		Add(ctx context.Context, in *do.ActivityCutpriceHistory) (lastInsertId int64, err error)
-		// Edit 编辑活动
-		Edit(ctx context.Context, in *do.ActivityCutpriceHistory) (affected int64, err error)
-		// Remove 删除活动记录
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IActivityGroupbooking interface {
-		// Get 根据编号读取活动信息
-		Get(ctx context.Context, id any) (out *entity.ActivityGroupbooking, err error)
-		// Gets 根据编号读取读取多条活动信息
-		Gets(ctx context.Context, id any) (list []*entity.ActivityGroupbooking, err error)
-		// Find 查询活动数据
-		Find(ctx context.Context, in *do.ActivityGroupbookingListInput) (out []*entity.ActivityGroupbooking, err error)
-		// List 分页读取活动
-		List(ctx context.Context, in *do.ActivityGroupbookingListInput) (out *do.ActivityGroupbookingListOutput, err error)
-		// Add 新增活动
-		Add(ctx context.Context, in *do.ActivityGroupbooking) (lastInsertId int64, err error)
-		// Edit 编辑活动
-		Edit(ctx context.Context, in *do.ActivityGroupbooking) (affected int64, err error)
-		// Remove 删除活动记录
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// DoGroupbooking 参加拼团活动
-		DoGroupbooking(ctx context.Context, orderId string, userId uint, gbId uint, activityInfo *model.ActivityInfoVo) (id uint, err error)
-		// DoGroupbooking 参加拼团活动
-		SetPaidYes(ctx context.Context, orderId string, userId uint) (flag bool, err error)
-		// CheckGroupbookingSuccess
-		CheckGroupbookingSuccess(ctx context.Context, orderId string) (flag bool, err error)
-		// ListsUserGroupbookingHistory 拼团列表
-		ListsUserGroupbookingHistory(ctx context.Context, in *do.ActivityGroupbookingHistoryListInput) (res *marketing.ActivityGroupbookingHistoryRes, err error)
-		// GetUserGroupbooking 拼团详情
-		GetUserGroupbooking(ctx context.Context, activityGroupbookingReq *marketing.ActivityGroupbookingReq) (activityGroupbookingRes *marketing.ActivityGroupbookingRes, err error)
-	}
-	IActivityGroupbookingHistory interface {
-		// Get 根据编号读取活动信息
-		Get(ctx context.Context, id any) (out *entity.ActivityGroupbookingHistory, err error)
-		// Gets 根据编号读取读取多条活动信息
-		Gets(ctx context.Context, id any) (list []*entity.ActivityGroupbookingHistory, err error)
-		// Find 查询活动数据
-		Find(ctx context.Context, in *do.ActivityGroupbookingHistoryListInput) (out []*entity.ActivityGroupbookingHistory, err error)
-		// List 分页读取活动
-		List(ctx context.Context, in *do.ActivityGroupbookingHistoryListInput) (out *do.ActivityGroupbookingHistoryListOutput, err error)
-		// Add 新增活动
-		Add(ctx context.Context, in *do.ActivityGroupbookingHistory) (lastInsertId int64, err error)
-		// Edit 编辑活动
-		Edit(ctx context.Context, in *do.ActivityGroupbookingHistory) (affected int64, err error)
+		Edit(ctx context.Context, in *do.ActivityBase) (affected int64, err error)
 		// Remove 删除活动记录
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
@@ -123,39 +63,11 @@ type (
 		// GetActivityInfo 获取活动信息
 		GetActivityInfo(ctx context.Context, itemIds []uint64) (output []*model.ActivityInfoVo, err error)
 	}
-	IActivityBase interface {
-		// Get 根据编号读取活动信息
-		Get(ctx context.Context, id any) (out *entity.ActivityBase, err error)
-		// Gets 根据编号读取读取多条活动信息
-		Gets(ctx context.Context, id any) (list []*entity.ActivityBase, err error)
-		// Find 查询活动数据
-		Find(ctx context.Context, in *do.ActivityBaseListInput) (out []*entity.ActivityBase, err error)
-		// List 分页读取活动
-		List(ctx context.Context, in *do.ActivityBaseListInput) (out *model.ActivityListOutput, err error)
-		// Add 新增活动
-		Add(ctx context.Context, in *do.ActivityBase) (lastInsertId int64, err error)
-		// Edit 编辑活动
-		Edit(ctx context.Context, in *do.ActivityBase) (affected int64, err error)
-		// Remove 删除活动记录
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// getActivityItemNum 获取非排他活动商品及数量
-		GetActivityItemNum(ctx context.Context, activityBase *entity.ActivityBase) (map[uint64]*model.ItemNumVo, error)
-		// ListVoucher 活动表-优惠券列表
-		ListVoucher(ctx context.Context, input *do.ActivityBaseListInput) (res *model.ActivityListOutput, err error)
-		// GetList
-		GetList(ctx context.Context, activityBaseListReq *do.ActivityBaseListInput) (activityBaseResPage *model.ActivityListOutput, err error)
-		// EditActivityBase
-		EditActivityBase(ctx context.Context, activityId uint, data *do.ActivityBase) (bool, error)
-	}
 )
 
 var (
-	localActivityBase                IActivityBase
-	localActivityCutprice            IActivityCutprice
-	localActivityCutpriceHistory     IActivityCutpriceHistory
-	localActivityGroupbooking        IActivityGroupbooking
-	localActivityGroupbookingHistory IActivityGroupbookingHistory
-	localActivityItem                IActivityItem
+	localActivityBase IActivityBase
+	localActivityItem IActivityItem
 )
 
 func ActivityBase() IActivityBase {
@@ -167,50 +79,6 @@ func ActivityBase() IActivityBase {
 
 func RegisterActivityBase(i IActivityBase) {
 	localActivityBase = i
-}
-
-func ActivityCutprice() IActivityCutprice {
-	if localActivityCutprice == nil {
-		panic("implement not found for interface IActivityCutprice, forgot register?")
-	}
-	return localActivityCutprice
-}
-
-func RegisterActivityCutprice(i IActivityCutprice) {
-	localActivityCutprice = i
-}
-
-func ActivityCutpriceHistory() IActivityCutpriceHistory {
-	if localActivityCutpriceHistory == nil {
-		panic("implement not found for interface IActivityCutpriceHistory, forgot register?")
-	}
-	return localActivityCutpriceHistory
-}
-
-func RegisterActivityCutpriceHistory(i IActivityCutpriceHistory) {
-	localActivityCutpriceHistory = i
-}
-
-func ActivityGroupbooking() IActivityGroupbooking {
-	if localActivityGroupbooking == nil {
-		panic("implement not found for interface IActivityGroupbooking, forgot register?")
-	}
-	return localActivityGroupbooking
-}
-
-func RegisterActivityGroupbooking(i IActivityGroupbooking) {
-	localActivityGroupbooking = i
-}
-
-func ActivityGroupbookingHistory() IActivityGroupbookingHistory {
-	if localActivityGroupbookingHistory == nil {
-		panic("implement not found for interface IActivityGroupbookingHistory, forgot register?")
-	}
-	return localActivityGroupbookingHistory
-}
-
-func RegisterActivityGroupbookingHistory(i IActivityGroupbookingHistory) {
-	localActivityGroupbookingHistory = i
 }
 
 func ActivityItem() IActivityItem {

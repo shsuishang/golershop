@@ -19,7 +19,8 @@ const (
 	ACTIVITY_TYPE_PF_GROUPBUY_STORE uint = 1127 //批发团购
 
 	ACTIVITY_TYPE_MARKETING          uint = 1131 //市场活动
-	ACTIVITY_TYPE_GIFTBAG            uint = 1132 //礼包活动
+	ACTIVITY_TYPE_GIFTBAG            uint = 1132 //A+B组合套餐
+	ACTIVITY_TYPE_GIFTPACK           uint = 1130 //礼包活动
 	ACTIVITY_TYPE_MULTIPLEDISCOUNT   uint = 1133 //多件折
 	ACTIVITY_TYPE_BATDISCOUNT        uint = 1135 //阶梯价
 	ACTIVITY_TYPE_MULTIPLE_POINTS    uint = 1136 //多倍积分
