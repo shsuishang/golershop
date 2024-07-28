@@ -1,5 +1,7 @@
 package model
 
+import "golershop.cn/internal/model/entity"
+
 type TimelineInput struct {
 	Stime int64 `json:"stime"  type:"GE"     ` // 开始时间
 	Etime int64 `json:"etime"  type:"LE"     ` // 截止时间
@@ -144,4 +146,17 @@ type AnalyticsReturnInput struct {
 	ReturnStateId []uint `json:"return_state_id" dc:"卖家处理状态(ENUM): 3100-【客户】提交退单;3105-退单审核;3110-收货确认;3115-退款确认;3120-【客户】收款确认;3125-完成"` // 卖家处理状态
 	StoreId       uint   `json:"store_id" dc:"店铺编号"`                                                                                   // 店铺编号
 	StoreType     uint   `json:"store_type" dc:"店铺类型"`                                                                                 // 店铺类型
+}
+
+type ArticleBase struct {
+	entity.ArticleBase
+	ArticleTagList []*entity.ArticleTag `json:"article_tag_list" dc:"文章标签集合"` // 文章标签集合
+	UserNickname   string               `json:"user_nickname" `               // 用户昵称
+}
+type ArticleBaseOutput struct {
+	Items   []*ArticleBase // 列表
+	Page    int            // 分页号码
+	Total   int            // 总页数
+	Records int            // 数据总数
+	Size    int            // 单页数量
 }

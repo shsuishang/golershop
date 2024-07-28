@@ -79,3 +79,15 @@ type ArticleBaseListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type ArticleBaseEditStateReq struct {
+	g.Meta           `path:"/manage/cms/articleBase/editState" tags:"文章内容-修改状态" method:"post" summary:"文章内容-修改状态接口"`
+	ArticleId        int64 `json:"article_id"  dc:"文章管理编号"   ` // 文章管理编号
+	ArticleStatus    bool  `json:"article_status"          `   // 状态(BOOL):0-关闭;1-启用
+	ArticleReplyFlag bool  `json:"article_reply_flag"      `   // 是否启用问答留言(BOOL):0-否;1-是
+	ArticleIsPopular bool  `json:"article_is_popular"      `   // 是否热门
+}
+
+type ArticleBaseEditStateRes struct {
+	ArticleId int64 `json:"article_id"  dc:"文章管理编号"   ` // 文章管理编号
+}

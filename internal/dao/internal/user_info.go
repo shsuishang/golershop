@@ -400,3 +400,24 @@ func (dao *UserInfoDao) Count(ctx context.Context, in *do.UserInfoListInput) (co
 
 	return count, nil
 }
+
+// GetUserInfoMap 获取用户信息映射
+func (dao *UserInfoDao) GetUserInfoMap(ctx context.Context, userIds []uint) (map[int]*entity.UserInfo, error) {
+	// 获取用户信息列表
+	userInfos, err := dao.Gets(ctx, userIds)
+	if err != nil {
+		return nil, err
+	}
+
+	// 初始化用户信息映射
+	userInfoMap := make(map[int]*entity.UserInfo)
+
+	if len(userInfos) > 0 {
+		// 将用户信息列表转换为映射
+		for _, userInfo := range userInfos {
+			userInfoMap[int(userInfo.UserId)] = userInfo
+		}
+	}
+
+	return userInfoMap, nil
+}

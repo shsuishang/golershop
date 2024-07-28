@@ -31,7 +31,9 @@ type ConsumeDepositListReq struct {
 	g.Meta `path:"/manage/pay/consumeDeposit/list" tags:"交易单" method:"get" summary:"交易单列表接口"`
 	ml.BaseList
 
-	ConsumeDepositId uint `json:"deposit_id"            ` // 交易订单编号
+	UserId           uint   `json:"user_id"    `                             // 用户编号
+	DepositSubject   string `json:"deposit_subject"  type:"LIKE"           ` // 商品名称
+	ConsumeDepositId uint   `json:"deposit_id"            `                  // 交易订单编号
 }
 
 type ConsumeDepositListRes struct {
@@ -40,4 +42,16 @@ type ConsumeDepositListRes struct {
 	Total   int         `json:"total"`   // 总页数
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
+}
+
+type ConsumeDepositEditReviewReq struct {
+	g.Meta `path:"/manage/pay/consumeDeposit/editReview" tags:"支付表-收款确认" method:"post" summary:"支付表-收款确认"`
+	ml.BaseList
+
+	ConsumeDepositId uint `json:"deposit_id"            ` // 交易订单编号
+	DepositReview    bool `json:"deposit_review"        ` // 收款确认(BOOL):0-未确认;1-已确认
+}
+
+type ConsumeDepositEditReviewRes struct {
+	ConsumeDepositId uint `json:"deposit_id"            ` // 交易订单编号
 }

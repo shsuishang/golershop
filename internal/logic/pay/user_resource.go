@@ -35,6 +35,7 @@ import (
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 	"golershop.cn/utility/mtime"
 	"sort"
 )
@@ -595,4 +596,38 @@ func (s *sUserResource) GetSignState(ctx context.Context, userId uint) (flag boo
 
 	// 已经签到过
 	return userPointsHistoryNum > 0, err
+}
+
+func (s *sUserResource) GetList(ctx context.Context, in *do.UserResourceListInput) (out *model.UserResourceOutput, err error) {
+	// 获取 UserPointsHistory 列表
+	lists, err := s.List(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	if lists != nil && len(lists.Items) > 0 {
+
+		// 提取所有 userId
+		userIds := gconv.SliceUint(array.Column(lists.Items, "UserId"))
+
+		// 获取用户信息映射
+		userInfoMap, err := dao.UserInfo.GetUserInfoMap(ctx, userIds)
+		if err != nil {
+			return nil, err
+		}
+
+		out = &model.UserResourceOutput{}
+		gconv.Scan(lists, out)
+		for i := range out.Items {
+			userResource := out.Items[i]
+			if len(userInfoMap) > 0 {
+				userInfo := userInfoMap[int(userResource.UserId)]
+				if userInfo != nil {
+					userResource.UserNickname = userInfo.UserNickname
+				}
+			}
+		}
+	}
+
+	return out, nil
 }

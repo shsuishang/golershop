@@ -102,3 +102,22 @@ func (c *cArticleBase) RemoveBatch(ctx context.Context, req *cms.ArticleBaseRemo
 
 	return
 }
+
+// Edit 编辑
+func (c *cArticleBase) EditState(ctx context.Context, req *cms.ArticleBaseEditStateReq) (res *cms.ArticleBaseEditStateRes, err error) {
+
+	input := do.ArticleBase{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.ArticleBase().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &cms.ArticleBaseEditStateRes{
+		ArticleId: result,
+	}
+
+	return
+}

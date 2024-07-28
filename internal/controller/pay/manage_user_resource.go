@@ -2,11 +2,9 @@ package pay
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
-	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -22,17 +20,9 @@ func (c *cUserResource) List(ctx context.Context, req *pay.UserResourceListReq) 
 	input := do.UserResourceListInput{}
 	gconv.Scan(req, &input)
 
-	if !g.IsEmpty(req.UserId) {
-		var likes = []*ml.WhereExt{{
-			Column: dao.UserResource.Columns().UserId,
-			Val:    req.UserId,
-			Symbol: ml.LIKE,
-		}}
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.BaseList.WhereExt)
 
-		input.WhereExt = likes
-	}
-
-	var result, error = service.UserResource().List(ctx, &input)
+	var result, error = service.UserResource().GetList(ctx, &input)
 
 	if error != nil {
 		err = error

@@ -1,5 +1,7 @@
 package model
 
+import "golershop.cn/internal/model/entity"
+
 // UserPointsVo 用户积分
 type UserPointsVo struct {
 	UserId        uint    `json:"user_id,omitempty"`         // 所属用户
@@ -32,4 +34,40 @@ type PointStepVo struct {
 	Days      int    `json:"days"`      // 天数
 	Multiples string `json:"multiples"` // 倍数
 	ValueStr  string `json:"value_str"` // 前端映射 天数或倍数
+}
+type UserPointsHistory struct {
+	entity.UserPointsHistory
+	UserNickname string `json:"user_nickname"        `
+}
+
+type UserPointsHistoryOutput struct {
+	Items   []*UserPointsHistory `json:"items"    dc:"分页数据内容"`
+	Page    int                  `json:"page"`    // 分页号码
+	Total   int                  `json:"total"`   // 总页数
+	Records int                  `json:"records"` // 数据总数
+	Size    int                  `json:"size"`    // 单页数量
+}
+type UserResource struct {
+	entity.UserResource
+	UserNickname string `json:"user_nickname"        `
+}
+
+type UserResourceOutput struct {
+	Items   []*UserResource `json:"items"    dc:"分页数据内容"`
+	Page    int             `json:"page"`    // 分页号码
+	Total   int             `json:"total"`   // 总页数
+	Records int             `json:"records"` // 数据总数
+	Size    int             `json:"size"`    // 单页数量
+}
+type ConsumeRecord struct {
+	entity.ConsumeRecord
+	UserNickname string `json:"user_nickname"        `
+}
+
+type ConsumeRecordOutput struct {
+	Items   []*ConsumeRecord `json:"items"    dc:"分页数据内容"`
+	Page    int              `json:"page"`    // 分页号码
+	Total   int              `json:"total"`   // 总页数
+	Records int              `json:"records"` // 数据总数
+	Size    int              `json:"size"`    // 单页数量
 }

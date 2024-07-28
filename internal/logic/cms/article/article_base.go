@@ -22,10 +22,12 @@ package cms
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
@@ -50,8 +52,22 @@ func (s *sArticleBase) Find(ctx context.Context, in *do.ArticleBaseListInput) (o
 }
 
 // List 分页读取
-func (s *sArticleBase) List(ctx context.Context, in *do.ArticleBaseListInput) (out *do.ArticleBaseListOutput, err error) {
-	out, err = dao.ArticleBase.List(ctx, in)
+func (s *sArticleBase) List(ctx context.Context, in *do.ArticleBaseListInput) (out *model.ArticleBaseOutput, err error) {
+	list, err := dao.ArticleBase.List(ctx, in)
+	gconv.Scan(list, &out)
+
+	if !g.IsEmpty(out) {
+		for _, item := range out.Items {
+			if gstr.Trim(item.ArticleTags) != "" {
+				tags := gstr.Split(item.ArticleTags, ",")
+				tagList, err := dao.ArticleTag.Gets(ctx, tags)
+				if err != nil {
+					return nil, err
+				}
+				item.ArticleTagList = tagList
+			}
+		}
+	}
 
 	return out, err
 }
@@ -89,7 +105,7 @@ func (s *sArticleBase) Add(ctx context.Context, in *do.ArticleBase) (lastInsertI
 }
 
 func (s *sArticleBase) manageArticleTags(ctx context.Context, tag interface{}, action string) error {
-	if tag != "" {
+	if !g.IsEmpty(tag) {
 		tags := strings.Split(tag.(string), ",")
 		for _, t := range tags {
 			articleTag, err := dao.ArticleTag.Get(ctx, t)

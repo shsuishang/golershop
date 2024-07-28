@@ -64,3 +64,14 @@ type ArticleCommentListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type ArticleCommentEditStateReq struct {
+	g.Meta `path:"/manage/cms/articleComment/editState" tags:"文章评论表" method:"post" summary:"修改状态接口"`
+
+	CommentId     uint `json:"article_id"  dc:"文章评论编号"   ` // 文章评论编号
+	CommentIsShow bool `json:"comment_is_show"     `       // 是否显示(BOOL):1-显示;0-不显示
+}
+
+type ArticleCommentEditStateRes struct {
+	CommentId uint `json:"article_id" dc:"文章评论编号"   ` // 文章评论编号
+}

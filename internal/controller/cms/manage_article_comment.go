@@ -81,3 +81,22 @@ func (c *cArticleComment) Remove(ctx context.Context, req *cms.ArticleCommentRem
 
 	return
 }
+
+// Edit 编辑
+func (c *cArticleComment) EditState(ctx context.Context, req *cms.ArticleCommentEditStateReq) (res *cms.ArticleCommentEditStateRes, err error) {
+
+	input := do.ArticleComment{}
+	gconv.Scan(req, &input)
+
+	var result, error = service.ArticleComment().Edit(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	res = &cms.ArticleCommentEditStateRes{
+		CommentId: uint(result),
+	}
+
+	return
+}

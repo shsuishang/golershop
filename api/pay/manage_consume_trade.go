@@ -11,8 +11,11 @@ type ConsumeTradeListReq struct {
 	g.Meta `path:"/manage/pay/consumeTrade/list" tags:"交易单" method:"get" summary:"交易单列表接口"`
 	ml.BaseList
 
-	BuyerId        uint `json:"buyer_id"   `                  //买家编号
-	ConsumeTradeId uint `json:"consume_trade_id"            ` // 交易订单编号
+	BuyerId        uint   `json:"buyer_id"   `                    //买家编号
+	TradeTitle     string `json:"trade_title"   type:"LIKE"     ` // 标题
+	ConsumeTradeId uint   `json:"consume_trade_id"            `   // 交易订单编号
+	TradeTimeStart string `json:"trade_time_start"  field:"trade_paid_time"  type:"GE"          `
+	TradeTimeEnd   string `json:"trade_time_end"    field:"trade_paid_time"  type:"LE"          `
 }
 
 type ConsumeTradeListRes struct {

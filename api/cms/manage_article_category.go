@@ -73,7 +73,7 @@ type ArticleCategoryListRes struct {
 
 type ArticleCategoryTreeReq struct {
 	g.Meta       `path:"/manage/cms/articleCategory/tree" tags:"文章分类" method:"get" summary:"后台文章分类Tree"`
-	CategoryName string `json:"category_name"  d:""  dc:"搜索关键词"`
+	CategoryName string `json:"category_name" type:"LIKE"  d:""  dc:"搜索关键词"`
 }
 
 //type ArticleCategoryTreeRes model.TreeNode

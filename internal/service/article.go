@@ -31,7 +31,7 @@ import (
 type (
 	IArticleBase interface {
 		Find(ctx context.Context, in *do.ArticleBaseListInput) (out []*entity.ArticleBase, err error)
-		List(ctx context.Context, in *do.ArticleBaseListInput) (out *do.ArticleBaseListOutput, err error)
+		List(ctx context.Context, in *do.ArticleBaseListInput) (out *model.ArticleBaseOutput, err error)
 		Add(ctx context.Context, in *do.ArticleBase) (lastInsertId int64, err error)
 		Edit(ctx context.Context, in *do.ArticleBase) (affected int64, err error)
 		Remove(ctx context.Context, id any) (affected int64, err error)

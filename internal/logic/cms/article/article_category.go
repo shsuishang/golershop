@@ -166,7 +166,17 @@ func (s *sArticleCategory) Edit(ctx context.Context, in *do.ArticleCategory) (af
 
 // 删除多条记录模式
 func (s *sArticleCategory) Remove(ctx context.Context, id any) (affected int64, err error) {
+
 	//是否子项
+	categoryNum, err := dao.ArticleCategory.Ctx(ctx).Count(do.ArticleCategory{CategoryParentId: id})
+	if err != nil {
+		return 0, err
+	}
+	if categoryNum > 0 {
+		return 0, errors.New(fmt.Sprintf("该分类下有子分类"))
+	}
+
+	//是否被使用
 	count, err := dao.ArticleBase.Ctx(ctx).Count(do.ArticleBase{CategoryId: id})
 
 	if err != nil {

@@ -22,10 +22,13 @@ package pay
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/util/gconv"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 type sUserPointsHistory struct{}
@@ -81,4 +84,38 @@ func (s *sUserPointsHistory) Remove(ctx context.Context, id any) (affected int64
 	}
 
 	return affected, err
+}
+
+func (s *sUserPointsHistory) GetList(ctx context.Context, in *do.UserPointsHistoryListInput) (out *model.UserPointsHistoryOutput, err error) {
+	// 获取 UserPointsHistory 列表
+	lists, err := s.List(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	if lists != nil && len(lists.Items) > 0 {
+
+		// 提取所有 userId
+		userIds := gconv.SliceUint(array.Column(lists.Items, "UserId"))
+
+		// 获取用户信息映射
+		userInfoMap, err := dao.UserInfo.GetUserInfoMap(ctx, userIds)
+		if err != nil {
+			return nil, err
+		}
+
+		out = &model.UserPointsHistoryOutput{}
+		gconv.Scan(lists, out)
+		for i := range out.Items {
+			userPointsHistory := out.Items[i]
+			if len(userInfoMap) > 0 {
+				userInfo := userInfoMap[int(userPointsHistory.UserId)]
+				if userInfo != nil {
+					userPointsHistory.UserNickname = userInfo.UserNickname
+				}
+			}
+		}
+	}
+
+	return out, nil
 }

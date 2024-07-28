@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
@@ -20,6 +21,8 @@ type cConsumeDeposit struct{}
 func (c *cConsumeDeposit) List(ctx context.Context, req *pay.ConsumeDepositListReq) (res *pay.ConsumeDepositListRes, err error) {
 	input := do.ConsumeDepositListInput{}
 	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
 	var result, error = service.ConsumeDeposit().List(ctx, &input)
 
@@ -54,6 +57,23 @@ func (c *cConsumeDeposit) OfflinePay(ctx context.Context, req *pay.ConsumeDeposi
 
 	res = &pay.ConsumeDepositOfflinePayRes{
 		OrderId: req.OrderId,
+	}
+
+	return
+}
+
+func (c *cConsumeDeposit) EditReview(ctx context.Context, req *pay.ConsumeDepositEditReviewReq) (res *pay.ConsumeDepositEditReviewRes, err error) {
+	input := do.ConsumeDeposit{}
+	gconv.Scan(req, &input)
+
+	_, err = service.ConsumeDeposit().Edit(ctx, &input)
+
+	if err != nil {
+		err = err
+	}
+
+	res = &pay.ConsumeDepositEditReviewRes{
+		ConsumeDepositId: req.ConsumeDepositId,
 	}
 
 	return
