@@ -36,12 +36,6 @@ type (
 		GetUser(ctx context.Context) *model.ContextUser
 		GetUserId(ctx context.Context) uint
 		GetRequest(ctx context.Context) *ghttp.Request
-		IncrementTx(ctx context.Context)
-		DecrementTx(ctx context.Context)
-		GetTx(ctx context.Context) int
-		AddCacheKey(ctx context.Context, keys []string)
-		GetCacheKeys(ctx context.Context) []string
-		AfterOutput(r *ghttp.Request)
 	}
 )
 

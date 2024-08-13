@@ -24,6 +24,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/container/garray"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -182,9 +183,13 @@ func (s *sProductIndex) Remove(ctx context.Context, id any) (affected int64, err
 func (s *sProductIndex) ListItem(ctx context.Context, req *pt.ItemListReq) (out *model.ItemListOutput, err error) {
 	output := &model.ItemListOutput{}
 
-	// 参加活动产品及数量 - 使用活动信息
-	itemNumVoMap := make(map[uint64]*model.ItemNumVo)
 	if !g.IsEmpty(req.ActivityId) {
+		activityBase, _ := dao.ActivityBase.Get(ctx, req.ActivityId)
+
+		if activityBase != nil {
+			req.ItemId = activityBase.ActivityItemIds
+			output.ActivityBase = activityBase
+		}
 	}
 
 	lists, err := service.ProductItem().ListItemKey(ctx, req)
@@ -268,11 +273,6 @@ func (s *sProductIndex) ListItem(ctx context.Context, req *pt.ItemListReq) (out 
 						}
 					}
 
-					// 活动产品数量
-					if numVo, ok := itemNumVoMap[vo.ItemId]; ok {
-						it.ActivityItemNum = numVo.Num
-					}
-
 					output.Items = append(output.Items, it)
 				}
 			}
@@ -296,8 +296,9 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 		return nil, err
 	}
 
-	//兼容开源版
-	productItem.AvailableQuantity = productItem.ItemQuantity - productItem.ItemQuantityFrozen
+	if productItem == nil {
+		return nil, gerror.New("商品SKU不存在!")
+	}
 
 	out.ItemRow = productItem
 

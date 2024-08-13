@@ -194,6 +194,8 @@ secure:
     - "/swagger/"
     - "/api.json"
     - "/front/sys/config/listTranslateLang"
+    - "/front/sys/config/guide"
+    - "/front/sys/config/getQrcode"
     - "/front/account/user/info"
     - "/front/sys/captcha/index"
     - "/front/sys/config/info"
@@ -201,6 +203,10 @@ secure:
     - "/front/sys/upload/index"
     - "/front/account/login/login"
     - "/front/account/login/register"
+    - "/front/account/wechat/checkAppLogin"
+    - "/front/account/wechat/jsCode2Session"
+    - "/front/account/wechat/getOpenIdByCode"
+    - "/front/account/wechat/callbackMp"
     - "/front/sys/district/tree"
     - "/front/pay/callback/wechatNotify"
     - "/front/pay/callback/alipayNotify"
@@ -226,7 +232,7 @@ secure:
     - "/front/cms/articleBase/list"
     - "/front/cms/articleBase/get"
 
-
+    - "/front/o2o/chain/list"
 
 # 系统配置
 shopSuite:
@@ -249,7 +255,7 @@ shopSuite:
   # 启用缓存
   cacheEnable: "false"
 
-  cacheNamespace: "c:1001:"
+  cacheNamespace: "gs:1001:"
 
 
 licence:

@@ -80,3 +80,12 @@ type StoreExpressLogisticsEditStateReq struct {
 type StoreExpressLogisticsEditStateRes struct {
 	LogisticsId interface{} `json:"logistics_id"   dc:"物流管理信息"`
 }
+
+type ReturnLogisticsReq struct {
+	g.Meta `path:"/manage/shop/storeExpressLogistics/returnLogistics" tags:"查看物流" method:"get" summary:"查看物流接口"`
+
+	ReturnTrackingName   string `json:"return_tracking_name"  `   // 物流名称
+	ReturnTrackingNumber string `json:"return_tracking_number"  ` // 物流公司编号
+}
+
+type ReturnLogisticsRes map[string]interface{}

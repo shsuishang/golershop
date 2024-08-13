@@ -20,16 +20,10 @@ type ActivitysVo struct {
 
 // ActivityRuleVo 活动规则结构体
 type ActivityRuleVo struct {
-	Rule          []RuleVo       `json:"rule"`
-	Requirement   RequirementVo  `json:"requirement"`
-	Voucher       VoucherVo      `json:"voucher"`
-	Groupbooking  GroupbookingVo `json:"groupbooking"`
-	Giftbag       GiftbagVo      `json:"giftbag"`
-	GroupBuyStore GroupbuyVo     `json:"group_buy_store"`
-	Marketing     MarketingVo    `json:"marketing"`
-	Lottery       LotteryVo      `json:"lottery"`
-	Cutprice      CutpriceVo     `json:"cutprice"`
-	Popup         PopupVo        `json:"popup"`
+	Rule        []RuleVo      `json:"rule"`
+	Requirement RequirementVo `json:"requirement"`
+	Voucher     VoucherVo     `json:"voucher"`
+	Popup       PopupVo       `json:"popup"`
 }
 
 // RuleVo 规则结构体
@@ -195,19 +189,4 @@ type ActivityListOutput struct {
 	Total   int               `json:"total"`   // 总页数
 	Records int               `json:"records"` // 数据总数
 	Size    int               `json:"size"`    // 单页数量
-}
-
-type ActivityGroupookingVo struct {
-	entity.ActivityGroupbooking
-	UserNickname string `json:"user_nickname"` // 买家昵称
-	UserAvatar   string `json:"user_avatar"`   // 用户头像
-}
-
-type ActivityGroupbookingHistoryVo struct {
-	entity.ActivityGroupbookingHistory
-	UserNickname string `json:"user_nickname"` // 买家昵称
-}
-type ActivityCutpriceVo struct {
-	entity.ActivityCutprice
-	UserNickname string `json:"user_nickname"` // 买家昵称
 }

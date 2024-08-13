@@ -225,21 +225,6 @@ func (s *sOrder) Detail(ctx context.Context, orderId any) (detail *model.OrderVo
 		detail.RemainPayTime = remainPayTime
 	}
 
-	// 是否拼团成功订单
-	if len(orderInfo.ActivityTypeId) > 0 {
-		activityTypeId := gconv.SliceUint(gstr.Split(orderInfo.ActivityTypeId, ","))
-
-		if array.InArray(activityTypeId, consts.ACTIVITY_TYPE_GROUPBOOKING) {
-			// 拼团是否可以审核
-			groupbookingHistorys, _ := dao.ActivityGroupbookingHistory.Find(ctx, &do.ActivityGroupbookingHistoryListInput{Where: do.ActivityGroupbookingHistory{OrderId: orderId}})
-			if len(groupbookingHistorys) > 0 {
-				history := groupbookingHistorys[0]
-				detail.ActivityGroupbookingHistory = history
-				detail.OrderIsGroupbookingSuccess = history.GbEnable == consts.ACTIVITY_GROUPBOOKING_SUCCESS
-			}
-		}
-	}
-
 	return detail, nil
 }
 
@@ -362,30 +347,6 @@ func (s *sOrder) List(ctx context.Context, in *do.OrderInfoListInput) (out *mode
 
 			//是否开了发票
 			vo.InvoiceIsApply = array.InArray(orderInvoiceIdList, vo.OrderId)
-		}
-
-		// 是否拼团成功订单
-		activityGroupbookingHistories, err := dao.ActivityGroupbookingHistory.Find(ctx, &do.ActivityGroupbookingHistoryListInput{
-			Where: do.ActivityGroupbookingHistory{OrderId: ids},
-		})
-
-		if err != nil {
-			// 处理错误
-		}
-
-		if len(activityGroupbookingHistories) > 0 {
-			userGroupbookingMap := make(map[string]*entity.ActivityGroupbookingHistory)
-			for _, history := range activityGroupbookingHistories {
-				userGroupbookingMap[history.OrderId] = history
-			}
-
-			// 设置 ActivityGroupbookingHistory 和 OrderIsGroupbookingSuccess
-			for _, vo := range out.Items {
-				if history, ok := userGroupbookingMap[vo.OrderId]; ok {
-					vo.ActivityGroupbookingHistory = history
-					vo.OrderIsGroupbookingSuccess = history.GbEnable == consts.ACTIVITY_GROUPBOOKING_SUCCESS
-				}
-			}
 		}
 
 		for _, vo := range out.Items {
@@ -749,7 +710,27 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 			}
 			// end 优惠券均分
 
-			//todo 处理店铺活动优惠
+			//todo 满减活动
+			//
+			//   var itemShareGiftbag decimal.Decimal
+			//
+			//   //满减均摊
+			//   if len(reduction) > 0 {
+			//   	for ri := 0; ri < ddrLen; ri++ {
+			//   		value := discountDetailRows[ri]
+			//
+			//   		if containsIntList(value["item_ids"], item["item_id"]) {
+			//   			//数组最后一个用减法
+			//   			if ri+1 == len(itemsList) {
+			//   				itemShareGiftbag.Sub(Convert.ToBigDecimal(value["discount"]), reductionDiscount)
+			//   				reductionDiscount = BigDecimal.ZERO
+			//   			} else {
+			//   				itemShareGiftbag.Mul(NumberUtil.Div(Convert.ToBigDecimal(value["discount"]), Convert.ToBigDecimal(value["old_amount"])), Convert.ToBigDecimal(item["subtotal"]))
+			//   				reductionDiscount.Add(reductionDiscount, itemShareGiftbag)
+			//   			}
+			//   		}
+			//   	}
+			//   }
 
 			// 1、订单基础表
 			orderBase := &do.OrderBase{}
@@ -870,57 +851,6 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 				if storeItemVo.KindId != consts.PRODUCT_KIND_ENTITY {
 					if storeItemVo.KindId == consts.PRODUCT_KIND_EDU {
 						// todo 具体业务逻辑，在支付完成处理。
-					} else {
-						if storeItemVo.KindId == consts.PRODUCT_KIND_CARD {
-							// 卡券类，发送code， 则代表交易完成，类似充话费、虚拟卡号等等
-							// todo 具体业务逻辑，在支付完成处理。
-						}
-
-						// 发送虚拟码，并记录客户递交的数据。
-						virtualRow := &do.ChainCode{}
-						itemId := itemsList[0].ItemId
-
-						//virtualServiceTime := ConvertToDate(getParameter("virtual_service_time"))
-						//virtualServiceDate := ConvertToDate(getParameter("virtual_service_date"))
-
-						virtualRow.ChainCode = ""
-						virtualRow.OrderId = orderId
-						virtualRow.ItemId = itemId
-						virtualRow.ChainCodeStatus = 0
-						//virtualRow.VirtualServiceDate = virtualServiceDate
-						//virtualRow.VirtualServiceTime = virtualServiceTime
-						virtualRow.ChainId = chainId
-						virtualRow.UserId = userId
-						virtualRow.StoreId = storeId
-
-						if _, err := service.ChainCode().Add(ctx, virtualRow); err != nil {
-							panic("保存服务订单数据失败!")
-						}
-					}
-				}
-
-				// 自提码数据
-				if storeItemVo.KindId == consts.PRODUCT_KIND_ENTITY && deliveryTypeId == consts.DELIVERY_TYPE_SELF_PICK_UP {
-					// 发送虚拟码，并记录客户递交的数据。
-					chainCodeRow := &do.ChainCode{}
-
-					//chainCodeStatus := ConvertToInt(getParameter("chain_code_status"))
-					//  virtualServiceTime := ConvertToDate(getParameter("virtual_service_time"))
-					//  virtualServiceDate := ConvertToDate(getParameter("virtual_service_date"))
-					//
-
-					chainCodeRow.ChainCode = ""
-					chainCodeRow.OrderId = orderId
-					//chainCodeRow.ItemId = itemId
-					chainCodeRow.ChainCodeStatus = 0
-					//chainCodeRow.VirtualServiceDate = virtualServiceDate
-					//chainCodeRow.VirtualServiceTime = virtualServiceTime
-					chainCodeRow.ChainId = chainId
-					chainCodeRow.UserId = userId
-					chainCodeRow.StoreId = storeId
-
-					if _, err := service.ChainCode().Add(ctx, chainCodeRow); err != nil {
-						panic("保存自提码数据失败!")
 					}
 				}
 
@@ -986,6 +916,7 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 						if !g.IsEmpty(item.ActivityId) {
 							itemRow.ActivityTypeId = item.ActivityInfo.ActivityTypeId // 活动类型:0-默认;1101-加价购=搭配宝;1102-店铺满赠-小礼品;1103-限时折扣;1104-优惠套装;1105-店铺优惠券coupon优惠券;1106-拼团;1107-满减送;1108-阶梯价
 							itemRow.ActivityId = item.ActivityId                      // 促销活动Id:与activity_type_id搭配使用, 团购Id/限时折扣Id/优惠套装Id
+
 						}
 
 						itemRow.OrderItemDiscountAmount = item.ItemDiscountAmount // 优惠金额  负数
@@ -1177,34 +1108,6 @@ func (s *sOrder) addOrder(ctx context.Context, cartData *model.CheckoutOutput) (
 						panic("订单支付状态修改失败!")
 					} else {
 						cartData.IsPaid = true
-					}
-				}
-
-				// 分销用户来源 - 平台推广员功能，佣金平台出
-				ifPlantformFx := service.ConfigBase().IfPlantformFx(ctx)
-
-				if ifPlantformFx {
-					distributionOrderVo := &model.DistributionOrderVo{
-						UserId:             userId,
-						StoreId:            storeId,
-						OrderId:            orderId,
-						OrderCommissionFee: orderData.OrderCommissionFee,
-						SalespersonId:      orderInfo.SalespersonId.(uint),
-						DistributorUserId:  orderInfo.DistributorUserId.(uint),
-					}
-
-					productIdRow := make([]uint64, len(itemRows))
-					for i, item := range itemRows {
-						productIdRow[i] = item.ProductId.(uint64)
-					}
-
-					userLevelIdFlag := false
-
-					// 暂时注释掉 Java 中的逻辑，Go 中未提供具体的函数调用和对象定义
-
-					if !userLevelIdFlag {
-						// 分销，初始化订单信息
-						service.DistributionOrder().InitDistributionUserOrder(ctx, distributionOrderVo, itemRows)
 					}
 				}
 
@@ -1408,12 +1311,6 @@ func (s *sOrder) Cancel(ctx context.Context, orderId string, orderStateNote stri
 			panic("取消优惠券失败！")
 		}
 
-		//取消拼团, 未支付的取消活动数据， 如果支付，则必须通过计划任务取消
-		_, err = s.CancelActivity(ctx, orderId)
-		if err != nil {
-			panic("取消拼团失败！")
-		}
-
 		// 取消发票
 		_, err = service.OrderInvoice().RemoveWhere(ctx, &do.OrderInvoiceListInput{
 			Where: do.OrderInvoice{
@@ -1507,10 +1404,6 @@ func (s *sOrder) SetPaidYes(ctx context.Context, orderId string) (flag bool, err
 		orderInvoice := &do.OrderInvoice{OrderIsPaid: true}
 		dao.OrderInvoice.EditWhere(ctx, queryWrapper, orderInvoice)
 
-		// 活动判断
-
-		// 推广
-
 		// 读取订单商品，更新销量
 		for _, orderItem := range orderItemList {
 			productId := orderItem.ProductId
@@ -1550,8 +1443,6 @@ func (s *sOrder) SetPaidYes(ctx context.Context, orderId string) (flag bool, err
 
 // Review 审核订单
 func (s *sOrder) Review(ctx context.Context, orderId string, orderStateNote string) (flag bool, err error) {
-	//判断活动前置条件
-	s.IfActivity(ctx, orderId)
 
 	orderBase, err := dao.OrderBase.Get(ctx, orderId)
 
@@ -1577,8 +1468,6 @@ func (s *sOrder) Review(ctx context.Context, orderId string, orderStateNote stri
 
 // Finance 财务审核
 func (s *sOrder) Finance(ctx context.Context, orderId string, orderStateNote string) (flag bool, err error) {
-	//判断活动前置条件
-	s.IfActivity(ctx, orderId)
 
 	orderBase, err := dao.OrderBase.Get(ctx, orderId)
 
@@ -1604,8 +1493,6 @@ func (s *sOrder) Finance(ctx context.Context, orderId string, orderStateNote str
 
 // Picking 出库审核
 func (s *sOrder) Picking(ctx context.Context, in *model.OrderPickingInput) (flag bool, err error) {
-	//判断活动前置条件
-	s.IfActivity(ctx, in.OrderId)
 
 	//判断前置条件
 	_, err = s.CheckOrderReturnWaiting(ctx, in.OrderId)
@@ -1679,8 +1566,6 @@ func (s *sOrder) ifShipping(ctx context.Context, orderStateId uint) (flag bool) 
 // Shipping 发货
 func (s *sOrder) Shipping(ctx context.Context, in *model.OrderShippingInput) (flag bool, err error) {
 	orderId := in.OrderId
-
-	s.IfActivity(ctx, orderId)
 
 	//判断前置条件
 	_, err = s.CheckOrderReturnWaiting(ctx, in.OrderId)
@@ -1874,15 +1759,6 @@ func (s *sOrder) Receive(ctx context.Context, orderId string, orderStateNote str
 
 		if err != nil {
 			return false, err
-		}
-
-		if flag {
-			// 分销功能。目前付款成功发放佣金，此处为收货后发放
-			fxSettleType := service.ConfigBase().GetStr(ctx, "fx_settle_type", "receive")
-
-			if fxSettleType == "receive" {
-				service.DistributionOrder().SettleDistributionUserOrder(ctx, orderId)
-			}
 		}
 
 		return flag, err
@@ -2285,65 +2161,6 @@ func (s *sOrder) ReviewToState(ctx context.Context, orderId string, toOrderState
 	})
 
 	return
-}
-
-func (s *sOrder) CancelActivity(ctx context.Context, orderId string) (flag bool, err error) {
-	// 如果此订单是是拼团生成的订单，取消后要转让团长或改变状态为拼团失败
-	// 查找订单关联的团
-	activityGroupQueryWrapper := &do.ActivityGroupbookingHistoryListInput{
-		Where: do.ActivityGroupbookingHistory{OrderId: orderId, GbEnable: g.Slice{consts.ACTIVITY_GROUPBOOKING_INEFFECTIVE, consts.ACTIVITY_GROUPBOOKING_UNDERWAY}},
-	}
-
-	bookingHistory, err := dao.ActivityGroupbookingHistory.FindOne(ctx, activityGroupQueryWrapper)
-	if err != nil {
-		return false, err
-	}
-
-	if bookingHistory != nil {
-		gbId := bookingHistory.GbId
-		gbhId := bookingHistory.GbhId
-
-		// 查找团的所有关联的订单
-		historyQueryWrapper := &do.ActivityGroupbookingHistoryListInput{
-			Where: do.ActivityGroupbookingHistory{GbId: gbId},
-		}
-
-		histories, err := dao.ActivityGroupbookingHistory.Find(ctx, historyQueryWrapper)
-		if err != nil {
-			return false, err
-		}
-
-		// 如果团目前只关联了一个订单，订单取消同时团也作废，如果已经关联一个以上订单，取消订单同时将团转让给其他参团者
-		if len(histories) == 1 && histories[0].OrderId == orderId {
-			// 团只有自己（有唯一历史记录，且订单号是自己的订单号），取消订单则拼团失败
-			activityGroupbooking := &do.ActivityGroupbooking{GbId: gbId, GbEnable: consts.ACTIVITY_GROUPBOOKING_FAIL}
-			// 取消团
-			_, err = dao.ActivityGroupbooking.Edit(ctx, gbId, activityGroupbooking)
-			if err != nil {
-				return false, err
-			}
-		}
-
-		// 取消参团记录
-		activityGroupbookingHistory := &do.ActivityGroupbookingHistory{GbhId: gbhId, GbEnable: consts.ACTIVITY_GROUPBOOKING_FAIL}
-		_, err = dao.ActivityGroupbookingHistory.Edit(ctx, gbhId, activityGroupbookingHistory)
-		if err != nil {
-			return false, err
-		}
-	}
-
-	return true, err
-}
-
-// 判断是否有活动条件限制
-func (s *sOrder) IfActivity(ctx context.Context, orderId string) bool {
-	orderInfo, _ := dao.OrderInfo.Get(ctx, orderId)
-
-	if len(orderInfo.ActivityTypeId) > 0 {
-
-	}
-
-	return true
 }
 
 // GetOrderStatisticsInfo 根据用户id获取用户订单统计信息

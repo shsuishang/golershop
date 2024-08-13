@@ -13,11 +13,10 @@ type StockBillVo struct {
 type OrderItemVo struct {
 	entity.OrderItem
 
-	OrderItemCanRefundAmount float64  `json:"order_item_can_refund_amount"          dc:"最终在线支付金额(退款金额)"        ` // 最终在线支付金额(退款金额)
-	ItemSavePrice            float64  `json:"item_save_price"          dc:"节省单价"        `                        // 节省单价
-	IfReturn                 bool     `json:"if_return"          dc:"是否可退货"        `                             // 是否可退货
-	ReturnIds                []string `json:"return_ids"          dc:"服务编号"        `                             // 服务编号
-	ProductItemName          string   `json:"product_item_name"          dc:"Spec名称"        `                    // Spec名称
+	CommentImage            []string                      `json:"comment_image"        `   // 评论上传的图片(DOT)
+	CommentScores           uint                          `json:"comment_scores"        `  // 评论分数
+	CommentContent          string                        `json:"comment_content"        ` // 评论内容
+	ProductCommentReplyList []*entity.ProductCommentReply `json:"product_comment_reply_list"        `
 }
 
 type OrderVo struct {
@@ -51,9 +50,7 @@ type OrderVo struct {
 	InvoiceIsApply bool  `json:"invoice_is_apply"                       ` // 发票标记
 	RemainPayTime  int64 `json:"remain_pay_time"        `                 // 订单倒计时
 
-	ActivityGroupbookingHistory *entity.ActivityGroupbookingHistory `json:"activity_groupbooking_history"                       ` // 拼团记录
-	OrderIsGroupbookingSuccess  bool                                `json:"order_is_groupbooking_success"                       ` // 拼团记录
-	IfBuyerCancel               bool                                `json:"if_buyer_cancel"                       `               // 是否可以取消
+	IfBuyerCancel bool `json:"if_buyer_cancel"                       ` // 是否可以取消
 
 }
 
@@ -221,4 +218,89 @@ type OrderNumOutput struct {
 	WaitPayNumEntity      int64 `json:"wait_pay_num_entity"`      // 等待支付订单数-实物
 	WaitPayNumV           int64 `json:"wait_pay_num_v"`           // 等待支付订单数-虚拟
 	ReturningNum          int64 `json:"returning_num"`            // 售后订单数
+}
+
+// EvaluationVo 评价Vo
+type EvaluationVo struct {
+	UserId                    uint   `json:"user_id"                   dc:"用户编号"`    // 用户编号
+	OrderItemEvaluationStatus []uint `json:"order_item_evaluation_status" dc:"评价状态"` // 评价状态
+	OrderId                   string `json:"order_id"                 dc:"订单编号"`     // 订单编号
+}
+
+// EvaluationVo 评价Vo
+type OrderCommentOutput struct {
+	Items           []*OrderItemVo `json:"items"           dc:"评论项"`   // 评论项
+	No              int            `json:"no"              dc:"否"`     // 否
+	OrderEvaluation interface{}    `json:"order_evaluation" dc:"订单评价"` // 订单评价
+	StoreInfo       StoreInfoVo    `json:"store_info"      dc:"店铺信息"`  // 店铺信息
+	Yes             int            `json:"yes"             dc:"是"`     // 是
+}
+
+type OrderCommentVo struct {
+	entity.OrderComment
+	CommentImages []string `json:"comment_image"   ` // 评论上传的图片(DOT)
+}
+
+// OrderCommentItemReq 添加评论请求详细数据
+type OrderCommentItemVo struct {
+	OrderItemReturnNum           int      `json:"orderItemReturnNum"`           // 退货数量
+	ItemPurchasePrice            int      `json:"itemPurchasePrice"`            // 购买价格
+	BuyerId                      int      `json:"buyerId"`                      // 买家ID
+	OrderItemReturnAgreeAmount   int      `json:"orderItemReturnAgreeAmount"`   // 同意退货金额
+	OrderItemUnitPrice           int      `json:"orderItemUnitPrice"`           // 单价
+	OrderItemInventoryLock       int      `json:"orderItemInventoryLock"`       // 库存锁定
+	ItemSrcId                    int      `json:"itemSrcId"`                    // 来源ID
+	CommentIsAnonymous           bool     `json:"commentIsAnonymous"`           // 是否匿名
+	ProductId                    int      `json:"productId"`                    // 商品ID
+	ActivityId                   int      `json:"activityId"`                   // 活动ID
+	OrderItemImage               string   `json:"orderItemImage"`               // 订单商品图片
+	ItemPurchaseRate             int      `json:"itemPurchaseRate"`             // 购买率
+	OrderItemConfirmFile         string   `json:"orderItemConfirmFile"`         // 确认文件
+	OrderItemSalerId             int      `json:"orderItemSalerId"`             // 卖家ID
+	DesignFileImages             string   `json:"designFileImages"`             // 设计文件图片
+	OrderItemReturnAgreeNum      int      `json:"orderItemReturnAgreeNum"`      // 同意退货数量
+	OrderItemAmount              int      `json:"orderItemAmount"`              // 订单商品金额
+	SrcOrderId                   string   `json:"srcOrderId"`                   // 源订单ID
+	ItemPlatformPrice            int      `json:"itemPlatformPrice"`            // 平台价格
+	ItemUnitPrice                int      `json:"itemUnitPrice"`                // 单位价格
+	ActivityCode                 string   `json:"activityCode"`                 // 活动代码
+	ItemChannelType              int      `json:"itemChannelType"`              // 渠道类型
+	Version                      int      `json:"version"`                      // 版本
+	OrderItemCommissionFeeRefund int      `json:"orderItemCommissionFeeRefund"` // 退款佣金费
+	OrderItemId                  int      `json:"orderItemId"`                  // 订单商品ID
+	OrderItemEvaluationStatus    int      `json:"orderItemEvaluationStatus"`    // 评价状态
+	OrderItemConfirmStatus       int      `json:"orderItemConfirmStatus"`       // 确认状态
+	ItemCostPrice                int      `json:"itemCostPrice"`                // 成本价
+	OrderId                      string   `json:"orderId"`                      // 订单ID
+	SpecInfo                     string   `json:"specInfo"`                     // 规格信息
+	ItemSalesRate                int      `json:"itemSalesRate"`                // 销售率
+	OrderItemCommissionFee       int      `json:"orderItemCommissionFee"`       // 佣金费
+	OrderItemQuantity            int      `json:"orderItemQuantity"`            // 订单商品数量
+	OrderItemReturnSubtotal      int      `json:"orderItemReturnSubtotal"`      // 退货小计
+	OrderItemNote                string   `json:"orderItemNote"`                // 订单商品备注
+	ItemVoucher                  int      `json:"itemVoucher"`                  // 代金券
+	ItemUnitPoIntegers           int      `json:"itemUnitPoIntegers"`           // 单位积分
+	CategoryId                   int      `json:"categoryId"`                   // 分类ID
+	SpecId                       int      `json:"specId"`                       // 规格ID
+	OrderItemDiscountAmount      int      `json:"orderItemDiscountAmount"`      // 订单商品折扣金额
+	OrderItemAdjustFee           int      `json:"orderItemAdjustFee"`           // 调整费
+	OrderGiveId                  int      `json:"orderGiveId"`                  // 赠品ID
+	ItemUnitSp                   int      `json:"itemUnitSp"`                   // 单位SP
+	StoreId                      int      `json:"storeId"`                      // 店铺ID
+	OrderItemPoIntegersFee       int      `json:"orderItemPoIntegersFee"`       // 积分费用
+	ItemId                       int      `json:"itemId"`                       // 商品ID
+	OrderItemRedemptionVoucher   int      `json:"orderItemRedemptionVoucher"`   // 兑换券
+	PolicyDiscountrate           int      `json:"policyDiscountrate"`           // 政策折扣率
+	OrderItemFile                string   `json:"orderItemFile"`                // 订单文件
+	ItemName                     string   `json:"itemName"`                     // 商品名称
+	OrderItemSupplierSync        int      `json:"orderItemSupplierSync"`        // 供应商同步状态
+	ActivityTypeId               int      `json:"activityTypeId"`               // 活动类型ID
+	OrderItemCommissionRate      int      `json:"orderItemCommissionRate"`      // 佣金率
+	OrderItemPaymentAmount       int      `json:"orderItemPaymentAmount"`       // 订单支付金额
+	Content                      string   `json:"content"`                      // 内容
+	CommentContent               string   `json:"commentContent"`               // 评论内容
+	CommentImage                 []string `json:"commentImage"`                 // 评论图片
+	CommentScores                uint     `json:"commentScores"`                // 评论分数
+	Scores                       int      `json:"scores"`                       // 分数
+	Comment                      string   `json:"comment"`                      // 评论
 }

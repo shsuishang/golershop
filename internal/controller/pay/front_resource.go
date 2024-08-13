@@ -49,3 +49,9 @@ func (c *cResource) SignState(ctx context.Context, req *pay.SignStateReq) (res *
 		return nil, errors.New("尚未签到")
 	}
 }
+
+// GetCommissionInfo 账户余额
+func (c *cResource) GetCommissionInfo(ctx context.Context, req *pay.DistributionCommissionReq) (res *pay.DistributionCommissionRes, err error) {
+
+	return res, err
+}

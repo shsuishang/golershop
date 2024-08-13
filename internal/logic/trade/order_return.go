@@ -195,13 +195,15 @@ func (s *sOrderReturn) GetByReturnId(ctx context.Context, returnId string) (*mod
 			for _, itemVo := range orderReturnItemVos {
 				orderItem, ok := orderItemMap[itemVo.OrderItemId]
 				if ok {
+					itemVo.ItemName = orderItem.ItemName
+					itemVo.ProductName = orderItem.ProductName
 					itemVo.ProductItemName = fmt.Sprintf("%s %s", orderItem.ProductName, orderItem.ItemName)
 					itemVo.ItemUnitPrice = orderItem.ItemUnitPrice
 				}
 			}
 		}
 	}
-	orderReturnVo.Items = orderReturnItemVos
+	orderReturnVo.ReturnItemList = orderReturnItemVos
 
 	// 收货信息
 	orderDeliveryAddresses, err := dao.OrderDeliveryAddress.Find(ctx, &do.OrderDeliveryAddressListInput{
@@ -272,7 +274,7 @@ func (s *sOrderReturn) Review(ctx context.Context, orderReturn *do.OrderReturn, 
 				return false, fmt.Errorf("修改退款退货表信息失败")
 			}
 			// 不用退货
-			if err := s.dealWithReturn(ctx, returnIds, storeId, consts.RETURN_PROCESS_CHECK, orderReturns, consts.RETURN_PROCESS_FINISH); err != nil {
+			if err := s.DealWithReturn(ctx, returnIds, storeId, consts.RETURN_PROCESS_CHECK, orderReturns, consts.RETURN_PROCESS_FINISH); err != nil {
 				return false, err
 			}
 		} else {
@@ -296,7 +298,7 @@ func (s *sOrderReturn) Review(ctx context.Context, orderReturn *do.OrderReturn, 
 				}
 
 				// 需要退货
-				if err := s.dealWithReturn(ctx, returnIds, storeId, consts.RETURN_PROCESS_CHECK, orderReturns, 0); err != nil {
+				if err := s.DealWithReturn(ctx, returnIds, storeId, consts.RETURN_PROCESS_CHECK, orderReturns, 0); err != nil {
 					return false, err
 				}
 			} else {
@@ -336,7 +338,7 @@ func (s *sOrderReturn) checkNeedRefund(ctx context.Context, stateId, nextStateId
 }
 
 // DealWithReturn 处理退货
-func (s *sOrderReturn) dealWithReturn(ctx context.Context, returnIds []string, storeId uint, stateId uint, orderReturns []*entity.OrderReturn, nextStateId uint) error {
+func (s *sOrderReturn) DealWithReturn(ctx context.Context, returnIds []string, storeId uint, stateId uint, orderReturns []*entity.OrderReturn, nextStateId uint) error {
 	// 检查退货ID和订单退货是否为空
 	if len(returnIds) == 0 || len(orderReturns) == 0 {
 		return gerror.New("请选择需要审核的订单")
@@ -405,8 +407,7 @@ func (s *sOrderReturn) dealWithReturn(ctx context.Context, returnIds []string, s
 				// 查询订单退货详情列表
 				orderReturnItemList, err := dao.OrderReturnItem.Find(ctx, &do.OrderReturnItemListInput{
 					Where: do.OrderReturnItem{
-						OrderId:       orderId,
-						ReturnStateId: consts.RETURN_PROCESS_RECEIVED,
+						OrderId: orderId,
 					},
 				})
 				if err != nil {
@@ -470,7 +471,7 @@ func (s *sOrderReturn) editReturnNextState(ctx context.Context, returnIds []stri
 		},
 	}
 
-	if _, err := dao.OrderReturnItem.Edit(ctx, returnItemQueryWrapper, orderReturnItem); err != nil {
+	if _, err := dao.OrderReturnItem.EditWhere(ctx, returnItemQueryWrapper, orderReturnItem); err != nil {
 		return gerror.New("修改订单退货详情状态失败")
 	}
 
@@ -568,7 +569,7 @@ func (s *sOrderReturn) GetList(ctx context.Context, input *do.OrderReturnListInp
 				}
 			}
 		}
-		orderReturnRes.Items = orderReturnItemVos
+		orderReturnRes.ReturnItemList = orderReturnItemVos
 		orderReturnResList = append(orderReturnResList, orderReturnRes)
 	}
 
@@ -659,7 +660,7 @@ func (s *sOrderReturn) GetReturn(ctx context.Context, returnId any) (*model.Orde
 			}
 			orderReturnItemVos = append(orderReturnItemVos, orderReturnItemVo)
 		}
-		orderReturnRes.Items = orderReturnItemVos
+		orderReturnRes.ReturnItemList = orderReturnItemVos
 	}
 
 	return orderReturnRes, nil
@@ -1065,14 +1066,14 @@ func (s *sOrderReturn) AddReturnByItem(ctx context.Context, orderReturn *do.Orde
 		}
 
 		// 更新退货单金额
-		returnRefundAmount := orderReturn.ReturnRefundAmount.(float64)
+		returnRefundAmount := gconv.Float64(orderReturn.ReturnRefundAmount)
 		orderReturn.ReturnRefundAmount = returnRefundAmount + returnItemSubtotal
 
 		// 退还佣金计算
 		orderItemCommissionRate := orderItem.OrderItemCommissionRate
 		returnItem.ReturnItemCommisionFee = returnItemSubtotal * orderItemCommissionRate / 100
 
-		returnCommisionFee := orderReturn.ReturnCommisionFee.(float64)
+		returnCommisionFee := gconv.Float64(orderReturn.ReturnCommisionFee)
 		orderReturn.ReturnCommisionFee = returnCommisionFee + returnItem.ReturnItemCommisionFee.(float64)
 
 		// 修改订单数据
@@ -1093,7 +1094,7 @@ func (s *sOrderReturn) AddReturnByItem(ctx context.Context, orderReturn *do.Orde
 	}
 
 	// 退运费
-	returnShippingFee := orderReturn.ReturnShippingFee.(float64)
+	returnShippingFee := gconv.Float64(orderReturn.ReturnShippingFee)
 	orderReturn.ReturnRefundAmount = returnShippingFee + orderReturn.ReturnRefundAmount.(float64)
 
 	orderReturn.ReturnAddTime = time.Now().UnixMilli()

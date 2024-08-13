@@ -152,7 +152,7 @@ func (s *sMiddleware) NeverDoneCtx(r *ghttp.Request) {
 // 登录验证中间件
 func (s *sMiddleware) CheckLogin(r *ghttp.Request) {
 	//fmt.Println("登录验证中间件")
-	fmt.Println(r.RequestURI)
+	//fmt.Println(r.RequestURI)
 	//fmt.Println(r.URL)
 
 	u, _ := url.Parse(r.RequestURI) //将string解析成*URL格式

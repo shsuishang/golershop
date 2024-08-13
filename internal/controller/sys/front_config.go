@@ -23,6 +23,15 @@ func (c *cConfig) PublicKey(ctx context.Context, req *sys.ConfigPublicKeyReq) (r
 func (c *cConfig) TranslateLang(ctx context.Context, req *sys.TranslateLangReq) (res sys.TranslateLangRes, err error) {
 	return
 }
+
+func (c *cConfig) Guide(ctx context.Context, req *sys.GuideReq) (res sys.GuideRes, err error) {
+	return
+}
+
+func (c *cConfig) Qrcode(ctx context.Context, req *sys.QrcodeReq) (res sys.QrcodeRes, err error) {
+	return
+}
+
 func (c *cConfig) GetPcHelp(ctx context.Context, req *sys.GetPcHelpReq) (res sys.GetPcHelpRes, err error) {
 	// 定义配置键
 	keys := "page_pc_help"

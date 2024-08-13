@@ -188,33 +188,6 @@ func (c *cOrder) Receive(ctx context.Context, req *trade.UserOrderReceiveReq) (r
 	return
 }
 
-/*
-// StoreEvaluationWithContent 读取订单商品
-func (c *cOrder) StoreEvaluationWithContent(ctx context.Context, orderId string) (*model.CommonRes, error) {
-	return service.ProductComment.StoreEvaluationWithContent(orderId)
-}
-
-// AddOrderComment 添加订单评论
-func (c *cOrder) AddOrderComment(ctx context.Context, req *trade.UserOrderCommentReq) (*trade.UserOrderCommentRes, error) {
-	userId := service.ContextUtil.CheckLoginUserId(ctx)
-	orderBase, err := service.OrderBase.Get(ctx, req.OrderId)
-	if err != nil {
-		return nil, err
-	}
-
-	if !gutil.CheckDataRights(userId, orderBase, "UserId") {
-		return nil, model.BusinessException(ResultCode.FORBIDDEN)
-	}
-
-	err = service.ProductComment.AddOrderComment(req.OrderId)
-	if err != nil {
-		return nil, err
-	}
-
-	return model.Success(), nil
-}
-*/
-
 // OrderNum 获取用户中心订单数量
 func (c *cOrder) OrderNum(ctx context.Context, req *trade.UserOrderNumReq) (*trade.UserOrderNumRes, error) {
 	userId := service.BizCtx().GetUserId(ctx)
@@ -266,4 +239,41 @@ func (c *cOrder) AddOrderInvoice(ctx context.Context, req *trade.UserOrderInvoic
 	}
 
 	return
+}
+
+// StoreEvaluationWithContent 读取订单商品评价
+func (c *cOrder) StoreEvaluationWithContent(ctx context.Context, req *trade.StoreEvaluationWithContentReq) (res *trade.StoreEvaluationWithContentRes, err error) {
+	// 调用 service 方法获取订单评价
+	result, err := service.ProductComment().StoreEvaluationWithContent(ctx, req.OrderId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将结果转换为响应对象
+	gconv.Scan(result, &res)
+
+	return res, nil
+}
+
+// AddOrderComment 添加订单评价
+func (c *cOrder) AddOrderComment(ctx context.Context, req *trade.OrderCommentReq) (res *trade.OrderCommentRes, err error) {
+	// 检查当前登录用户
+	user := service.BizCtx().GetUser(ctx)
+	userId := user.UserId
+
+	// 获取订单信息
+	orderBase, err := service.OrderBase().Get(ctx, req.OrderId)
+	if err != nil {
+		return nil, err
+	}
+	if orderBase.UserId != userId {
+		return nil, errors.New("拒绝访问！")
+	}
+
+	// 调用 service 方法添加订单评价
+	if err := service.ProductComment().AddOrderComment(ctx, req); err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

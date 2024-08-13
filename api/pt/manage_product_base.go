@@ -22,7 +22,7 @@ type ProductItemVo struct {
 	ItemUnitPrice   float64 `json:"item_unit_price"      ` // 商品价格
 	ItemMarketPrice float64 `json:"item_market_price"    ` // 市场价
 	ItemUnitPoints  float64 `json:"item_unit_points"     ` // 积分价格
-	ItemQuantity    int     `json:"item_quantity"        ` // 商品库存
+	ItemQuantity    uint    `json:"item_quantity"        ` // 商品库存
 	//ItemQuantityFrozen uint    `json:"item_quantity_frozen" ` // 商品冻结库存
 	ItemWarnQuantity uint   `json:"item_warn_quantity"   ` // 库存预警值
 	ItemSpec         string `json:"item_spec"            ` // 商品规格序列化(JSON):{spec_id:spec_item_id, spec_id:spec_item_id, spec_id:spec_item_id}

@@ -61,6 +61,10 @@ func (s *sLogin) Login(ctx context.Context, user *entity.UserBase) (out model.Lo
 	// 获取用户信息
 	userInfo, err := dao.UserInfo.Get(ctx, user.UserId)
 
+	if userInfo == nil {
+		return out, gerror.NewCode(gcode.CodeBusinessValidationFailed, "用户不存在")
+	}
+
 	// 判断当前用户状态
 	if userInfo.UserState == 0 {
 		return out, gerror.NewCode(gcode.CodeBusinessValidationFailed, "您的账号已被禁用,请联系管理员")
@@ -369,27 +373,34 @@ func (s *sLogin) DoRegister(ctx context.Context, input *model.RegisterInput) (us
 			return err
 		}
 
-		// 判断传递的活动id
+		//是否为管理员
 
-		sourceUserId := s.GetSourceUserId(ctx)
-		if sourceUserId != 0 {
-			input.UserParentId = sourceUserId
-		}
+		if input.RoleId != 0 {
+			userAdmin := &do.UserAdmin{}
+			userAdmin.UserId = userId
+			userAdmin.RoleId = input.RoleId
 
-		// 分销用户来源 - 平台推广员功能，佣金平台出
-		// 修改用户上级关系
-		userParentId := input.UserParentId
+			if input.RoleId == 9 {
+				userAdmin.UserRoleId = 1001
+			} else if input.RoleId == 3 {
+				userAdmin.UserRoleId = 1003
+				userAdmin.ChainId = input.ChainId
+			} else if input.RoleId == 2 {
+				userAdmin.UserRoleId = 1003
+				userAdmin.StoreId = input.StoreId
+			}
 
-		if userParentId != 0 {
-			UserBase, err := dao.UserBase.Get(ctx, userParentId)
+			_, err = dao.UserAdmin.Add(ctx, userAdmin)
+
 			if err != nil {
 				return err
 			}
-			if UserBase != nil {
-				s.AddSourceUserId(ctx, userId, userParentId, input.ActivityId, input.SourceUccCode)
-			}
+		}
 
-			// 分享券活动id
+		// 判断传递的活动id
+		sourceUserId := s.GetSourceUserId(ctx)
+		if sourceUserId != 0 {
+			input.UserParentId = sourceUserId
 		}
 
 		//记录渠道来源
@@ -489,62 +500,6 @@ func (s *sLogin) IsSignedIn(ctx context.Context) bool {
 		return true
 	}
 	return false
-}
-
-// AddSourceUserId 添加分销来源用户 - 台推广员功能，佣金平台出
-func (s *sLogin) AddSourceUserId(ctx context.Context, userId, userParentId, activityId uint, sourceUccCode string) bool {
-	// 分销用户来源 - 平台推广员功能，佣金平台出
-	if userParentId != 0 {
-		// 初始化推广员记录
-		userActive := service.ConfigBase().GetBool(ctx, "distribution_user_auto_active", false)
-		service.UserDistribution().InitDistributionUser(ctx, userParentId, userActive)
-
-		// 查找合伙人
-		userParentRow, _ := dao.UserDistribution.Get(ctx, userParentId)
-		rootUserId := uint(0)
-		if userParentRow != nil && userParentRow.UserParentId != 0 {
-			rootUserId = userParentRow.UserParentId
-		}
-
-		userDistribution := &do.UserDistribution{
-			UserId:        userId,
-			UserParentId:  userParentId,
-			UserPartnerId: rootUserId,
-			UserTime:      uint64(time.Now().UnixMilli()),
-			ActivityId:    activityId,
-		}
-
-		// 新注册用户
-		fxUserRow, _ := dao.UserDistribution.Get(ctx, userId)
-		if fxUserRow == nil {
-			// 添加用户关系
-			if !service.UserDistribution().AddPlantformUser(ctx, userDistribution) {
-				panic("添加用户关系失败")
-				return false
-			}
-
-			// 带来粉丝，赠送积分
-			// 赠送积分
-			plantformFxGiftPoint := service.ConfigBase().GetFloat(ctx, "plantform_fx_gift_point", 0)
-			if plantformFxGiftPoint > 0 {
-				desc := fmt.Sprintf("推广粉丝 %d 送积分 %.2f", userId, plantformFxGiftPoint)
-
-				userPointsVo := &model.UserPointsVo{
-					UserId:        userParentId,
-					Points:        plantformFxGiftPoint,
-					PointsTypeId:  consts.POINTS_TYPE_FX_FANS,
-					PointsLogDesc: desc,
-				}
-
-				if _, err := service.UserResource().Points(ctx, userPointsVo); err != nil {
-					panic("积分操作失败")
-					return false
-				}
-			}
-		}
-	}
-
-	return true
 }
 
 // GetSourceUserId 用户来源

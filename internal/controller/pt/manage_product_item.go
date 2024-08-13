@@ -6,6 +6,7 @@ import (
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pt"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -71,6 +72,41 @@ func (c *cProductItem) EditState(ctx context.Context, req *pt.ProductItemEditSta
 	res = &pt.ProductItemEditStateRes{
 		ItemId: result,
 	}
+
+	return
+}
+
+// EditStock 更改库存
+func (c *cProductItem) EditStock(ctx context.Context, req *pt.ProductEditStockReq) (res *pt.ProductEditStockRes, err error) {
+	// 将请求参数转换为输入类型
+	input := []*model.ProductEditStockInput{}
+	gconv.Structs(req, &input)
+
+	// 批量更新库存
+	err = service.ProductItem().BatchEditStock(ctx, input)
+
+	// 如果更新成功，返回成功响应
+	if err != nil {
+		return nil, err
+	}
+
+	// 否则返回错误信息
+	return nil, err
+}
+
+// List
+func (c *cProductItem) GetStockBillItems(ctx context.Context, req *pt.StockBillItemListReq) (res *pt.StockBillItemListRes, err error) {
+	input := do.StockBillItemListInput{}
+	gconv.Scan(req, &input)
+
+	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
+	var result, error = service.StockBillItem().List(ctx, &input)
+
+	if error != nil {
+		err = error
+	}
+
+	gconv.Scan(result, &res)
 
 	return
 }

@@ -67,3 +67,25 @@ type UserResourceListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type UpdateUserMoneyReq struct {
+	g.Meta `path:"/manage/pay/userResource/updateUserMoney" tags:"修改资金" method:"post" summary:"修改资金接口"`
+
+	UserId      uint    `json:"user_id"                   `             // 用户编号
+	RecordTotal float64 `json:"record_total"  v:"required#用户资金不能为空"   ` // 用户资金
+}
+
+type UpdateUserMoneyRes struct {
+	UserId uint `json:"user_id"                   ` // 用户编号
+}
+
+type UpdatePointsReq struct {
+	g.Meta `path:"/manage/pay/userResource/updatePoints" tags:"修改积分" method:"post" summary:"修改积分接口"`
+
+	UserId     uint    `json:"user_id"                   ` // 用户编号
+	UserPoints float64 `json:"points"               `      // 积分
+}
+
+type UpdatePointsRes struct {
+	UserId uint `json:"user_id"                   ` // 用户编号
+}

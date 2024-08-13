@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -81,4 +82,44 @@ func (c *cUserResource) Remove(ctx context.Context, req *pay.UserResourceRemoveR
 	res = &pay.UserResourceRemoveRes{}
 
 	return
+}
+
+// UpdateUserMoney 修改资金
+func (c *cUserResource) UpdateUserMoney(ctx context.Context, req *pay.UpdateUserMoneyReq) (res *pay.UpdateUserMoneyRes, err error) {
+	// 将请求参数复制到 MoneyVo 对象
+	input := &model.MoneyVo{}
+	gconv.Scan(req, input)
+
+	// 调用服务更新用户资金
+	success, err := service.UserResource().UpdateUserMoney(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 返回结果
+	if success {
+		return res, err
+	}
+
+	return nil, err
+}
+
+// UpdatePoints 修改积分
+func (c *cUserResource) UpdatePoints(ctx context.Context, req *pay.UpdatePointsReq) (res *pay.UpdatePointsRes, err error) {
+	// 将请求参数复制到 MoneyVo 对象
+	input := &model.UserPointsVo{}
+	gconv.Scan(req, input)
+
+	// 调用服务更新用户资金
+	success, err := service.UserResource().UpdatePoints(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 返回结果
+	if success {
+		return res, err
+	}
+
+	return nil, err
 }

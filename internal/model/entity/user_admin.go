@@ -31,4 +31,7 @@ type UserAdmin struct {
 	UserAdminCtime   *gtime.Time `json:"user_admin_ctime"   ` // 创建时间
 	UserAdminUtime   *gtime.Time `json:"user_admin_utime"   ` // 更新时间
 	UserIsSuperadmin bool        `json:"user_is_superadmin" ` // 是否超管
+	RoleId           uint        `json:"role_id"            ` // 角色编号(ENUM):0-用户;2-商家;3-门店;9-平台;
+	ChainId          uint        `json:"chain_id"           ` // 所属门店
+	StoreId          uint        `json:"store_id"           ` // 店铺编号
 }

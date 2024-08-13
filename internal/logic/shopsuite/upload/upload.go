@@ -29,6 +29,7 @@ package logic
 import (
 	"context"
 	"fmt"
+	"github.com/eleven26/goss/v4"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
@@ -151,6 +152,80 @@ func (s *sUpload) upload(ctx context.Context, fileExt string, fileSize string, m
 		FileUrl:  utility.GetWebUrl(ctx, fileUrl),
 		MimeType: filetype,
 		UserId:   userId,
+	}
+
+	//oss 判断
+	uploadType := service.ConfigBase().GetInt(ctx, "upload_type", 0)
+	if uploadType == 0 {
+
+	} else {
+		var oss *goss.Goss
+
+		var endpoint string
+		var bucket string
+		var region string
+		var accessKey string
+		var secretKey string
+		var ossPrefix string
+
+		if uploadType == 1 {
+			endpoint = service.ConfigBase().GetStr(ctx, "aliyun_endpoint", "oss-accelerate.aliyuncs.com")
+			bucket = service.ConfigBase().GetStr(ctx, "aliyun_bucket", "kuteshop")
+			region = service.ConfigBase().GetStr(ctx, "aliyun_regionid", "")
+			accessKey = service.ConfigBase().GetStr(ctx, "aliyun_access_key_id", "")
+			secretKey = service.ConfigBase().GetStr(ctx, "aliyun_access_key_secret", "")
+			ossPrefix = service.ConfigBase().GetStr(ctx, "aliyun_default_dir", "golershop")
+
+			oss, err = goss.New(goss.WithConfig(&goss.Config{
+				Endpoint:  endpoint,
+				AccessKey: accessKey,
+				SecretKey: secretKey,
+				Region:    region,
+				Bucket:    bucket,
+			}))
+		} else if uploadType == 2 {
+			endpoint = service.ConfigBase().GetStr(ctx, "tengxun_endpoint", "")
+			bucket = service.ConfigBase().GetStr(ctx, "tencent_bucket_name", "kuteshop")
+			region = service.ConfigBase().GetStr(ctx, "tengxun_region_region", "")
+			accessKey = service.ConfigBase().GetStr(ctx, "tengxun_secret_id", "")
+			secretKey = service.ConfigBase().GetStr(ctx, "tengxun_secret_key", "")
+			ossPrefix = service.ConfigBase().GetStr(ctx, "tengxun_default_dir", "golershop")
+
+			oss, err = goss.New(goss.WithConfig(&goss.Config{
+				Endpoint:  endpoint,
+				AccessKey: accessKey,
+				SecretKey: secretKey,
+				Region:    region,
+				Bucket:    bucket,
+			}))
+		} else if uploadType == 3 {
+			endpoint = service.ConfigBase().GetStr(ctx, "huawei_endpoint", "oss-accelerate.aliyuncs.com")
+			bucket = service.ConfigBase().GetStr(ctx, "huawei_bucket", "kuteshop")
+			region = service.ConfigBase().GetStr(ctx, "huawei_domain", "")
+			accessKey = service.ConfigBase().GetStr(ctx, "huawei_access_key", "")
+			secretKey = service.ConfigBase().GetStr(ctx, "huawei_secret_key", "")
+			ossPrefix = service.ConfigBase().GetStr(ctx, "huawei_default_dir", "golershop")
+
+			oss, err = goss.New(goss.WithConfig(&goss.Config{
+				Endpoint:  endpoint,
+				AccessKey: accessKey,
+				SecretKey: secretKey,
+				Region:    region,
+				Bucket:    bucket,
+			}))
+		}
+
+		up := ossPrefix + fileUrl
+		//data, _ := os.ReadFile(filePath)
+		//rd := bytes.NewReader(data)
+		//err = goss.Put(ctx, up, rd)
+
+		err = oss.PutFromFile(ctx, up, filePath)
+
+		if err == nil {
+			ossUrl := fmt.Sprintf("https://%s.%s/%s", bucket, endpoint, up)
+			result.FileUrl = ossUrl
+		}
 	}
 
 	return result, nil

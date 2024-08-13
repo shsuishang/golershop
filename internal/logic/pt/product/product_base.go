@@ -25,11 +25,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/shopspring/decimal"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
@@ -37,6 +41,7 @@ import (
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
 	"golershop.cn/utility/array"
+	"math"
 	"sort"
 	"strings"
 )
@@ -126,9 +131,20 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 		in.ProductIndex.ProductAddTime = gtime.Now().TimestampMilli()
 
 		in.ProductIndex.ProductFrom = 1000
-
 	} else {
 		productId = gconv.Uint64(in.ProductBase.ProductId)
+	}
+
+	//第一次加
+	for _, v := range in.ProductItems {
+		if g.IsEmpty(v.ItemId) {
+			itemId, err := service.NumberSeq().GetNextSeqInt(ctx, "item_id")
+			if err != nil {
+				return 0, err
+			}
+
+			v.ItemId = itemId
+		}
 	}
 
 	//默认商品设置判断
@@ -288,7 +304,8 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 
 		//商品SKU Product_ItemModel
 		//读取已经存在的SKU, 需要删除的记录
-		itemIds, err := dao.ProductItem.FindKey(ctx, &do.ProductItemListInput{Where: do.ProductItem{ProductId: productId}})
+		oldProductItems, err := dao.ProductItem.Find(ctx, &do.ProductItemListInput{Where: do.ProductItem{ProductId: productId}})
+		itemIds := array.Column(oldProductItems, "ItemId")
 
 		for _, v := range in.ProductItems {
 			v.ProductId = in.ProductBase.ProductId
@@ -301,6 +318,28 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 
 		if !g.IsEmpty(itemIds) {
 			dao.ProductItem.Remove(ctx, itemIds)
+		}
+
+		// 处理ItemName
+		for _, v := range in.ProductItems {
+			itemNames := garray.NewStrArray()
+			specitemids := garray.NewStrArray()
+			// 解析规格项 JSON
+			specs := gjson.New(v.ItemSpec).Array()
+
+			// 遍历规格项
+			for _, spec := range specs {
+				itemMap := gconv.Map(spec)
+				// 从规格项中获取item
+				item := gconv.Map(itemMap["item"])
+				// 将item的name添加到itemNames
+				itemNames.Append(gconv.String(item["name"]))
+				specitemids.Append(gconv.String(item["id"]))
+			}
+
+			// 将所有itemNames用空格拼接并设置到ItemName字段
+			v.ItemName = itemNames.Join(" ")
+			v.SpecItemIds = specitemids.Join(",")
 		}
 
 		_, err = dao.ProductItem.Saves(ctx, in.ProductItems)
@@ -320,8 +359,77 @@ func (s *sProductBase) SaveProdcut(ctx context.Context, in *model.SaveProductInp
 
 		//Product_ValidPeriodModel
 		if in.ProductIndex.KindId == consts.PRODUCT_KIND_FUWU {
+			in.ProductValidPeriod.ProductId = in.ProductBase.ProductId
 			_, err = dao.ProductValidPeriod.Save(ctx, in.ProductValidPeriod)
 
+			if err != nil {
+				return err
+			}
+		}
+
+		// 提取旧的ItemId集合
+		oldItemIds := array.Column(oldProductItems, "ItemId")
+
+		// 添加商品，设置期初库存
+		// 编辑商品，设置库存变动
+		var stockBillItems []*do.StockBillItem
+		for _, v := range in.ProductItems {
+			stockBillItem := &do.StockBillItem{
+				ProductId:   v.ProductId,
+				ProductName: in.ProductBase.ProductName,
+				ItemId:      v.ItemId,
+				ItemName:    v.ItemName,
+			}
+
+			// oldItemIds 已经存在的SKU，修改
+			//if garray.NewArrayFrom(oldItemIds).Contains(v.ItemId) {
+			if array.InArray(oldItemIds, v.ItemId) {
+				// 查找对应的旧商品项
+				var findItem *entity.ProductItem
+				for _, it := range oldProductItems {
+					if it.ItemId == v.ItemId.(uint64) {
+						findItem = it
+					}
+				}
+
+				if findItem != nil {
+					diff := int(v.ItemQuantity.(uint) - findItem.ItemQuantity)
+
+					if diff == 0 {
+						continue
+					} else if diff > 0 {
+						stockBillItem.BillTypeId = consts.BILL_TYPE_IN
+						stockBillItem.StockTransportTypeId = consts.STOCK_IN_OTHER
+					} else {
+						// 减少库存
+						if float64(findItem.AvailableQuantity) < math.Abs(float64(diff)) {
+							return gerror.New("出库数量不能大于总库存！")
+						}
+
+						stockBillItem.BillTypeId = consts.BILL_TYPE_OUT
+						stockBillItem.StockTransportTypeId = consts.STOCK_OUT_OTHER
+					}
+
+					stockBillItem.BillItemQuantity = gconv.Uint(math.Abs(float64(diff)))
+					stockBillItem.WarehouseItemQuantity = findItem.ItemQuantity
+					stockBillItems = append(stockBillItems, stockBillItem)
+				}
+			} else {
+				stockBillItem.BillTypeId = consts.BILL_TYPE_IN
+				stockBillItem.StockTransportTypeId = consts.STOCK_IN_INIT
+				stockBillItem.BillItemQuantity = v.ItemQuantity
+				stockBillItem.WarehouseItemQuantity = 0
+				stockBillItems = append(stockBillItems, stockBillItem)
+			}
+
+			// 设置单价和小计
+			stockBillItem.BillItemUnitPrice = v.ItemUnitPrice
+			stockBillItem.BillItemSubtotal, _ = decimal.NewFromFloat(stockBillItem.BillItemUnitPrice.(float64)).Mul(decimal.NewFromInt(gconv.Int64(stockBillItem.BillItemQuantity))).Float64()
+		}
+
+		// 如果有需要保存的库存单据项
+		if len(stockBillItems) > 0 {
+			_, err := dao.StockBillItem.Saves(ctx, stockBillItems)
 			if err != nil {
 				return err
 			}
@@ -485,19 +593,10 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
 					itVo.ActivityId = activityInfoVo.ActivityId
 				}
 
-				// 阶梯价， 需要数量计算单价
-				if activityInfoVo.ActivityTypeId == consts.ACTIVITY_TYPE_BATDISCOUNT || activityInfoVo.ActivityTypeId == consts.ACTIVITY_TYPE_MULTIPLEDISCOUNT {
-					//用户等级判断
-					if userLevelRate != 100 {
-						itVo.ItemSalePrice = itVo.ItemUnitPrice * float64(userLevelRate) / 100
-						itVo.ItemSavePrice = itVo.ItemUnitPrice - itVo.ItemSalePrice
-						itVo.ItemDiscountAmount = itVo.ItemSavePrice * float64(itVo.CartQuantity)
-					}
-				} else {
 					itVo.ItemSalePrice = activityInfoVo.ActivityItemPrice
 					itVo.ItemSavePrice = itVo.ItemUnitPrice - activityInfoVo.ActivityItemPrice
 					itVo.ItemDiscountAmount = itVo.ItemSavePrice * float64(itVo.CartQuantity)
-				}
+
 			} else {
 				//用户等级判断
 				if userLevelRate != 100 {
@@ -584,12 +683,6 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
  * @return
  */
 func (s *sProductBase) checkSingleActivity(ctx context.Context, activityTypeId uint) bool {
-
-	if activityTypeId == consts.ACTIVITY_TYPE_GROUPBOOKING {
-		activityId := gconv.Uint(g.RequestFromCtx(ctx).Get("activity_id"))
-
-		return activityId != 0
-	}
 
 	return true
 }

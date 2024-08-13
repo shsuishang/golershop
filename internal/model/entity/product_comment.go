@@ -42,7 +42,7 @@ type ProductComment struct {
 	CommentHelpful     uint        `json:"comment_helpful"      ` // 有帮助
 	CommentNohelpful   uint        `json:"comment_nohelpful"    ` // 无帮助
 	CommentTime        *gtime.Time `json:"comment_time"         ` // 评价时间
-	CommentIsAnonymous uint        `json:"comment_is_anonymous" ` // 匿名评价
+	CommentIsAnonymous bool        `json:"comment_is_anonymous" ` // 匿名评价
 	CommentEnable      bool        `json:"comment_enable"       ` // 评价信息的状态(BOOL): 1-正常显示; 0-禁止显示
 	ChainId            uint        `json:"chain_id"             ` // 门店编号
 	SubsiteId          uint        `json:"subsite_id"           ` // 所属分站:0-总站

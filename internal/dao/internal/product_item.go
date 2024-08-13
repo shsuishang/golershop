@@ -173,6 +173,14 @@ func (dao *ProductItemDao) Gets(ctx context.Context, id any) (entitys []*entity.
 		err = dao.Ctx(ctx).WherePri(id).Scan(&entitys)
 	}
 
+	for _, item := range entitys {
+		if item.ItemQuantity >= item.ItemQuantityFrozen {
+			item.AvailableQuantity = item.ItemQuantity - item.ItemQuantityFrozen
+		} else {
+			item.AvailableQuantity = 0
+		}
+	}
+
 	return entitys, err
 }
 
@@ -196,6 +204,14 @@ func (dao *ProductItemDao) Find(ctx context.Context, in *do.ProductItemListInput
 	// 对象转换
 	if err := query.Scan(&out); err != nil {
 		return out, err
+	}
+
+	for _, item := range out {
+		if item.ItemQuantity >= item.ItemQuantityFrozen {
+			item.AvailableQuantity = item.ItemQuantity - item.ItemQuantityFrozen
+		} else {
+			item.AvailableQuantity = 0
+		}
 	}
 
 	return out, nil
@@ -255,7 +271,7 @@ func (dao *ProductItemDao) FindKey(ctx context.Context, in *do.ProductItemListIn
 
 	for _, record := range idRes {
 		if !record[dao.Columns().PrimaryKey].IsEmpty() {
-			out = append(out, record[dao.Columns().PrimaryKey])
+			out = append(out, record[dao.Columns().PrimaryKey].Uint64())
 		}
 	}
 
@@ -298,6 +314,14 @@ func (dao *ProductItemDao) List(ctx context.Context, in *do.ProductItemListInput
 	// 对象转换
 	if err := query.Scan(&out.Items); err != nil {
 		return out, err
+	}
+
+	for _, item := range out.Items {
+		if item.ItemQuantity >= item.ItemQuantityFrozen {
+			item.AvailableQuantity = item.ItemQuantity - item.ItemQuantityFrozen
+		} else {
+			item.AvailableQuantity = 0
+		}
 	}
 
 	return out, nil

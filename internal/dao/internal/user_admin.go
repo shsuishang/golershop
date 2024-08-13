@@ -48,6 +48,9 @@ type UserAdminColumns struct {
 	UserAdminCtime   string // 创建时间
 	UserAdminUtime   string // 更新时间
 	UserIsSuperadmin string // 是否超管
+	RoleId           string // 角色编号(ENUM):0-用户;2-商家;3-门店;9-平台;
+	ChainId          string // 所属门店
+	StoreId          string // 店铺编号
 	PrimaryKey       string // 主键
 }
 
@@ -58,6 +61,9 @@ var userAdminColumns = UserAdminColumns{
 	UserAdminCtime:   "user_admin_ctime",
 	UserAdminUtime:   "user_admin_utime",
 	UserIsSuperadmin: "user_is_superadmin",
+	RoleId:           "role_id",
+	ChainId:          "chain_id",
+	StoreId:          "store_id",
 	PrimaryKey:       "user_id",
 }
 

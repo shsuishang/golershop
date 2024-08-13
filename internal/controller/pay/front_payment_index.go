@@ -121,7 +121,7 @@ func (c *cPaymentIndex) WechatAppletPay(ctx context.Context, req *pay.WechatAppl
 	//获得交易号
 	tradeNo := payInfo.TradeNo
 
-	appId := service.ConfigBase().GetStr(ctx, "wechat_app_id", "")
+	appId := service.ConfigBase().GetStr(ctx, "wechat_xcx_app_id", "")
 	client, err := service.PaymentWechat().GetClient(ctx)
 
 	if err != nil {
@@ -152,16 +152,27 @@ func (c *cPaymentIndex) WechatAppletPay(ctx context.Context, req *pay.WechatAppl
 		xlog.Error(err)
 		return
 	}
-	if wxRsp.Code == wechat.Success {
-		xlog.Debugf("wxRsp: %+v", wxRsp.Response)
-		return
-	}
-	xlog.Errorf("wxRsp:%s", wxRsp.Error)
 
-	//下单后，获取微信小程序支付、APP支付、JSAPI支付所需要的 pay sign
-	// 小程序
-	applet, err := client.PaySignOfApplet(appId, wxRsp.Response.PrepayId)
-	gconv.Scan(applet, res.Data)
+	res = &pay.WechatAppletPayRes{}
+	res.OrderId = gstr.JoinAny(req.OrderId, ",")
+
+	if wxRsp.Code == wechat.Success {
+		//下单后，获取微信小程序支付、APP支付、JSAPI支付所需要的 pay sign
+		// 小程序
+		applet, err := client.PaySignOfApplet(appId, wxRsp.Response.PrepayId)
+
+		if err != nil {
+			xlog.Error(err)
+		}
+
+		res.Data = applet
+
+		res.StatusCode = 200
+	} else {
+		xlog.Errorf("wxRsp:%s", wxRsp.Error)
+
+		res.StatusCode = 250
+	}
 
 	return
 }
@@ -212,18 +223,28 @@ func (c *cPaymentIndex) WechatAppPay(ctx context.Context, req *pay.WechatAppPayR
 		xlog.Error(err)
 		return
 	}
+
+	res = &pay.WechatAppPayRes{}
+	res.OrderId = gstr.JoinAny(req.OrderId, ",")
+
 	if wxRsp.Code == wechat.Success {
 		xlog.Debugf("wxRsp: %+v", wxRsp.Response)
-		return
-	}
-	xlog.Errorf("wxRsp:%s", wxRsp.Error)
 
-	// App
-	applet, err := client.PaySignOfApp(appId, wxRsp.Response.PrepayId)
-	gconv.Scan(applet, res.Data)
+		// App
+		applet, err := client.PaySignOfApp(appId, wxRsp.Response.PrepayId)
+
+		if err != nil {
+			xlog.Error(err)
+		}
+
+		res.Data = applet
+		res.StatusCode = 200
+	} else {
+		res.StatusCode = 250
+		xlog.Errorf("wxRsp:%s", wxRsp.Error)
+	}
 
 	return
-
 }
 
 // WechatJSAPIPay 微信JSAPI支付
@@ -274,14 +295,22 @@ func (c *cPaymentIndex) WechatJSAPIPay(ctx context.Context, req *pay.WechatJSAPI
 	}
 	if wxRsp.Code == wechat.Success {
 		xlog.Debugf("wxRsp: %+v", wxRsp.Response)
-		return
-	}
-	xlog.Errorf("wxRsp:%s", wxRsp.Error)
 
-	//下单后，获取微信小程序支付、APP支付、JSAPI支付所需要的 pay sign
-	// JSAPI
-	applet, err := client.PaySignOfJSAPI(appId, wxRsp.Response.PrepayId)
-	gconv.Scan(applet, res.Data)
+		//下单后，获取微信小程序支付、APP支付、JSAPI支付所需要的 pay sign
+		// JSAPI
+		applet, err := client.PaySignOfJSAPI(appId, wxRsp.Response.PrepayId)
+
+		if err != nil {
+			xlog.Error(err)
+		}
+
+		res.Data = applet
+		res.StatusCode = 200
+	} else {
+		xlog.Errorf("wxRsp:%s", wxRsp.Error)
+
+		res.StatusCode = 250
+	}
 
 	return
 }

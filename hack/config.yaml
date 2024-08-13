@@ -86,18 +86,4 @@ gfcli:
         gJsonSupport: true
         overwriteDao: true
 
-      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
-        group: "sns"
-        removePrefix: "sns_"
-        tables: "sns_story_timeline,sns_story_like,sns_story_forward,sns_story_comment_reply_helpful,sns_story_comment_reply,sns_story_comment_helpful,sns_story_comment,sns_story_collection,sns_story_category,sns_story_base,sns_story_advertisement"
-        jsonCase: "Snake"
-        gJsonSupport: true
-        overwriteDao: true
 
-      - link: "mysql:modulith_open:pwd@tcp(localhost:3306)/modulith_open?loc=Local&parseTime=true"
-        group: "o2o"
-        removePrefix: "o2o_"
-        tables: "o2o_chain_base,o2o_chain_item"
-        jsonCase: "Snake"
-        gJsonSupport: true
-        overwriteDao: true

@@ -20,12 +20,27 @@ type ConfigPublicKeyRes struct {
 	PublicKey string `json:"public_key"        `
 }
 
+type QrcodeReq struct {
+	g.Meta `path:"/front/sys/config/getQrcode" tags:"配置管理" method:"get" summary:"根据提货码获取二维码"`
+}
+
+type QrcodeRes struct {
+}
+
+type GuideReq struct {
+	g.Meta `path:"/front/sys/config/guide" tags:"配置管理" method:"get" summary:"加载广告导航"`
+}
+
+type GuideRes struct {
+}
+
 type TranslateLangReq struct {
 	g.Meta `path:"/front/sys/config/listTranslateLang" tags:"配置管理" method:"get" summary:"语言包"`
 }
 
 type TranslateLangRes struct {
 }
+
 type GetPcHelpReq struct {
 	g.Meta `path:"/front/sys/config/getPcHelp" tags:"站点帮助" method:"get" summary:"站点帮助"`
 }

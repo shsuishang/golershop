@@ -1,6 +1,8 @@
 package model
 
-import "golershop.cn/internal/model/entity"
+import (
+	"golershop.cn/internal/model/entity"
+)
 
 // UserPointsVo 用户积分
 type UserPointsVo struct {
@@ -70,4 +72,15 @@ type ConsumeRecordOutput struct {
 	Total   int              `json:"total"`   // 总页数
 	Records int              `json:"records"` // 数据总数
 	Size    int              `json:"size"`    // 单页数量
+}
+
+// MoneyVo 余额
+type MoneyVo struct {
+	UserId              uint    `json:"user_id"              dc:"所属用户"` // 所属用户
+	RecordTotal         float64 `json:"record_total"         dc:"余额"`   // 余额
+	TradeTypeDeposit    uint    `json:"trade_type_deposit"   dc:"交易类型"` // 交易类型
+	RecordDesc          string  `json:"record_desc"          dc:"描述"`   // 描述
+	PaymentTypeId       uint    `json:"payment_type_id"      dc:"支付方式"` // 支付方式
+	RecordCommissionFee float64 `json:"record_commission_fee" dc:"佣金"`  // 佣金
+	OrderId             string  `json:"order_id"             dc:"订单编号"` // 订单编号
 }

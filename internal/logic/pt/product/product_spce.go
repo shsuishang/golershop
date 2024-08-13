@@ -105,6 +105,22 @@ func (s *sProductSpec) Edit(ctx context.Context, in *do.ProductSpec) (affected i
 // Remove 删除多条记录模式
 func (s *sProductSpec) Remove(ctx context.Context, id any) (affected int64, err error) {
 
+	input := &do.ProductInfoListInput{}
+	input.WhereExt = []*ml.WhereExt{{
+		Column: dao.ProductInfo.Columns().SpecIds,
+		Val:    id,
+		Symbol: ml.IN,
+	}}
+
+	count, err := dao.ProductInfo.Count(ctx, input)
+	if err != nil {
+		return 0, err
+	}
+
+	if count > 0 {
+		return 0, errors.New("规格已被商品使用，不可删除")
+	}
+
 	//是否内置
 	one, err := dao.ProductSpec.Get(ctx, id)
 

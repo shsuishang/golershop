@@ -128,10 +128,7 @@ func (s *sUserPay) GetPayPasswd(ctx context.Context, userId uint) (*entity.UserP
 
 // ChangePayPassword 修改支付密码
 func (s *sUserPay) ChangePayPassword(ctx context.Context, oldPayPassword, newPayPassword, payPassword string, userId uint) (bool, error) {
-	userPay, err := s.GetPayPasswd(ctx, userId)
-	if err != nil {
-		return false, err
-	}
+	userPay, _ := s.GetPayPasswd(ctx, userId)
 
 	if userPay == nil {
 		// 新建支付密码

@@ -24,3 +24,10 @@ type SignStateReq struct {
 
 type SignStateRes struct {
 }
+
+type DistributionCommissionReq struct {
+	g.Meta `path:"/front/pay/userResource/getCommissionInfo" tags:"账户余额信息" method:"get" summary:"账户余额信息"`
+}
+
+type DistributionCommissionRes struct {
+}

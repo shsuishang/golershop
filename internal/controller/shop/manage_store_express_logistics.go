@@ -116,3 +116,14 @@ func (c *cStoreExpressLogistics) EditState(ctx context.Context, req *shop.StoreE
 
 	return
 }
+
+// ReturnLogistics 查看物流
+func (c *cStoreExpressLogistics) ReturnLogistics(ctx context.Context, req *shop.ReturnLogisticsReq) (res shop.ReturnLogisticsRes, err error) {
+	// 调用 service 层的 returnLogistics 方法，传入快递公司名称和快递单号
+	result, err := service.OrderLogistics().ReturnLogistics(ctx, req.ReturnTrackingName, req.ReturnTrackingNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, err
+}

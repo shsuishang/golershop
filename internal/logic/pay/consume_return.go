@@ -51,6 +51,22 @@ func (s *sConsumeReturn) DoRefund(ctx context.Context, orderReturns []*entity.Or
 
 	orderReturnItems, _ := dao.OrderReturnItem.Find(ctx, &do.OrderReturnItemListInput{Where: do.OrderReturnItem{ReturnId: returnIds}})
 	userInfoList, _ := dao.UserInfo.Gets(ctx, userIds)
+
+	// 提取所有唯一的订单商品ID
+	orderItemIdsMap := make(map[uint64]struct{})
+	for _, item := range orderReturnItems {
+		orderItemIdsMap[item.OrderItemId] = struct{}{}
+	}
+
+	// 将唯一的订单商品ID转换为切片
+	var orderItemIds []uint64
+	for id := range orderItemIdsMap {
+		orderItemIds = append(orderItemIds, id)
+	}
+
+	// 获取订单商品列表
+	orderItemList, _ := dao.OrderItem.Gets(ctx, orderItemIds)
+
 	curDate := gtime.Now()
 	ymdDate := gtime.Now()
 	pointsVaueRate := service.ConfigBase().GetFloat(ctx, "points_vaue_rate", 0.0)
@@ -157,9 +173,11 @@ func (s *sConsumeReturn) DoRefund(ctx context.Context, orderReturns []*entity.Or
 			for _, orderReturnItem := range orderReturnItems {
 				if orderReturnItem.ReturnId == returnId {
 					var orderItem *do.OrderItem
-					for _, item := range orderItems {
+					for _, item := range orderItemList {
 						if item.OrderItemId == orderReturnItem.OrderItemId {
-							orderItem = item
+							newOrderItem := &do.OrderItem{}
+							gconv.Scan(item, &newOrderItem)
+							orderItem = newOrderItem
 							break
 						}
 					}
@@ -252,17 +270,17 @@ func (s *sConsumeReturn) SetReturnPaidYes(ctx context.Context, returnIds []strin
 	orderReturn := &do.OrderReturn{
 		ReturnIsPaid: true,
 	}
-	orderReturn.ReturnIsPaid = false
 
 	// 构建查询条件
 	returnQueryWrapper := &do.OrderReturnListInput{
 		Where: do.OrderReturn{
-			ReturnId: returnIds,
+			ReturnId:     returnIds,
+			ReturnIsPaid: false,
 		},
 	}
 
 	// 更新订单退货信息
-	_, err := dao.OrderReturn.Edit(ctx, returnQueryWrapper, orderReturn)
+	_, err := dao.OrderReturn.EditWhere(ctx, returnQueryWrapper, orderReturn)
 	if err != nil {
 		return false, gerror.New("更新订单退货信息失败")
 	}
@@ -283,98 +301,6 @@ func (s *sConsumeReturn) SetReturnPaidYes(ctx context.Context, returnIds []strin
 
 	if g.IsEmpty(orderIds) {
 		return false, nil
-	}
-
-	// 判断是否存在用金额退款
-	orderQueryWrapper := &do.DistributionOrderListInput{
-		Where: do.DistributionOrder{
-			OrderId:  orderIds,
-			UoActive: 1,
-		},
-	}
-	distributionOrderList, err := dao.DistributionOrder.Find(ctx, orderQueryWrapper)
-	if err != nil {
-		return false, gerror.New("查询分销订单失败")
-	}
-
-	var userIds []uint
-	for _, distributionOrder := range distributionOrderList {
-		userIds = append(userIds, distributionOrder.UserId)
-	}
-	//userIds = g.SliceUnique(userIds)
-
-	// 获取分销佣金列表
-	commissionList, err := dao.DistributionCommission.Gets(ctx, userIds)
-	if err != nil {
-		return false, gerror.New("获取分销佣金列表失败")
-	}
-
-	commissionListDo := make([]*do.DistributionCommission, 0)
-	if !g.IsEmpty(distributionOrderList) {
-		for _, distributionOrder := range distributionOrderList {
-			uoBuyCommission := decimal.NewFromFloat(distributionOrder.UoBuyCommission)
-			uoDirectsellerCommission := distributionOrder.UoDirectsellerCommission
-			addCommissionRefundAmount := uoBuyCommission.Add(decimal.NewFromFloat(uoDirectsellerCommission))
-
-			userId := distributionOrder.UserId
-			var commission *entity.DistributionCommission
-			for _, c := range commissionList {
-				if c.UserId == userId {
-					commission = c
-					break
-				}
-			}
-
-			if commission != nil {
-				commissionRefundAmount := gconv.Float64(commission.CommissionRefundAmount)
-				commission.CommissionRefundAmount, _ = addCommissionRefundAmount.Add(decimal.NewFromFloat(commissionRefundAmount)).Float64()
-
-				commissionListDo = append(commissionListDo, &do.DistributionCommission{
-					CommissionRefundAmount: commission.CommissionRefundAmount,
-				})
-			}
-		}
-
-		if !g.IsEmpty(commissionList) {
-			_, err = dao.DistributionCommission.Saves(ctx, commissionListDo)
-			if err != nil {
-				return false, gerror.New("更新分销佣金失败")
-			}
-		}
-
-		uoIds := make([]uint, 0)
-		for _, distributionOrder := range distributionOrderList {
-			uoIds = append(uoIds, distributionOrder.UoId)
-		}
-
-		//uoIds = g.SliceUnique(uoIds)
-
-		distributionOrder := &do.DistributionOrder{
-			UoActive: true,
-		}
-		distributionOrderQueryWrapper := &do.DistributionOrderListInput{
-			Where: do.DistributionOrder{
-				UoId: uoIds,
-			},
-		}
-
-		_, err = dao.DistributionOrder.EditWhere(ctx, distributionOrderQueryWrapper, distributionOrder)
-		if err != nil {
-			return false, gerror.New("更新分销订单失败")
-		}
-
-		distributionOrderItem := &do.DistributionOrderItem{
-			UoiActive: true,
-		}
-		orderItemQueryWrapper := &do.DistributionOrderItemListInput{
-			Where: do.DistributionOrderItem{
-				OrderId: orderIds,
-			},
-		}
-		_, err = dao.DistributionOrderItem.Edit(ctx, orderItemQueryWrapper, distributionOrderItem)
-		if err != nil {
-			return false, gerror.New("更新分销订单项失败")
-		}
 	}
 
 	return true, nil

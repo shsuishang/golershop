@@ -23,6 +23,8 @@ package service
 import (
 	"context"
 
+	"golershop.cn/api/trade"
+
 	"golershop.cn/api/pt"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
@@ -30,42 +32,6 @@ import (
 )
 
 type (
-	IProductSpec interface {
-		// Get 读取规格
-		Get(ctx context.Context, id any) (out *entity.ProductSpec, err error)
-		// Gets 读取多条规格
-		Gets(ctx context.Context, id any) (list []*entity.ProductSpec, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductSpecListInput) (out []*entity.ProductSpec, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductSpecListInput) (out *do.ProductSpecListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductSpec) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductSpec) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IProductAssist interface {
-		// Get 读取属性
-		Get(ctx context.Context, id any) (out *entity.ProductAssist, err error)
-		// Gets 读取多条属性
-		Gets(ctx context.Context, id any) (list []*entity.ProductAssist, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductAssistListInput) (out []*entity.ProductAssist, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductAssistListInput) (out *do.ProductAssistListOutput, err error)
-		// Tree 查询数据
-		Tree(ctx context.Context) (out []*model.ProductAssistTreeVo, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductAssist) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductAssist) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// GetAssists 获取商品辅助属性
-		GetAssists(ctx context.Context, assistIds string) (out []*model.ProductAssistOutput, err error)
-	}
 	IProductAssistItem interface {
 		// Find 查询数据
 		Find(ctx context.Context, in *do.ProductAssistItemListInput) (out []*entity.ProductAssistItem, err error)
@@ -79,23 +45,27 @@ type (
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
-	IProductBrand interface {
-		// Get 读取品牌
-		Get(ctx context.Context, id any) (out *entity.ProductBrand, err error)
-		// Gets 读取多条品牌
-		Gets(ctx context.Context, id any) (list []*entity.ProductBrand, err error)
+	IProductBase interface {
 		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductBrandListInput) (out []*entity.ProductBrand, err error)
+		Find(ctx context.Context, in *do.ProductBaseListInput) (out []*entity.ProductBase, err error)
 		// List 分页读取
-		List(ctx context.Context, in *do.ProductBrandListInput) (out *do.ProductBrandListOutput, err error)
+		List(ctx context.Context, in *do.ProductBaseListInput) (out *do.ProductBaseListOutput, err error)
 		// Add 新增
-		Add(ctx context.Context, in *do.ProductBrand) (lastInsertId int64, err error)
+		Add(ctx context.Context, in *do.ProductBase) (lastInsertId int64, err error)
 		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductBrand) (affected int64, err error)
+		Edit(ctx context.Context, in *do.ProductBase) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
-		// GetTree 获取商品品牌树
-		GetTree(ctx context.Context) (brandList []*pt.BrandTreeRes, err error)
+		// SaveProdcut 添加或者编辑商品
+		SaveProdcut(ctx context.Context, in *model.SaveProductInput) (productId uint64, err error)
+		// RemoveProdcut 删除商品
+		RemoveProdcut(ctx context.Context, id any) (affected int64, err error)
+		// GetProduct 读取商品信息
+		GetProduct(ctx context.Context, id any) (productData model.ProductDateOutput, err error)
+		// GetItems 读取商品信息
+		GetItems(ctx context.Context, itemIds []uint64, userId uint) (out []*model.ProductItemVo, err error)
+		// BatchEditState 批量编辑商品状态
+		BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error)
 	}
 	IProductCategory interface {
 		// 读取商品分类
@@ -120,20 +90,6 @@ type (
 		Edit(ctx context.Context, in *do.ProductCategory) (affected int64, err error)
 		// 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IProductComment interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductCommentListInput) (out []*entity.ProductComment, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductCommentListInput) (out *do.ProductCommentListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductComment) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductComment) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// GetList 获取商品评论列表
-		GetList(ctx context.Context, productCommentListReq *do.ProductCommentListInput) (productCommentPage *do.ProductCommentListOutput, err error)
 	}
 	IProductIndex interface {
 		// GetList 商品搜索查询列表
@@ -166,14 +122,111 @@ type (
 		Edit(ctx context.Context, in *do.ProductItem) (affected int64, err error)
 		// LockSkuStock 锁库存
 		LockSkuStock(ctx context.Context, itemId uint64, cartQuantity uint) (affected int64, err error)
-		// EditStock 编辑库存
-		EditStock(ctx context.Context, input *model.ProductEditStockInput) (success bool, err error)
+		// LockSkuStock 锁库存
+		EditStock(ctx context.Context, in *model.ProductEditStockInput) (success bool, err error)
 		// ReleaseSkuStock 锁库存
 		ReleaseSkuStock(ctx context.Context, itemId uint64, releaseQuantity uint) (affected int64, err error)
 		// List 分页读取
 		ListItemKey(ctx context.Context, req *pt.ItemListReq) (out *do.ItemListKeyOutput, err error)
-		// ifOnSale 函数判断商品是否在售
 		IfOnSale(ctx context.Context, item *model.ProductItemVo) bool
+		BatchEditStock(ctx context.Context, inputs []*model.ProductEditStockInput) (err error)
+	}
+	IProductSpec interface {
+		// Get 读取规格
+		Get(ctx context.Context, id any) (out *entity.ProductSpec, err error)
+		// Gets 读取多条规格
+		Gets(ctx context.Context, id any) (list []*entity.ProductSpec, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductSpecListInput) (out []*entity.ProductSpec, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductSpecListInput) (out *do.ProductSpecListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductSpec) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductSpec) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IProductTag interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductTagListInput) (out []*entity.ProductTag, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductTagListInput) (out *do.ProductTagListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductTag) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductTag) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IProductComment interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductCommentListInput) (out []*entity.ProductComment, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductCommentListInput) (out *do.ProductCommentListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductComment) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductComment) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetList
+		GetList(ctx context.Context, productCommentListReq *do.ProductCommentListInput) (productCommentPage *do.ProductCommentListOutput, err error)
+		// StoreEvaluationWithContent
+		StoreEvaluationWithContent(ctx context.Context, orderId string) (out *model.OrderCommentOutput, err error)
+		// AddOrderComment
+		AddOrderComment(ctx context.Context, commentReq *trade.OrderCommentReq) error
+	}
+	IProductAssist interface {
+		// Get 读取属性
+		Get(ctx context.Context, id any) (out *entity.ProductAssist, err error)
+		// Gets 读取多条属性
+		Gets(ctx context.Context, id any) (list []*entity.ProductAssist, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductAssistListInput) (out []*entity.ProductAssist, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductAssistListInput) (out *do.ProductAssistListOutput, err error)
+		Tree(ctx context.Context) (out []*model.ProductAssistTreeVo, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductAssist) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductAssist) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetAssists 获取商品辅助属性
+		GetAssists(ctx context.Context, assistIds string) (out []*model.ProductAssistOutput, err error)
+	}
+	IProductBrand interface {
+		// Get 读取品牌
+		Get(ctx context.Context, id any) (out *entity.ProductBrand, err error)
+		// Gets 读取多条品牌
+		Gets(ctx context.Context, id any) (list []*entity.ProductBrand, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductBrandListInput) (out []*entity.ProductBrand, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductBrandListInput) (out *do.ProductBrandListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductBrand) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductBrand) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetTree
+		GetTree(ctx context.Context) (brandList []*pt.BrandTreeRes, err error)
+	}
+	IProductSpecItem interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.ProductSpecItemListInput) (out []*entity.ProductSpecItem, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.ProductSpecItemListInput) (out *do.ProductSpecItemListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.ProductSpecItem) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.ProductSpecItem) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// EditState 编辑任务状态
+		EditState(ctx context.Context, req *pt.ProductSpecItemEditStateReq) (res *pt.ProductSpecItemEditStateRes, err error)
 	}
 	IProductType interface {
 		// 读取类型
@@ -195,80 +248,22 @@ type (
 		// Info 读取类型信息
 		Info(ctx context.Context, id any) (out *model.ProductTypeInfoOutput, err error)
 	}
-	IProductBase interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductBaseListInput) (out []*entity.ProductBase, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductBaseListInput) (out *do.ProductBaseListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductBase) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductBase) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// SaveProdcut 添加或者编辑商品
-		SaveProdcut(ctx context.Context, in *model.SaveProductInput) (productId uint64, err error)
-		// RemoveProdcut 删除商品
-		RemoveProdcut(ctx context.Context, id any) (affected int64, err error)
-		// GetProduct 读取商品信息
-		GetProduct(ctx context.Context, id any) (productData model.ProductDateOutput, err error)
-		GetItems(ctx context.Context, itemIds []uint64, userId uint) (out []*model.ProductItemVo, err error)
-		// BatchEditState 批量编辑商品状态
-		BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error)
-	}
-	IProductSpecItem interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductSpecItemListInput) (out []*entity.ProductSpecItem, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductSpecItemListInput) (out *do.ProductSpecItemListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductSpecItem) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductSpecItem) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// EditState 编辑任务状态
-		EditState(ctx context.Context, req *pt.ProductSpecItemEditStateReq) (res *pt.ProductSpecItemEditStateRes, err error)
-	}
-	IProductTag interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ProductTagListInput) (out []*entity.ProductTag, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ProductTagListInput) (out *do.ProductTagListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ProductTag) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ProductTag) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
 )
 
 var (
-	localProductBase       IProductBase
+	localProductAssist     IProductAssist
+	localProductBrand      IProductBrand
 	localProductSpecItem   IProductSpecItem
+	localProductType       IProductType
+	localProductSpec       IProductSpec
 	localProductTag        IProductTag
+	localProductComment    IProductComment
+	localProductAssistItem IProductAssistItem
+	localProductBase       IProductBase
+	localProductCategory   IProductCategory
 	localProductIndex      IProductIndex
 	localProductItem       IProductItem
-	localProductSpec       IProductSpec
-	localProductAssist     IProductAssist
-	localProductAssistItem IProductAssistItem
-	localProductBrand      IProductBrand
-	localProductCategory   IProductCategory
-	localProductComment    IProductComment
-	localProductType       IProductType
 )
-
-func ProductBase() IProductBase {
-	if localProductBase == nil {
-		panic("implement not found for interface IProductBase, forgot register?")
-	}
-	return localProductBase
-}
-
-func RegisterProductBase(i IProductBase) {
-	localProductBase = i
-}
 
 func ProductSpecItem() IProductSpecItem {
 	if localProductSpecItem == nil {
@@ -281,26 +276,15 @@ func RegisterProductSpecItem(i IProductSpecItem) {
 	localProductSpecItem = i
 }
 
-func ProductTag() IProductTag {
-	if localProductTag == nil {
-		panic("implement not found for interface IProductTag, forgot register?")
+func ProductType() IProductType {
+	if localProductType == nil {
+		panic("implement not found for interface IProductType, forgot register?")
 	}
-	return localProductTag
+	return localProductType
 }
 
-func RegisterProductTag(i IProductTag) {
-	localProductTag = i
-}
-
-func ProductSpec() IProductSpec {
-	if localProductSpec == nil {
-		panic("implement not found for interface IProductSpec, forgot register?")
-	}
-	return localProductSpec
-}
-
-func RegisterProductSpec(i IProductSpec) {
-	localProductSpec = i
+func RegisterProductType(i IProductType) {
+	localProductType = i
 }
 
 func ProductAssist() IProductAssist {
@@ -312,17 +296,6 @@ func ProductAssist() IProductAssist {
 
 func RegisterProductAssist(i IProductAssist) {
 	localProductAssist = i
-}
-
-func ProductAssistItem() IProductAssistItem {
-	if localProductAssistItem == nil {
-		panic("implement not found for interface IProductAssistItem, forgot register?")
-	}
-	return localProductAssistItem
-}
-
-func RegisterProductAssistItem(i IProductAssistItem) {
-	localProductAssistItem = i
 }
 
 func ProductBrand() IProductBrand {
@@ -347,17 +320,6 @@ func RegisterProductCategory(i IProductCategory) {
 	localProductCategory = i
 }
 
-func ProductComment() IProductComment {
-	if localProductComment == nil {
-		panic("implement not found for interface IProductComment, forgot register?")
-	}
-	return localProductComment
-}
-
-func RegisterProductComment(i IProductComment) {
-	localProductComment = i
-}
-
 func ProductIndex() IProductIndex {
 	if localProductIndex == nil {
 		panic("implement not found for interface IProductIndex, forgot register?")
@@ -380,13 +342,57 @@ func RegisterProductItem(i IProductItem) {
 	localProductItem = i
 }
 
-func ProductType() IProductType {
-	if localProductType == nil {
-		panic("implement not found for interface IProductType, forgot register?")
+func ProductSpec() IProductSpec {
+	if localProductSpec == nil {
+		panic("implement not found for interface IProductSpec, forgot register?")
 	}
-	return localProductType
+	return localProductSpec
 }
 
-func RegisterProductType(i IProductType) {
-	localProductType = i
+func RegisterProductSpec(i IProductSpec) {
+	localProductSpec = i
+}
+
+func ProductTag() IProductTag {
+	if localProductTag == nil {
+		panic("implement not found for interface IProductTag, forgot register?")
+	}
+	return localProductTag
+}
+
+func RegisterProductTag(i IProductTag) {
+	localProductTag = i
+}
+
+func ProductComment() IProductComment {
+	if localProductComment == nil {
+		panic("implement not found for interface IProductComment, forgot register?")
+	}
+	return localProductComment
+}
+
+func RegisterProductComment(i IProductComment) {
+	localProductComment = i
+}
+
+func ProductAssistItem() IProductAssistItem {
+	if localProductAssistItem == nil {
+		panic("implement not found for interface IProductAssistItem, forgot register?")
+	}
+	return localProductAssistItem
+}
+
+func RegisterProductAssistItem(i IProductAssistItem) {
+	localProductAssistItem = i
+}
+
+func ProductBase() IProductBase {
+	if localProductBase == nil {
+		panic("implement not found for interface IProductBase, forgot register?")
+	}
+	return localProductBase
+}
+
+func RegisterProductBase(i IProductBase) {
+	localProductBase = i
 }

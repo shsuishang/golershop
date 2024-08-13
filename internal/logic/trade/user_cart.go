@@ -116,6 +116,23 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 	var activityBase *entity.ActivityBase
 
 	if !g.IsEmpty(in.ActivityId) {
+
+		activityBase, err = dao.ActivityBase.Get(ctx, in.ActivityId)
+
+		if activityBase != nil {
+			if activityBase.ActivityState != consts.ACTIVITY_STATE_NORMAL {
+				return nil, errors.New("活动尚未开启！")
+			}
+
+			// 会员等级判断
+			_, err := s.checkoutLevel(ctx, activityBase.ActivityUseLevel, userInfo.UserLevelId)
+			if err != nil {
+				panic(err)
+			}
+
+		} else {
+			return nil, errors.New("非法活动参数！")
+		}
 	}
 
 	orderProductAmount := decimal.NewFromFloat(0) // 商品订单原价
@@ -130,9 +147,6 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 	storeIds := gconv.SliceUint(array.Column(in.Items, "StoreId"))
 
 	productItemList, err := service.ProductBase().GetItems(ctx, itemIds, in.UserId)
-
-	// 活动商品数量 多件折 等使用
-	activityItemQuantityTotalMap := make(map[uint]uint)
 
 	// 店铺分组
 	storeItemsMap := make(map[uint][]*model.ProductItemVo)
@@ -159,7 +173,12 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 		it.CartSelect = checkoutItemVo.CartSelect
 
 		// 判断可用库存
-		it.AvailableQuantity = it.ItemQuantity - it.ItemQuantityFrozen
+		if it.ItemQuantity >= it.ItemQuantityFrozen {
+			it.AvailableQuantity = it.ItemQuantity - it.ItemQuantityFrozen
+		} else {
+			it.AvailableQuantity = 0
+		}
+
 		it.IsOnSale = service.ProductItem().IfOnSale(ctx, it)
 
 		// 商品是否可销售
@@ -232,6 +251,12 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 		}
 
 		storeItemVo := &model.StoreItemVo{}
+
+		storeItemVo.Activitys.Gift = make([]interface{}, 0)
+		storeItemVo.Activitys.Reduction = make([]interface{}, 0)
+		storeItemVo.Activitys.Multple = make([]interface{}, 0)
+		storeItemVo.Activitys.Bargains = make([]interface{}, 0)
+
 		storeItemVo.RedemptionItems = make([]*model.ActivitysVo, 0)
 		storeItemVo.VoucherItems = make([]*model.UserVoucherRes, 0)
 		storeItemVo.ActivityBase = activityBase
@@ -256,105 +281,6 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 			// todo 处理单品活动价格
 
 			if item.ActivityInfo != nil {
-				if item.ActivityInfo.ActivityTypeId == consts.ACTIVITY_TYPE_BATDISCOUNT {
-					// 处理批发价
-					percent := decimal.NewFromFloat(100)
-
-					if item.ActivityInfo.ActivityBase.ActivityRule != "" {
-						var activityRuleVo model.ActivityRuleVo
-						err := json.Unmarshal([]byte(item.ActivityInfo.ActivityBase.ActivityRule), &activityRuleVo)
-						if err != nil {
-							return nil, err
-						}
-
-						rules := activityRuleVo.Rule
-
-						// 使用 Comparator 进行排序
-						sort.Slice(rules, func(i, j int) bool {
-							return rules[i].Num < rules[j].Num
-						})
-
-						for _, r := range rules {
-							if item.CartQuantity >= r.Num {
-								percent = decimal.NewFromFloat(r.Percent)
-							} else {
-								break
-							}
-						}
-					}
-
-					// 是否触发阶梯价
-					if percent.Equal(decimal.NewFromFloat(100)) {
-						// 未触发，清除活动标记
-						item.ActivityInfo = nil
-						item.ActivityId = 0
-					} else {
-						salePrice := decimal.NewFromFloat(item.ItemUnitPrice).Mul(percent).Div(decimal.NewFromFloat(100)).Round(2)
-						item.ItemSalePrice, _ = salePrice.Float64()
-
-						savePrice := decimal.NewFromFloat(item.ItemUnitPrice).Sub(salePrice)
-						item.ItemSavePrice, _ = savePrice.Float64()
-
-						item.ItemDiscountAmount, _ = savePrice.Mul(decimal.NewFromFloat(float64(item.CartQuantity))).Float64()
-					}
-				} else if item.ActivityInfo.ActivityTypeId == consts.ACTIVITY_TYPE_MULTIPLEDISCOUNT {
-					// 处理多件折
-					// 需要根据活动提前计算好
-					if g.IsEmpty(activityItemQuantityTotalMap[item.ActivityId]) {
-						activityItemIds := gconv.SliceUint64(gstr.Split(item.ActivityInfo.ActivityBase.ActivityItemIds, ","))
-						var activityItemQuantityTotal uint = 0
-
-						for _, s := range items {
-							if s.CartSelect && array.InArray(activityItemIds, s.ItemId) {
-								activityItemQuantityTotal += s.CartQuantity
-							}
-						}
-
-						activityItemQuantityTotalMap[item.ActivityId] = activityItemQuantityTotal
-					}
-
-					activityItemQuantityTotal := activityItemQuantityTotalMap[item.ActivityId]
-
-					percent := decimal.NewFromFloat(100)
-
-					if item.ActivityInfo.ActivityBase.ActivityRule != "" {
-						var activityRuleVo model.ActivityRuleVo
-						err := json.Unmarshal([]byte(item.ActivityInfo.ActivityBase.ActivityRule), &activityRuleVo)
-						if err != nil {
-							return nil, err
-						}
-
-						rules := activityRuleVo.Rule
-
-						// 使用 Comparator 进行排序
-						sort.Slice(rules, func(i, j int) bool {
-							return rules[i].Num < rules[j].Num
-						})
-
-						for _, r := range rules {
-							if activityItemQuantityTotal >= r.Num {
-								percent = decimal.NewFromFloat(r.Percent)
-							} else {
-								break
-							}
-						}
-					}
-
-					// 是否触发阶梯价
-					if percent.Equal(decimal.NewFromFloat(100)) {
-						// 未触发，清除活动标记
-						item.ActivityInfo = nil
-						item.ActivityId = 0
-					} else {
-						salePrice := decimal.NewFromFloat(item.ItemUnitPrice).Mul(percent).Div(decimal.NewFromFloat(100)).Round(2)
-						item.ItemSalePrice, _ = salePrice.Float64()
-
-						savePrice := decimal.NewFromFloat(item.ItemUnitPrice).Sub(salePrice)
-						item.ItemSavePrice, _ = savePrice.Float64()
-
-						item.ItemDiscountAmount, _ = savePrice.Mul(decimal.NewFromFloat(float64(item.CartQuantity))).Float64()
-					}
-				}
 				// 会员等级判断
 				if item.ActivityInfo != nil {
 					activity := item.ActivityInfo.ActivityBase
@@ -461,65 +387,7 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 
 				if !g.IsNil(activityRuleVo) {
 					// 礼包活动 必须套餐直接下单。
-					if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_GIFTBAG || activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_CUTPRICE {
-						if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_GIFTBAG {
-							// 组合套餐活动
-							giftbag := activityRuleVo.Giftbag
 
-							if g.IsNil(giftbag) {
-								panic(errors.New("组合套餐信息不存在！"))
-							}
-							moneyAmount = decimal.NewFromFloat(giftbag.GiftbagAmount)
-						} else if activityBase.ActivityTypeId == consts.ACTIVITY_TYPE_CUTPRICE {
-							// 砍价活动
-							activityCutprice, err := dao.ActivityCutprice.FindOne(ctx, &do.ActivityCutpriceListInput{Where: do.ActivityCutprice{
-								ActivityId: in.ActivityId,
-								UserId:     in.UserId,
-							}})
-
-							if activityCutprice == nil || err != nil {
-								panic(errors.New("砍价记录信息不存在！"))
-							}
-
-							moneyAmount = decimal.NewFromFloat(activityCutprice.AcSalePrice)
-						}
-
-						discountAmount = productAmount.Sub(moneyAmount)
-
-						// 套餐优惠比例
-						discountRate := moneyAmount.Div(productAmount).Round(6)
-						newAmount := decimal.NewFromFloat(0) // 已分配额度
-
-						var i int
-						// 取出参与的产品的总值
-						for _, item := range items {
-							if !item.CartSelect {
-								continue
-							}
-
-							i++
-
-							itemOriSubtotal := decimal.NewFromFloat(item.ItemUnitPrice).Mul(decimal.NewFromFloat(float64(item.CartQuantity)))
-
-							// 最后一个商品
-							if i == itemSelectedSize {
-								itemNewSubtotal := moneyAmount.Sub(newAmount)
-								item.ItemSalePrice, _ = itemNewSubtotal.Div(decimal.NewFromFloat(float64(item.CartQuantity))).Round(6).Float64()
-								item.ItemSavePrice = item.ItemUnitPrice - item.ItemSalePrice
-								item.ItemSubtotal, _ = itemNewSubtotal.Float64()
-								item.ItemDiscountAmount, _ = itemOriSubtotal.Sub(itemNewSubtotal).Float64()
-							} else {
-								itemNewSubtotal := itemOriSubtotal.Mul(discountRate)
-								// item.ItemPointsSubtotal = itemPointsSubtotal
-								item.ItemSalePrice, _ = itemNewSubtotal.Div(decimal.NewFromFloat(float64(item.CartQuantity))).Round(6).Float64()
-								item.ItemSavePrice = item.ItemUnitPrice - item.ItemSalePrice
-								item.ItemSubtotal, _ = itemNewSubtotal.Float64()
-								item.ItemDiscountAmount, _ = itemOriSubtotal.Sub(itemNewSubtotal).Float64()
-
-								newAmount = newAmount.Add(itemNewSubtotal)
-							}
-						}
-					}
 				}
 			}
 		}
@@ -751,7 +619,7 @@ func (s *sUserCart) AddCart(ctx context.Context, in *model.CartAddInput) (res bo
 	}
 
 	// 判断可用库存
-	availableQuantity := productItem.ItemQuantity - productItem.ItemQuantityFrozen
+	availableQuantity := productItem.AvailableQuantity
 
 	// 查找购物车中是否已经有该商品
 	cart, err := dao.UserCart.FindOne(ctx, &do.UserCartListInput{Where: do.UserCart{UserId: in.UserId, ItemId: in.ItemId}})
@@ -916,7 +784,7 @@ func (s *sUserCart) EditQuantity(ctx context.Context, userCart *do.UserCart, use
 				return 0, errors.New("该商品不存在！")
 			}
 			// 判断可用库存
-			availableQuantity := productItem.ItemQuantity - productItem.ItemQuantityFrozen
+			availableQuantity := productItem.AvailableQuantity
 			if userCart.CartQuantity.(uint) > availableQuantity {
 				return 0, errors.New(fmt.Sprintf("库存可用数量 %d 件，请确认！", availableQuantity))
 			}

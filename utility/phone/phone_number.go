@@ -141,7 +141,7 @@ func GetPhoneModelWithCountry(phoneNumber string) *PhoneModel {
 
 // IsValidNumber 判定手机号是否可用
 func IsValidNumber(phoneNumber string) bool {
-	pn, err := phonenumbers.Parse(phoneNumber, "CH")
+	pn, err := phonenumbers.Parse(phoneNumber, "CN")
 	if err != nil {
 		log.Printf("Error parsing phone number: %v", err)
 		return false

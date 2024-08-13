@@ -24,6 +24,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gcache"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -113,24 +114,9 @@ func (s *sProductCategory) GetTree(ctx context.Context, in *do.ProductCategoryLi
 
 	s.makeTree(list, &categoryNode)
 
-	/*
-		columnIds := array.Column(list, dao.ProductCategory.Columns().CategoryId)
+	out = categoryNode.Children
 
-			for _, c := range list {
-				if c.CategoryParentId != 0 && !array.InArray(columnIds, c.CategoryParentId) {
-					child := &model.CategoryTreeNode{}
-					child.Children = make([]*model.CategoryTreeNode, 0)
-
-					//child.ProductCategory = *c
-					gconv.Scan(*c, &child.ProductCategory)
-
-					categoryNode.Children = append(categoryNode.Children, child)
-				}
-			}
-
-	*/
-
-	return categoryNode.Children, nil
+	return out, nil
 }
 
 // 递归生成分类列表
@@ -294,10 +280,15 @@ func (s *sProductCategory) Add(ctx context.Context, in *do.ProductCategory) (out
 	//	return out, err
 	//}
 
+	if g.IsEmpty(in.TypeId) {
+		return 0, gerror.New("请选择绑定商品类型")
+	}
+
 	lastInsertId, err := dao.ProductCategory.Add(ctx, in)
 	if err != nil {
 		return out, err
 	}
+
 	return lastInsertId, err
 }
 

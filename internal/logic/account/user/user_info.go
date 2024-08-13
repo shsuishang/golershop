@@ -24,6 +24,7 @@ import (
 	"context"
 	"errors"
 	"github.com/gogf/gf/v2/crypto/gmd5"
+	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
@@ -36,7 +37,7 @@ import (
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
-	"time"
+	"golershop.cn/utility/mtime"
 )
 
 type sUserInfo struct{}
@@ -209,9 +210,9 @@ func (s *sUserInfo) GetUserData(ctx context.Context, userId uint) (userInfoOutpu
 
 	// 统计没有取消的订单
 	orderStates := []uint{consts.ORDER_STATE_WAIT_PAY, consts.ORDER_STATE_WAIT_PAID, consts.ORDER_STATE_WAIT_REVIEW, consts.ORDER_STATE_WAIT_FINANCE_REVIEW, consts.ORDER_STATE_PICKING, consts.ORDER_STATE_WAIT_SHIPPING, consts.ORDER_STATE_SHIPPED, consts.ORDER_STATE_RECEIVED, consts.ORDER_STATE_FINISH, consts.ORDER_STATE_SELF_PICKUP}
-	month := GetMonthTimeRange()
+	Start, End := mtime.LastMonth()
 	// 本月订单
-	orderNum, err := dao.AnalyticsOrder.GetOrderNum(ctx, month.Start, month.End, orderStates, nil, userId, 0)
+	orderNum, err := dao.AnalyticsOrder.GetOrderNum(ctx, Start, End, orderStates, nil, userId, 0)
 	if err == nil && orderNum != nil {
 		userInfoOutput.MonthOrder = orderNum
 	}
@@ -223,7 +224,7 @@ func (s *sUserInfo) GetUserData(ctx context.Context, userId uint) (userInfoOutpu
 	}
 
 	// 本月消费金额
-	tradeAmount, err := dao.AnalyticsTrade.SalesAmount(ctx, month.Start, month.End, int64(userId))
+	tradeAmount, err := dao.AnalyticsTrade.SalesAmount(ctx, Start, End, int64(userId))
 	if err == nil && tradeAmount != nil {
 		userInfoOutput.MonthTrade = tradeAmount
 	}
@@ -257,12 +258,6 @@ func (s *sUserInfo) GetUserData(ctx context.Context, userId uint) (userInfoOutpu
 		userInfoOutput.UserRegTime = userLogin.UserRegTime
 	}
 
-	// 推广员信息
-	userDistribution, err := dao.UserDistribution.Get(ctx, userId)
-	if err == nil && userDistribution != nil {
-		userInfoOutput.UserParentId = userDistribution.UserParentId
-	}
-
 	// 登录时间
 	loginHistoryPage, err := dao.UserLoginHistory.List(ctx, &do.UserLoginHistoryListInput{
 		Where: do.UserLoginHistory{
@@ -279,40 +274,7 @@ func (s *sUserInfo) GetUserData(ctx context.Context, userId uint) (userInfoOutpu
 		userInfoOutput.UserLoginTime = loginHistoryPage.Items[0].UserLoginTime
 	}
 
-	// 累计佣金
-	distributionCommission, err := dao.DistributionCommission.Get(ctx, userId)
-	if err == nil && distributionCommission != nil {
-		userInfoOutput.UserCommissionNow = distributionCommission.CommissionAmount - distributionCommission.CommissionSettled
-	}
-
-	// 本月佣金
-	monthCommission, _ := dao.DistributionCommission.CalCommission(ctx, userId, 0, month.Start, month.End, 0, 0)
-	userInfoOutput.MonthCommissionBuy = gconv.Float64(monthCommission)
-
 	return userInfoOutput, nil
-}
-
-// TimeRange 结构体表示时间范围
-type TimeRange struct {
-	Start int64 // 起始时间，Unix时间戳（毫秒）
-	End   int64 // 结束时间，Unix时间戳（毫秒）
-}
-
-// GetMonthTimeRange 获取当前月份的时间范围
-func GetMonthTimeRange() TimeRange {
-	now := time.Now()
-	year, month, _ := now.Date()
-	startOfMonth := time.Date(year, month, 1, 0, 0, 0, 0, now.Location())
-	endOfMonth := startOfMonth.AddDate(0, 1, 0).Add(-time.Millisecond) // 当前月的最后一毫秒
-
-	// 转换为Unix时间戳（毫秒）
-	startUnixMilli := startOfMonth.UnixNano() / int64(time.Millisecond)
-	endUnixMilli := endOfMonth.UnixNano() / int64(time.Millisecond)
-
-	return TimeRange{
-		Start: startUnixMilli,
-		End:   endUnixMilli,
-	}
 }
 
 // AddTags 批量设置标签
@@ -337,8 +299,50 @@ func (s *sUserInfo) AddTags(ctx context.Context, userIds string, tagIds string) 
 	return true, nil
 }
 
+// AddVouchers 添加代金券
+func (s *sUserInfo) AddVouchers(ctx context.Context, userIds []uint, activityId uint) error {
+	// 用户编号为空
+	if len(userIds) == 0 {
+		return gerror.New("用户编号为空")
+	}
+
+	// 活动不存在
+	activityBase, err := dao.ActivityBase.Get(ctx, activityId)
+	if err != nil {
+		return gerror.New("活动不存在！")
+	}
+
+	// 活动规则为空
+	var activityRuleVo *model.ActivityRuleVo
+	gconv.Struct(activityBase.ActivityRule, &activityRuleVo)
+	if activityRuleVo == nil {
+		return gerror.New("活动规则为空！")
+	}
+
+	// 活动优惠券信息为空
+	voucherVo := activityRuleVo.Voucher
+	if voucherVo == (model.VoucherVo{}) {
+		return gerror.New("活动优惠券信息为空！")
+	}
+
+	// 用户数大于优惠券剩余数量，添加失败
+	if voucherVo.VoucherQuantity-voucherVo.VoucherQuantityUse < uint(len(userIds)) {
+		return gerror.New("用户数大于优惠券剩余数量，添加失败！")
+	}
+
+	// 事务处理
+	for _, userId := range userIds {
+		_, err := service.UserVoucher().AddVoucher(ctx, activityId, userId)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
 // GetList 获取用户信息列表
 func (s *sUserInfo) GetList(ctx context.Context, in *do.UserInfoListInput) (out *model.UserInfoListOutput, err error) {
+
 	userPage, err := s.List(ctx, in)
 	if err != nil {
 		return nil, err
@@ -358,46 +362,68 @@ func (s *sUserInfo) EditUser(ctx context.Context, userInfo *model.UserInfo) (aff
 		return 0, err
 	}
 
-	userParentId := userInfo.UserParentId
-
-	// 读取用户旧数据信息
-	userDistribution, err := dao.UserDistribution.Get(ctx, userInfo.UserId)
-	if err != nil {
-		return 0, err
-	}
-
-	oldUserParentId := uint(0)
-	if userDistribution != nil {
-		oldUserParentId = userDistribution.UserParentId
-	}
-
-	// 新增用户关系，初始化数据
-	if userParentId > 0 && userParentId != oldUserParentId {
-		// 查找合伙人
-		userParentRow, err := dao.UserDistribution.Get(ctx, userParentId)
-		if err != nil {
-			return 0, err
-		}
-
-		rootUserId := uint(0)
-		if userParentRow != nil {
-			if userParentRow.UserParentId > 0 {
-				rootUserId = userParentRow.UserParentId
-			}
-		}
-
-		userDistributionNew := &do.UserDistribution{
-			UserId:        userInfo.UserId,
-			UserParentId:  userParentId,
-			UserPartnerId: rootUserId,
-			UserTime:      uint(time.Now().Unix()),
-		}
-
-		// 添加用户关系
-		if !service.UserDistribution().AddPlantformUser(ctx, userDistributionNew) {
-			return 0, errors.New("添加用户关系失败！")
-		}
-	}
-
 	return success, nil
+}
+
+// RemoveUser 删除用户
+func (s *sUserInfo) RemoveUser(ctx context.Context, userId uint) (res bool, err error) {
+	// 启动事务
+	err = dao.UserBase.Transaction(ctx, func(ctx context.Context, tx gdb.TX) error {
+		userAdmin, err := dao.UserAdmin.Get(ctx, do.UserAdmin{UserId: userId})
+		if err != nil {
+			return err
+		}
+
+		if !g.IsEmpty(userAdmin) && userAdmin.UserIsSuperadmin {
+			return gerror.New("该账号为系统管理员，不可删除！")
+		}
+
+		// 删除用户
+		if _, err := dao.UserBase.Remove(ctx, userId); err != nil {
+			return err
+		}
+		if _, err := dao.UserInfo.Remove(ctx, userId); err != nil {
+			return err
+		}
+		if _, err := dao.UserLogin.Remove(ctx, userId); err != nil {
+			return err
+		}
+		if _, err := dao.UserResource.Remove(ctx, userId); err != nil {
+			return err
+		}
+
+		// 删除用户绑定连接
+		bindKeys, err := dao.UserBindConnect.FindKey(ctx, &do.UserBindConnectListInput{Where: do.UserBindConnect{UserId: userId}})
+		if err != nil {
+			return err
+		}
+
+		if _, err := dao.UserBindConnect.Remove(ctx, bindKeys); err != nil {
+			return err
+		}
+
+		// 删除讲师
+		/*
+			if service.ConfigBase().GetBool(ctx, "edu_enable", false) {
+				productIds, err := dao.CourseDetail.FindColumn(ctx, "product_id", do.CourseDetail{UserId: userId})
+				if err != nil {
+					return err
+				}
+				if len(productIds) > 0 {
+					return gerror.Newf("该讲师已绑定课程编号为：%s，无法删除！", gstr.Join(gconv.Strings(productIds), ","))
+				}
+				if _, err := dao.UserLecturer.Remove(ctx, userId); err != nil {
+					return err
+				}
+			}
+		*/
+
+		return nil
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

@@ -22,10 +22,16 @@ package trade
 
 import (
 	"context"
+	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
+	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
+	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 )
 
 type sOrderBase struct{}
@@ -108,4 +114,120 @@ func (s *sOrderBase) Remove(ctx context.Context, id any) (affected int64, err er
 	}
 
 	return affected, err
+}
+
+// GetEvaluationItem 获取订单评价项
+func (s *sOrderBase) GetEvaluationItem(ctx context.Context, evaluationVo *model.EvaluationVo) (comment *model.OrderCommentOutput, err error) {
+	comment = &model.OrderCommentOutput{}
+
+	orderId := evaluationVo.OrderId
+	userId := evaluationVo.UserId
+
+	input := &do.OrderItemListInput{
+		Where: do.OrderItem{
+			UserId: userId,
+		},
+	}
+	input.WhereExt = []*ml.WhereExt{{
+		Column: dao.OrderItem.Columns().OrderItemEvaluationStatus,
+		Val:    evaluationVo.OrderItemEvaluationStatus,
+		Symbol: ml.IN,
+	}}
+
+	// 如果传入订单则单个订单进行查询，否则查询出已完成的订单ID
+	var orderIds []interface{}
+	if !g.IsEmpty(orderId) {
+		input = &do.OrderItemListInput{
+			Where: do.OrderItem{
+				OrderId: orderId,
+			},
+		}
+	} else {
+		stateId := []uint{consts.ORDER_STATE_FINISH, consts.ORDER_STATE_RECEIVED}
+		infoinput := &do.OrderInfoListInput{
+			Where: do.OrderInfo{
+				UserId: userId,
+			},
+		}
+		infoinput.WhereExt = []*ml.WhereExt{{
+			Column: dao.OrderInfo.Columns().OrderStateId,
+			Val:    stateId,
+			Symbol: ml.IN,
+		}}
+		infoids, err := dao.OrderInfo.FindKey(ctx, infoinput)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(infoids) > 0 {
+			input.WhereExt = []*ml.WhereExt{{
+				Column: dao.OrderItem.Columns().OrderId,
+				Val:    orderIds,
+				Symbol: ml.IN,
+			}}
+		}
+	}
+	orderItems, err := dao.OrderItem.Find(ctx, input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var orderItemVos []*model.OrderItemVo
+	for _, orderItem := range orderItems {
+		orderItemVo := &model.OrderItemVo{}
+		gconv.Struct(orderItem, orderItemVo)
+		orderItemVos = append(orderItemVos, orderItemVo)
+	}
+
+	comment.Items = orderItemVos
+	comment.No = 0
+	comment.Yes = 0
+
+	var itemIds []uint64
+	for _, orderItem := range orderItems {
+		itemId := orderItem.ItemId
+		if !array.InArray(itemIds, itemId) {
+			itemIds = append(itemIds, itemId)
+		}
+	}
+
+	if g.IsEmpty(orderId) && len(orderIds) > 0 {
+
+		evaluationNo := &do.OrderItemListInput{
+			Where: do.OrderItem{
+				UserId:                    userId,
+				OrderItemEvaluationStatus: consts.ORDER_ITEM_EVALUATION_NO,
+			},
+		}
+		evaluationNo.WhereExt = []*ml.WhereExt{{
+			Column: dao.OrderItem.Columns().OrderId,
+			Val:    orderIds,
+			Symbol: ml.IN,
+		}}
+		noNum, err := dao.OrderItem.Count(ctx, evaluationNo)
+		if err != nil {
+			return nil, err
+		}
+
+		evaluationYes := &do.OrderItemListInput{
+			Where: do.OrderItem{
+				UserId:                    userId,
+				OrderItemEvaluationStatus: consts.ORDER_ITEM_EVALUATION_YES,
+			},
+		}
+		evaluationNo.WhereExt = []*ml.WhereExt{{
+			Column: dao.OrderItem.Columns().OrderId,
+			Val:    orderIds,
+			Symbol: ml.IN,
+		}}
+		yesNum, err := dao.OrderItem.Count(ctx, evaluationYes)
+		if err != nil {
+			return nil, err
+		}
+		comment.No = noNum
+		comment.Yes = yesNum
+	}
+
+	return comment, nil
 }

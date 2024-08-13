@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/trade"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -93,7 +94,7 @@ func (c *cReturn) Cancel(ctx context.Context, req *trade.ReturnCancelReq) (res *
 		return nil, gerror.New(g.I18n().Translate(ctx, "请先登录！"))
 	}
 
-	returnOrder, err := service.OrderReturn().Get(ctx, req.ReturnId)
+	returnOrder, err := dao.OrderReturn.Get(ctx, req.ReturnId)
 	if err != nil {
 		return nil, err
 	}

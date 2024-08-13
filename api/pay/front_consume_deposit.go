@@ -67,7 +67,7 @@ type WechatJSAPIPayReq struct {
 
 type WechatJSAPIPayRes struct {
 	MoneyPayRes
-	Data *wechat.AppletParams `json:"data"` //微信V3支付结果
+	Data *wechat.JSAPIPayParams `json:"data"` //微信V3支付结果
 }
 
 type WechatAppPayReq struct {
@@ -78,7 +78,7 @@ type WechatAppPayReq struct {
 
 type WechatAppPayRes struct {
 	MoneyPayRes
-	Data *wechat.AppletParams `json:"data"` //微信V3支付结果
+	Data *wechat.AppPayParams `json:"data"` //微信V3支付结果
 }
 
 type WechatH5PayReq struct {

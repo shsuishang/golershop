@@ -53,5 +53,20 @@ func (c *cUserVoucher) GetEachVoucherNum(ctx context.Context, req *shop.GetVouch
 
 // Add 领取代金券
 func (c *cUserVoucher) Add(ctx context.Context, req *shop.UserVoucherAddReq) (res *shop.UserVoucherAddRes, err error) {
+	// 获取当前登录用户ID
+	user := service.BizCtx().GetUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// 领取代金券
+	success, err := service.UserVoucher().AddVoucher(ctx, req.ActivityId, user.UserId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 构造返回结果
+	res = &shop.UserVoucherAddRes{}
+	gconv.Scan(success, res)
 	return res, nil
 }

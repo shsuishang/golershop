@@ -23,6 +23,7 @@ package product
 import (
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -33,6 +34,7 @@ import (
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"golershop.cn/utility/array"
 	"math"
 )
 
@@ -276,4 +278,82 @@ func (dao *sProductItem) IfOnSale(ctx context.Context, item *model.ProductItemVo
 	// 判断是否在售
 	return item.ProductStateId == consts.PRODUCT_STATE_NORMAL && item.ItemEnable == consts.PRODUCT_STATE_NORMAL &&
 		availableQuantity > 0 && item.ItemQuantity > 0
+}
+
+// BatchEditStock 批量编辑库存
+func (s *sProductItem) BatchEditStock(ctx context.Context, inputs []*model.ProductEditStockInput) (err error) {
+
+	// 获取所有ItemId的集合
+	itemIds := array.Column(inputs, "ItemId")
+
+	// 根据itemIds获取商品SKU信息
+	productItems, err := s.Gets(ctx, itemIds)
+	if err != nil {
+		return err
+	}
+	if len(productItems) == 0 {
+		return gerror.New("商品SKU信息不存在！")
+	}
+
+	// 将输入的ProductEditStockInput转换为以ItemId为键的映射
+	editStockInputMap := make(map[uint64]*model.ProductEditStockInput)
+	for _, input := range inputs {
+		editStockInputMap[input.ItemId] = input
+	}
+
+	// 初始化stockBillItems列表
+	var stockBillItems []*do.StockBillItem
+
+	// 遍历商品SKU信息，更新库存并生成StockBillItem
+	for _, v := range productItems {
+		input := editStockInputMap[v.ItemId]
+		if input != nil {
+			stockBillItem := &do.StockBillItem{
+				ProductId:             v.ProductId,
+				ItemId:                v.ItemId,
+				ItemName:              v.ItemName,
+				BillItemQuantity:      input.ItemQuantity,
+				WarehouseItemQuantity: v.ItemQuantity,
+			}
+
+			// 根据BillTypeId设置入库或出库类型，并更新库存
+			if input.BillTypeId == consts.BILL_TYPE_IN {
+				stockBillItem.BillTypeId = consts.BILL_TYPE_IN
+				stockBillItem.StockTransportTypeId = consts.STOCK_IN_OTHER
+
+				// 增加库存
+				v.ItemQuantity += input.ItemQuantity
+			} else {
+				stockBillItem.BillTypeId = consts.BILL_TYPE_OUT
+				stockBillItem.StockTransportTypeId = consts.STOCK_OUT_OTHER
+
+				// 减少库存
+				if v.AvailableQuantity >= input.ItemQuantity {
+					v.ItemQuantity -= input.ItemQuantity
+				} else {
+					return gerror.New("出库数量不能大于总库存！")
+				}
+			}
+
+			// 设置单价和小计
+			stockBillItem.BillItemUnitPrice = v.ItemUnitPrice
+			stockBillItem.BillItemSubtotal = v.ItemUnitPrice * (gconv.Float64(stockBillItem.BillItemQuantity))
+
+			stockBillItems = append(stockBillItems, stockBillItem)
+		}
+	}
+
+	// 保存或更新StockBillItem
+	if _, err := dao.StockBillItem.Saves(ctx, stockBillItems); err != nil {
+		return gerror.New("保存出入库单据失败！")
+	}
+
+	// 保存或更新ProductItem
+	input := []*do.ProductItem{}
+	gconv.Structs(productItems, &input)
+	if _, err := dao.ProductItem.Saves(ctx, input); err != nil {
+		return gerror.New("修改商品SKU信息失败！")
+	}
+
+	return nil
 }

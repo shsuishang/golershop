@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pay"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -22,6 +23,7 @@ func (c *cUserPointsHistory) List(ctx context.Context, req *pay.UserPointsHistor
 
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.BaseList.WhereExt)
 
+	input.Order = []*ml.BaseOrder{{Sidx: dao.UserPointsHistory.Columns().PointsLogTime, Sort: ml.ORDER_BY_DESC}}
 	var result, error = service.UserPointsHistory().GetList(ctx, &input)
 
 	if error != nil {

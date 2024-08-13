@@ -23,6 +23,7 @@ package service
 import (
 	"context"
 
+	"golershop.cn/api/marketing"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -44,6 +45,17 @@ type (
 		Edit(ctx context.Context, in *do.ActivityBase) (affected int64, err error)
 		// Remove 删除活动记录
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		// ListVoucher 活动表-优惠券列表
+		ListVoucher(ctx context.Context, input *do.ActivityBaseListInput) (res *model.ActivityListOutput, err error)
+		// AddActivityBase 新增活动基础信息
+		AddActivityBase(ctx context.Context, activityBase *marketing.ActivityBaseAddReq) (bool, error)
+		// GetList 获取活动列表
+		GetList(ctx context.Context, activityBaseListReq *do.ActivityBaseListInput) (activityBaseResPage *model.ActivityListOutput, err error)
+		// UpdateActivityBase 更新活动基础信息
+		UpdateActivityBase(ctx context.Context, activityBase *marketing.ActivityBaseEditReq) (bool, error)
+		FixActivityData(ctx context.Context, activityBaseList []*entity.ActivityBase) ([]*entity.ActivityBase, error)
+		// EditActivityBase 编辑活动基础信息
+		EditActivityBase(ctx context.Context, activityId uint, data *do.ActivityBase) (bool, error)
 	}
 	IActivityItem interface {
 		// Get 根据编号读取活动信息
@@ -70,17 +82,6 @@ var (
 	localActivityItem IActivityItem
 )
 
-func ActivityBase() IActivityBase {
-	if localActivityBase == nil {
-		panic("implement not found for interface IActivityBase, forgot register?")
-	}
-	return localActivityBase
-}
-
-func RegisterActivityBase(i IActivityBase) {
-	localActivityBase = i
-}
-
 func ActivityItem() IActivityItem {
 	if localActivityItem == nil {
 		panic("implement not found for interface IActivityItem, forgot register?")
@@ -90,4 +91,15 @@ func ActivityItem() IActivityItem {
 
 func RegisterActivityItem(i IActivityItem) {
 	localActivityItem = i
+}
+
+func ActivityBase() IActivityBase {
+	if localActivityBase == nil {
+		panic("implement not found for interface IActivityBase, forgot register?")
+	}
+	return localActivityBase
+}
+
+func RegisterActivityBase(i IActivityBase) {
+	localActivityBase = i
 }

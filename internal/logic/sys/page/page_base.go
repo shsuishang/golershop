@@ -42,6 +42,7 @@ import (
 	"golershop.cn/utility"
 	"golershop.cn/utility/array"
 	"math"
+	"math/rand"
 )
 
 type sPageBase struct{}
@@ -154,126 +155,6 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 
 	plantformFxEnable := service.ConfigBase().GetBool(ctx, "plantform_fx_enable", false)
 
-	menu1 := map[string]interface{}{
-		"id":         1,
-		"name":       "我的拼团",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#DB384C",
-		"icon":       "icon-gouwu",
-		"featureKey": "FightGrp",
-		"url":        "/activity/fightgroup/order",
-	}
-	list = append(list, menu1)
-
-	menu4 := map[string]interface{}{
-		"id":         36,
-		"name":       "售后服务",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#44afa4",
-		"icon":       "zc zc-tuihuanhuo",
-		"featureKey": "service",
-		"url":        "/member/member/returnlist",
-	}
-	list = append(list, menu4)
-
-	menu5 := map[string]interface{}{
-		"id":         4,
-		"name":       "我的砍价",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#ffc333",
-		"icon":       "icon-kanjia",
-		"featureKey": "CutPrice",
-		"url":        "/activity/cutprice/userlist",
-	}
-	list = append(list, menu5)
-
-	menu44 := map[string]interface{}{
-		"id":         44,
-		"name":       "签到",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#ffc333",
-		"icon":       "zc zc-qiandao",
-		"featureKey": "MemSign",
-		"url":        "/member/member/sign",
-	}
-	list = append(list, menu44)
-
-	menu8 := map[string]interface{}{
-		"id":         6,
-		"name":       "会员中心",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#ffc333",
-		"icon":       "icon-zuanshi",
-		"featureKey": "MemGrade",
-		"url":        "/member/member/task",
-	}
-	list = append(list, menu8)
-
-	menu10 := map[string]interface{}{
-		"id":         107,
-		"name":       "商品收藏",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#56ABE4",
-		"icon":       "icon-liwu",
-		"featureKey": "FavProd",
-		"url":        "/member/member/favorites",
-	}
-	list = append(list, menu10)
-
-	menu11 := map[string]interface{}{
-		"id":         108,
-		"name":       "我的足迹",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#56ABE4",
-		"icon":       "zc zc-zuji",
-		"featureKey": "FavProd",
-		"url":        "/member/member/browse",
-	}
-	list = append(list, menu11)
-
-	menu12 := map[string]interface{}{
-		"id":         8,
-		"name":       "收货地址",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#1BC2A6",
-		"icon":       "icon-shouhuodizhi",
-		"featureKey": "UserAddress",
-		"url":        "/member/address/list",
-	}
-	list = append(list, menu12)
-
-	menu120 := map[string]interface{}{
-		"id":         120,
-		"name":       "开票信息",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#1BC2A6",
-		"icon":       "zc-caiwukaipiao",
-		"featureKey": "UserInvoice",
-		"url":        "/member/invoice/list",
-	}
-	list = append(list, menu120)
-
-	menu121 := map[string]interface{}{
-		"id":         120,
-		"name":       "我的发票",
-		"is_show":    true,
-		"cat":        1,
-		"color":      "#1BC2A6",
-		"icon":       "zc-kaipiao",
-		"featureKey": "OrderInvoice",
-		"url":        "/member/invoice/order",
-	}
-	list = append(list, menu121)
-
 	menu14 := map[string]interface{}{
 		"id":         21,
 		"name":       "推广中心",
@@ -281,7 +162,7 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"cat":        1,
 		"color":      "#327eac",
 		"icon":       "zc zc-fenxiao",
-		"featureKey": "fenxiao",
+		"FeatureKey": "fenxiao",
 		"url":        "/member/fans/index",
 	}
 	list = append(list, menu14)
@@ -293,10 +174,142 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"cat":        1,
 		"color":      "#ffc333",
 		"icon":       "zc zc-xuexishuben",
-		"featureKey": "CourseStudy",
+		"FeatureKey": "CourseStudy",
 		"url":        "/edu/course/study",
 	}
 	list = append(list, menu24)
+
+	menu28 := map[string]interface{}{
+		"id":         28,
+		"name":       "我的订阅",
+		"is_show":    service.ConfigBase().IfEdu(ctx),
+		"cat":        1,
+		"color":      "#69c0ff",
+		"icon":       "zc zc-dingyuezhongxin",
+		"FeatureKey": "LecturerSubscribe",
+		"url":        "/edu/lecturer/subscribe",
+	}
+	list = append(list, menu28)
+
+	menu1 := map[string]interface{}{
+		"id":         1,
+		"name":       "我的拼团",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#DB384C",
+		"icon":       "zc zc-wodepintuan",
+		"FeatureKey": "FightGrp",
+		"url":        "/activity/fightgroup/order",
+	}
+	list = append(list, menu1)
+
+	menu4 := map[string]interface{}{
+		"id":         36,
+		"name":       "售后服务",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#44afa4",
+		"icon":       "zc zc-shouhoufuwu",
+		"FeatureKey": "service",
+		"url":        "/member/member/returnlist",
+	}
+	list = append(list, menu4)
+
+	menu5 := map[string]interface{}{
+		"id":         4,
+		"name":       "我的砍价",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#b37feb",
+		"icon":       "zc zc-wodekanjia",
+		"FeatureKey": "CutPrice",
+		"url":        "/activity/cutprice/userlist",
+	}
+	list = append(list, menu5)
+
+	menu44 := map[string]interface{}{
+		"id":         44,
+		"name":       "签到",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#5cdbd3",
+		"icon":       "zc zc-wodeqiandao",
+		"FeatureKey": "MemSign",
+		"url":        "/member/member/sign",
+	}
+	list = append(list, menu44)
+
+	menu8 := map[string]interface{}{
+		"id":         6,
+		"name":       "会员中心",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#ffc333",
+		"icon":       "zc zc-huiyuanzhongxin",
+		"FeatureKey": "MemGrade",
+		"url":        "/member/member/task",
+	}
+	list = append(list, menu8)
+
+	menu10 := map[string]interface{}{
+		"id":         107,
+		"name":       "商品收藏",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#56ABE4",
+		"icon":       "zc zc-wodeshoucang",
+		"FeatureKey": "FavProd",
+		"url":        "/member/member/favorites",
+	}
+	list = append(list, menu10)
+
+	menu11 := map[string]interface{}{
+		"id":         108,
+		"name":       "我的足迹",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#56ABE4",
+		"icon":       "zc zc-wodezuji",
+		"FeatureKey": "FavProd",
+		"url":        "/member/member/browse",
+	}
+	list = append(list, menu11)
+
+	menu12 := map[string]interface{}{
+		"id":         8,
+		"name":       "收货地址",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#1BC2A6",
+		"icon":       "zc zc-wodedizhi",
+		"FeatureKey": "UserAddress",
+		"url":        "/member/address/list",
+	}
+	list = append(list, menu12)
+
+	menu120 := map[string]interface{}{
+		"id":         120,
+		"name":       "开票信息",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#ff85c0",
+		"icon":       "zc zc-kaipiaoxinxi",
+		"FeatureKey": "UserInvoice",
+		"url":        "/member/invoice/list",
+	}
+	list = append(list, menu120)
+
+	menu121 := map[string]interface{}{
+		"id":         120,
+		"name":       "我的发票",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#ffc069",
+		"icon":       "zc zc-wodefapiao",
+		"FeatureKey": "OrderInvoice",
+		"url":        "/member/invoice/order",
+	}
+	list = append(list, menu121)
 
 	menu17 := map[string]interface{}{
 		"id":         32,
@@ -304,11 +317,23 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"is_show":    true,
 		"cat":        1,
 		"color":      "#ac8dd5",
-		"icon":       "zc zc-bangzhu",
-		"featureKey": "Help",
+		"icon":       "zc zc-bangzhuzhongxin",
+		"FeatureKey": "Help",
 		"url":        "/pagesub/article/list",
 	}
 	list = append(list, menu17)
+
+	menu30 := map[string]interface{}{
+		"id":         30,
+		"name":       "平台客服",
+		"is_show":    true,
+		"cat":        1,
+		"color":      "#399efd",
+		"icon":       "zc zc-kefu2",
+		"FeatureKey": "KefuKey",
+		"url":        "",
+	}
+	list = append(list, menu30)
 
 	menu21 := map[string]interface{}{
 		"id":         11,
@@ -317,7 +342,7 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 		"cat":        1,
 		"color":      "#DB384C",
 		"icon":       "zc zc-qingchuhuancun",
-		"featureKey": "CleanCacheKey",
+		"FeatureKey": "CleanCacheKey",
 		"url":        "",
 	}
 	list = append(list, menu21)
@@ -335,8 +360,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    true,
 			"cat":        1,
 			"color":      "#ac8dd5",
-			"icon":       "zc zc-zhibo",
-			"featureKey": "Live",
+			"icon":       "zc zc-wodezhibo",
+			"FeatureKey": "Live",
 			"url":        "/pagesub/livepush/add",
 		}
 		list = append(list, menu22)
@@ -350,8 +375,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    false,
 			"cat":        2,
 			"color":      "#56ABE4",
-			"icon":       "zc zc-zuji",
-			"featureKey": "FavProd",
+			"icon":       "zc zc-qishoudating",
+			"FeatureKey": "FavProd",
 			"url":        "/paotui/index/index",
 		}
 		list = append(list, menu23)
@@ -365,8 +390,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    true,
 			"cat":        2,
 			"color":      "#ac8dd5",
-			"icon":       "zc zc-zhibo",
-			"featureKey": "ReloadLang",
+			"icon":       "zc zc-duoyuyan",
+			"FeatureKey": "ReloadLang",
 			"url":        "",
 		}
 		list = append(list, menu23)
@@ -380,8 +405,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    true,
 			"cat":        2,
 			"color":      "#56ABE4",
-			"icon":       "zc zc-15",
-			"featureKey": "FavProd",
+			"icon":       "zc zc-shenqingzhubo",
+			"FeatureKey": "FavProd",
 			"url":        "/xcxlive/anchor/apply",
 		}
 		list = append(list, menu25)
@@ -392,8 +417,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    true,
 			"cat":        2,
 			"color":      "#56ABE4",
-			"icon":       "zc zc-fangjian",
-			"featureKey": "FavProd",
+			"icon":       "zc zc-chuanjianfangjian",
+			"FeatureKey": "FavProd",
 			"url":        "/xcxlive/room/add",
 		}
 		list = append(list, menu26)
@@ -404,8 +429,8 @@ func (s *sPageBase) getAllCenterMenu(ctx context.Context) map[string]interface{}
 			"is_show":    true,
 			"cat":        2,
 			"color":      "#56ABE4",
-			"icon":       "zc zc-fenlei1",
-			"featureKey": "FavProd",
+			"icon":       "zc zc-zhiboliebiao",
+			"FeatureKey": "FavProd",
 			"url":        "/xcxlive/room/list",
 		}
 		list = append(list, menu27)
@@ -587,19 +612,6 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 							item_unit_price := productItemRow.ItemUnitPrice
 							item_unit_points := productItemRow.ItemUnitPoints
 							item_unit_sp := 0.0
-
-							var activity_type_id uint
-							for _, activity_item_row := range activityItemList {
-								if activity_item_row.ItemId == did {
-									activity_type_id = activity_item_row.ActivityTypeId
-									break
-								}
-							}
-
-							//秒杀
-							if consts.ACTIVITY_TYPE_LIMITED_DISCOUNT == activity_type_id {
-
-							}
 
 							int_item_unit_price := 0.0
 							if item_unit_price > 0 {
@@ -1260,9 +1272,123 @@ func (s *sPageBase) GetDataInfo(ctx context.Context, pageDataReq *sys.PageBaseGe
 			pageDataItemVoList = append(pageDataItemVoList, pageDataItemVo)
 		}
 		baseListRes.Items = pageDataItemVoList
+	case 17:
+		// 代金券
+		activityQueryWrapper := &do.ActivityBaseListInput{
+			Where: do.ActivityBase{
+				ActivityState:  consts.ACTIVITY_STATE_NORMAL,
+				ActivityTypeId: consts.ACTIVITY_TYPE_VOUCHER,
+			},
+			BaseList: ml.BaseList{
+				Page: pageDataReq.Page,
+				Size: pageDataReq.Size,
+			},
+		}
+
+		if !g.IsEmpty(pageDataReq.Name) {
+			var likes = []*ml.WhereExt{{
+				Column: dao.ActivityBase.Columns().ActivityName,
+				Val:    "%" + pageDataReq.Name + "%",
+				Symbol: ml.LIKE,
+			}}
+			activityQueryWrapper.WhereExt = likes
+		}
+
+		activityPage, err := dao.ActivityBase.List(ctx, activityQueryWrapper)
+		if err != nil {
+			return nil, err
+		}
+
+		if !g.IsEmpty(activityPage.Records) {
+			for _, item := range activityPage.Items {
+				if !g.IsEmpty(item.ActivityRule) {
+					pageDataVo := new(model.PageDataVo)
+					err := gconv.Struct(item.ActivityRule, pageDataVo)
+					if err != nil {
+						return nil, err
+					}
+
+					if pageDataVo != nil {
+						pageDataItemVo := &model.PageDataItemVo{
+							Id:            uint64(item.ActivityId),
+							Name:          item.ActivityName,
+							Path:          pageDataVo.VoucherImage,
+							ItemSalePrice: float64(pageDataVo.VoucherPrice),
+							ProductTips:   "",
+							StartTime:     "/Date(-62135596800000)/",
+							StartTimeStr:  pageDataVo.ActivityStarttime,
+							EndTime:       "/Date(-62135596800000)/",
+							EndTimeStr:    pageDataVo.ActivityEndtime,
+							OrderCount:    gconv.Uint(math.Max(float64(rand.Intn(92)+8), float64(pageDataVo.ProductSaleNum))),
+							MarketPrice:   float64(pageDataVo.VoucherPrice),
+							UserLimit:     uint(pageDataVo.VoucherPreQuantity),
+						}
+						pageDataItemVoList = append(pageDataItemVoList, pageDataItemVo)
+					}
+				}
+			}
+			baseListRes.Items = pageDataItemVoList
+		}
 
 	default:
 		break
 	}
 	return baseListRes, nil
+}
+
+func getProductBaseMap(ctx context.Context, productIds []interface{}) (map[uint64]*entity.ProductBase, error) {
+	productBaseMap := make(map[uint64]*entity.ProductBase)
+	productBaseList, err := dao.ProductBase.Gets(ctx, productIds)
+	if err != nil {
+		return nil, err
+	}
+
+	if !g.IsEmpty(productBaseList) {
+		for _, productBase := range productBaseList {
+			productBaseMap[productBase.ProductId] = productBase
+		}
+	}
+
+	return productBaseMap, nil
+}
+
+func getProductImageMap(ctx context.Context, productIds []interface{}) (map[uint64]*entity.ProductImage, error) {
+	productImageMap := make(map[uint64]*entity.ProductImage)
+	productImageQueryWrapper := &do.ProductImageListInput{
+		Where: do.ProductImage{
+			ProductId: productIds,
+		},
+	}
+	productImages, err := dao.ProductImage.Find(ctx, productImageQueryWrapper)
+	if err != nil {
+		return nil, err
+	}
+
+	if !g.IsEmpty(productImages) {
+		for _, productImage := range productImages {
+			productImageMap[productImage.ProductId] = productImage
+		}
+	}
+
+	return productImageMap, nil
+}
+func getProductItemMap(ctx context.Context, productIds []interface{}) (map[uint64]*entity.ProductItem, error) {
+	ProductItemMap := make(map[uint64]*entity.ProductItem)
+	ProductItemQueryWrapper := &do.ProductItemListInput{
+		Where: do.ProductItem{
+			ProductId: productIds,
+		},
+	}
+	ProductItems, err := dao.ProductItem.Find(ctx, ProductItemQueryWrapper)
+	if err != nil {
+		return nil, err
+	}
+
+	if !g.IsEmpty(ProductItems) {
+		for _, ProductItem := range ProductItems {
+			ProductItemMap[ProductItem.ProductId] = ProductItem
+		}
+	}
+
+	return ProductItemMap, nil
 }

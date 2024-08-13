@@ -22,7 +22,6 @@ package access
 
 import (
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/net/ghttp"
 	"github.com/gogf/gf/v2/os/grpool"
@@ -83,11 +82,10 @@ func (s *sAccessHistory) OperateAccess(r *ghttp.Request) {
 	browserName := ua.Name
 	browserVersion := ua.Version
 
-	fmt.Println("Browser:", browserName, browserVersion)
+	//fmt.Println("Browser:", browserName, browserVersion)
 
 	// 获取操作系统名称
 	osName := ua.OS
-	fmt.Println("Operating System:", osName)
 
 	AccessClientId = r.GetSessionId()
 

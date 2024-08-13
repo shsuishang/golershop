@@ -16,6 +16,7 @@ type UserInfoOutput struct {
 	UserRechargeCardFrozen float64 `json:"user_recharge_card_frozen" ` // 冻结充值卡:待结算
 	UserPoints             float64 `json:"user_points"               ` // 积分
 	UserPointsFrozen       float64 `json:"user_points_frozen"        ` // 冻结积分
+	UserExp                float64 `json:"user_exp"                  ` // 经验值
 	UserCredit             float64 `json:"user_credit"               ` // 可用信用
 	UserCreditFrozen       float64 `json:"user_credit_frozen"        ` // 冻结额度
 	UserCreditUsed         float64 `json:"user_credit_used"          ` // 使用信用

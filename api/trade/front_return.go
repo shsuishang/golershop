@@ -56,7 +56,7 @@ type ReturnCancelRes struct {
 }
 
 type ReturnItemReq struct {
-	g.Meta `path:"/front/trade/orderReturn/returnItem" tags:"售后订单" method:"post" summary:"退单新增接口"`
+	g.Meta `path:"/front/trade/orderReturn/returnItem" tags:"售后订单" method:"get" summary:"退单查询接口"`
 
 	// 退单号
 	OrderId     string `json:"order_id" dc:"订单编号"`

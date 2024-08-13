@@ -54,8 +54,9 @@ type UserPointsHistoryListReq struct {
 	g.Meta `path:"/manage/pay/userPointsHistory/list" tags:"余额记录" method:"get" summary:"余额记录列表接口"`
 	ml.BaseList
 
-	UserId      uint `json:"user_id"    `                      // 用户编号
-	PointsLogId uint `json:"points_log_id"                   ` // 用户编号
+	UserId        uint        `json:"user_id"    ` // 用户编号
+	PointsLogId   uint        `json:"points_log_id"  `
+	PointsLogTime *gtime.Time `json:"points_log_time"  ` // 创建时间
 }
 
 type UserPointsHistoryListRes struct {

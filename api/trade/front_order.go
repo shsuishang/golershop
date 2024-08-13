@@ -215,3 +215,32 @@ type UserOrderInvoiceEditReq struct {
 type UserOrderInvoiceEditRes struct {
 	OrderInvoiceId uint `json:"order_invoice_id" dc:"发票管理编号"   ` // 发票管理编号
 }
+
+type StoreEvaluationWithContentReq struct {
+	g.Meta `path:"/front/trade/order/storeEvaluationWithContent" tags:"订单评价" method:"get" summary:"订单评价接口"`
+
+	OrderId string `json:"order_id"   ` // 订单编号
+}
+
+type StoreEvaluationWithContentRes struct {
+	Items           []model.OrderItemVo `json:"items"`            // 评论显示项目
+	No              int                 `json:"no"`               // 否
+	OrderEvaluation interface{}         `json:"order_evaluation"` // 订单评价
+	StoreInfo       model.StoreInfoVo   `json:"store_info"`       // 店铺信息
+	Yes             int                 `json:"yes"`              // 是
+}
+
+type OrderCommentReq struct {
+	g.Meta `path:"/front/trade/order/addOrderComment" tags:"订单评价" method:"post" summary:"订单评价接口"`
+
+	OrderId             string  `json:"order_id"           dc:"订单编号"`                          // 订单编号
+	Item                string  `json:"item"               dc:"评论详细 -> 对应OrderCommentItemReq"` // 评论详细 -> 对应OrderCommentItemReq
+	CommentContent      string  `json:"comment_content"    dc:"评论内容"`                          // 评论内容
+	StoreDesccredit     float64 `json:"store_desccredit"   dc:"描述相符"`                          // 描述相符
+	StoreServicecredit  float64 `json:"store_servicecredit" dc:"服务评价"`                         // 服务评价
+	StoreDeliverycredit float64 `json:"store_deliverycredit" dc:"物流评价"`                        // 物流评价
+	CommentIsAnonymous  bool    `json:"comment_is_anonymous" dc:"匿名评价"`                        // 匿名评价
+}
+
+type OrderCommentRes struct {
+}

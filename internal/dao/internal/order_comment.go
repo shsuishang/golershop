@@ -26,12 +26,8 @@ import (
 	"math"
 
 	"github.com/mallsuite/gocore/core/ml"
-	"golershop.cn/internal/dao/global"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
-	"golershop.cn/internal/service"
-	"golershop.cn/utility/array"
-	"golershop.cn/utility/log"
 
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
@@ -40,7 +36,6 @@ import (
 
 // OrderCommentDao is the data access object for table trade_order_comment.
 type OrderCommentDao struct {
-	BaseRepository
 	table   string              // table is the underlying table name of the DAO.
 	group   string              // group is the database configuration group name of current DAO.
 	columns OrderCommentColumns // columns contains all the column names of Table for convenient usage.
@@ -95,10 +90,6 @@ var orderCommentColumns = OrderCommentColumns{
 // NewOrderCommentDao creates and returns a new DAO object for table data access.
 func NewOrderCommentDao() *OrderCommentDao {
 	return &OrderCommentDao{
-		BaseRepository: BaseRepository{
-			Table: "trade_order_comment",
-			Group: "trade",
-		},
 		group:   "trade",
 		table:   "trade_order_comment",
 		columns: orderCommentColumns,
@@ -137,10 +128,7 @@ func (dao *OrderCommentDao) Ctx(ctx context.Context) *gdb.Model {
 // Note that, you should not Commit or Rollback the transaction in function f
 // as it is automatically handled by this function.
 func (dao *OrderCommentDao) Transaction(ctx context.Context, f func(ctx context.Context, tx gdb.TX) error) (err error) {
-	service.BizCtx().IncrementTx(ctx)
-	err = dao.Ctx(ctx).Transaction(ctx, f)
-	service.BizCtx().DecrementTx(ctx)
-	return
+	return dao.Ctx(ctx).Transaction(ctx, f)
 }
 
 // Get 读取一条记录
@@ -162,74 +150,7 @@ func (dao *OrderCommentDao) Get(ctx context.Context, id any) (one *entity.OrderC
 // Gets 读取多条记录
 func (dao *OrderCommentDao) Gets(ctx context.Context, id any) (entitys []*entity.OrderComment, err error) {
 	if !g.IsEmpty(id) {
-		items := map[string]gdb.Record{}
-		if global.Cache && dao.IsNotInTransaction(ctx) {
-			keys := dao.Keys(id)
-			rowMap, err := g.Redis().MGet(ctx, keys...)
-			if err != nil {
-				log.Error(ctx, err)
-			}
-
-			var existIds []interface{}
-			for _, v := range rowMap {
-				if !g.IsEmpty(v) {
-					item := gdb.Record{}
-					gconv.Struct(v, &item)
-					items[item[dao.Columns().PrimaryKey].String()] = item
-					existIds = append(existIds, item[dao.columns.PrimaryKey])
-				}
-			}
-
-			var newIds []any
-			if len(items) != len(keys) {
-				for _, i := range gconv.SliceAny(id) {
-					if !array.InArray(existIds, i) {
-						newIds = append(newIds, i)
-					}
-				}
-
-				if len(newIds) != 0 {
-					newRes, err := dao.Ctx(ctx).WherePri(newIds).All()
-
-					if err != nil {
-						return nil, err
-					}
-
-					for _, record := range newRes {
-						if !record[dao.Columns().PrimaryKey].IsEmpty() {
-							_, err := g.Redis().Set(ctx, dao.Key(record[dao.Columns().PrimaryKey]), record)
-							if err != nil {
-								log.Error(ctx, err)
-							}
-
-							items[record[dao.Columns().PrimaryKey].String()] = record
-						}
-					}
-				}
-			}
-		} else {
-			res, err := dao.Ctx(ctx).WherePri(id).All()
-
-			if err != nil {
-				return nil, err
-			}
-
-			for _, record := range res {
-				if !record[dao.Columns().PrimaryKey].IsEmpty() {
-					items[record[dao.Columns().PrimaryKey].String()] = record
-				}
-			}
-		}
-
-		// 排序
-		if len(items) > 0 {
-			for _, i := range gconv.SliceStr(id) {
-				item := &entity.OrderComment{}
-				gconv.Struct(items[i], item)
-
-				entitys = append(entitys, item)
-			}
-		}
+		err = dao.Ctx(ctx).WherePri(id).Scan(&entitys)
 	}
 
 	return entitys, err
@@ -237,16 +158,27 @@ func (dao *OrderCommentDao) Gets(ctx context.Context, id any) (entitys []*entity
 
 // Find 查询数据
 func (dao *OrderCommentDao) Find(ctx context.Context, in *do.OrderCommentListInput) (out []*entity.OrderComment, err error) {
-	keys, err := dao.FindKey(ctx, in)
-	if err != nil {
-		return nil, err
+	var (
+		m = dao.Ctx(ctx)
+	)
+
+	query := m.Where(in.Where).OmitNil()
+	query = ml.BuildWhere(query, in.WhereLike, in.WhereExt)
+
+	// 排序
+	query = ml.BuildOrder(query, in.Sidx, in.Sort)
+	if len(in.Order) > 0 {
+		for _, it := range in.Order {
+			query = ml.BuildOrder(query, it.Sidx, it.Sort)
+		}
 	}
 
-	if len(keys) > 0 {
-		out, err = dao.Gets(ctx, keys)
+	// 对象转换
+	if err := query.Scan(&out); err != nil {
+		return out, err
 	}
 
-	return out, err
+	return out, nil
 }
 
 // FindOne 查询一条数据
@@ -312,40 +244,14 @@ func (dao *OrderCommentDao) FindKey(ctx context.Context, in *do.OrderCommentList
 
 // List 分页读取
 func (dao *OrderCommentDao) List(ctx context.Context, in *do.OrderCommentListInput) (out *do.OrderCommentListOutput, err error) {
-	res, err := dao.ListKey(ctx, in)
-
-	if err != nil {
-		return nil, err
-	}
-
-	out = &do.OrderCommentListOutput{}
-	out.Page = res.Page
-	out.Total = res.Total
-	out.Records = res.Records
-	out.Size = res.Size
-
-	if len(res.Items) > 0 {
-		rows, err := dao.Gets(ctx, res.Items)
-		if err != nil {
-			return nil, err
-		}
-
-		out.Items = rows
-	}
-
-	return out, nil
-}
-
-// List 分页读取
-func (dao *OrderCommentDao) ListKey(ctx context.Context, in *do.OrderCommentListInput) (out *do.OrderCommentListKeyOutput, err error) {
 	var (
-		m = dao.Ctx(ctx).Fields(dao.Columns().PrimaryKey)
+		m = dao.Ctx(ctx)
 	)
 
 	query := m.Where(in.Where).OmitNil()
 	query = ml.BuildWhere(query, in.WhereLike, in.WhereExt)
 
-	out = &do.OrderCommentListKeyOutput{}
+	out = &do.OrderCommentListOutput{}
 	out.Page = in.Page
 	out.Size = in.Size
 
@@ -370,15 +276,8 @@ func (dao *OrderCommentDao) ListKey(ctx context.Context, in *do.OrderCommentList
 	query = query.Page(in.Page, in.Size)
 
 	// 对象转换
-	idRes, err := query.All()
-	if err != nil {
-		return nil, err
-	}
-
-	for _, record := range idRes {
-		if !record[dao.Columns().PrimaryKey].IsEmpty() {
-			out.Items = append(out.Items, record[dao.Columns().PrimaryKey])
-		}
+	if err := query.Scan(&out.Items); err != nil {
+		return out, err
 	}
 
 	return out, nil
@@ -401,44 +300,37 @@ func (dao *OrderCommentDao) Edit(ctx context.Context, id any, in *do.OrderCommen
 		return 0, err
 	}
 
-	num, err := dao.Ctx(ctx).Data(data).OmitNil().WherePri(id).UpdateAndGetAffected()
-	if err != nil {
-		return 0, err
-	}
-
-	if num > 0 {
-		dao.RemoveCache(ctx, id)
-	}
-
-	return num, err
+	//FieldsEx(dao.Columns().Id)
+	return dao.Ctx(ctx).Data(data).OmitNil().WherePri(id).UpdateAndGetAffected()
 }
 
 // EditWhere 根据Where条件编辑
 func (dao *OrderCommentDao) EditWhere(ctx context.Context, where *do.OrderCommentListInput, in *do.OrderComment) (int64, error) {
-	ids, err := dao.FindKey(ctx, where)
-	if err != nil {
+	data := do.OrderComment{}
+	if err := gconv.Scan(in, &data); err != nil {
 		return 0, err
 	}
 
-	if len(ids) > 0 {
-		num, err := dao.Edit(ctx, ids, in)
+	query := dao.Ctx(ctx).Data(data).OmitNil().Where(where.Where)
+	query = ml.BuildWhere(query, where.WhereLike, where.WhereExt)
 
-		if err != nil {
-			return 0, err
-		}
-
-		return num, err
-	}
-
-	return 0, nil
+	return query.UpdateAndGetAffected()
 }
 
 // Save 保存
 func (dao *OrderCommentDao) Save(ctx context.Context, in *do.OrderComment) (affected int64, err error) {
-	input := make([]*do.OrderComment, 0)
-	input = append(input, in)
+	data := do.OrderComment{}
+	if err = gconv.Scan(in, &data); err != nil {
+		return 0, err
+	}
 
-	return dao.Saves(ctx, input)
+	res, err := dao.Ctx(ctx).Data(data).OmitNil().Save()
+
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
 }
 
 // Saves 批量保存
@@ -454,31 +346,17 @@ func (dao *OrderCommentDao) Saves(ctx context.Context, in []*do.OrderComment) (a
 		return 0, err
 	}
 
-	ids := array.Column(in, dao.columns.PrimaryKey)
-	ids = array.DeleteEmpty(ids)
-	dao.RemoveCache(ctx, ids)
-
 	return res.RowsAffected()
 }
 
 // Increment 增加
 func (dao *OrderCommentDao) Increment(ctx context.Context, id any, column string, amount interface{}) (sql.Result, error) {
-	res, err := dao.Ctx(ctx).WherePri(id).Increment(column, amount)
-	if err == nil {
-		dao.RemoveCache(ctx, id)
-	}
-
-	return res, err
+	return dao.Ctx(ctx).WherePri(id).Increment(column, amount)
 }
 
 // Decrement 减少
 func (dao *OrderCommentDao) Decrement(ctx context.Context, id any, column string, amount interface{}) (sql.Result, error) {
-	res, err := dao.Ctx(ctx).WherePri(id).Decrement(column, amount)
-	if err == nil {
-		dao.RemoveCache(ctx, id)
-	}
-
-	return res, err
+	return dao.Ctx(ctx).WherePri(id).Decrement(column, amount)
 }
 
 // Remove 根据主键删除
@@ -488,29 +366,20 @@ func (dao *OrderCommentDao) Remove(ctx context.Context, id any) (int64, error) {
 		return 0, err
 	}
 
-	dao.RemoveCache(ctx, id)
-
 	return res.RowsAffected()
 }
 
 // Remove 根据Where条件删除
 func (dao *OrderCommentDao) RemoveWhere(ctx context.Context, where *do.OrderCommentListInput) (int64, error) {
-	ids, err := dao.FindKey(ctx, where)
+	query := dao.Ctx(ctx).Where(where.Where)
+	query = ml.BuildWhere(query, where.WhereLike, where.WhereExt)
+
+	res, err := query.Delete()
 	if err != nil {
 		return 0, err
 	}
 
-	if len(ids) > 0 {
-		num, err := dao.Remove(ctx, ids)
-
-		if err != nil {
-			return 0, err
-		}
-
-		return num, err
-	}
-
-	return 0, nil
+	return res.RowsAffected()
 }
 
 // Count 查询数据记录

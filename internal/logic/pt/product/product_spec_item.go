@@ -22,6 +22,7 @@ package product
 
 import (
 	"context"
+	"errors"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pt"
@@ -78,6 +79,21 @@ func (s *sProductSpecItem) Edit(ctx context.Context, in *do.ProductSpecItem) (af
 
 // Remove 删除多条记录模式
 func (s *sProductSpecItem) Remove(ctx context.Context, id any) (affected int64, err error) {
+	input := &do.ProductItemListInput{}
+	input.WhereExt = []*ml.WhereExt{{
+		Column: dao.ProductItem.Columns().SpecItemIds,
+		Val:    id,
+		Symbol: ml.IN,
+	}}
+
+	count, err := dao.ProductItem.Count(ctx, input)
+	if err != nil {
+		return 0, err
+	}
+
+	if count > 0 {
+		return 0, errors.New("规格已被商品使用，不可删除")
+	}
 
 	affected, err = dao.ProductSpecItem.Remove(ctx, id)
 

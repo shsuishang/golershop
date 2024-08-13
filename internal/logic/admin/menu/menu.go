@@ -221,9 +221,20 @@ func (s *sMenu) GetTree(ctx context.Context, in *do.MenuBaseListInput) (out []*m
 
 	res, err := dao.MenuBase.List(ctx, in)
 
+	var filteredMenuBases []*entity.MenuBase
+
+	for _, tmp := range res.Items {
+		// 判断功能是否开启
+		if tmp.MenuFunc != "" && !service.ConfigBase().GetBool(ctx, tmp.MenuFunc, false) {
+			continue
+		}
+		// Add the item to the filtered list
+		filteredMenuBases = append(filteredMenuBases, tmp)
+	}
+
 	// 数据转换
 	var list []*entity.MenuBase
-	gconv.Scan(res.Items, &list)
+	gconv.Scan(filteredMenuBases, &list)
 
 	// begin 为了菜单显示隐藏判断
 	var menuIds []string
@@ -251,6 +262,7 @@ func (s *sMenu) GetTree(ctx context.Context, in *do.MenuBaseListInput) (out []*m
 			gconv.Scan(*c, &child.Menu)
 			gconv.Scan(*c, &child.Menu.Meta)
 			child.Menu.Meta.MenuClose = !c.MenuClose
+			child.Menu.Meta.MenuBubble = c.MenuBubble
 
 			menuNode.Children = append(menuNode.Children, child)
 		}

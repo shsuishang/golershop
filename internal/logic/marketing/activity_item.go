@@ -25,7 +25,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
@@ -33,6 +32,7 @@ import (
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
 	"golershop.cn/utility/array"
+	"strings"
 )
 
 type sActivityItem struct{}
@@ -169,24 +169,8 @@ func (s *sActivityItem) GetActivityInfo(ctx context.Context, itemIds []uint64) (
 	}
 
 	// 非排他性活动
-
-	queryWrapper := &do.ActivityBaseListInput{}
-	queryWrapper.Where.ActivityTypeId = []uint{consts.ACTIVITY_TYPE_GIFTBAG, consts.ACTIVITY_TYPE_CUTPRICE, consts.ACTIVITY_TYPE_BATDISCOUNT, consts.ACTIVITY_TYPE_MULTIPLEDISCOUNT}
-	queryWrapper.Where.ActivityState = consts.ACTIVITY_STATE_NORMAL
-
-	queryWrapper.WhereExt = append(queryWrapper.WhereExt, &ml.WhereExt{
-		Column: dao.ActivityBase.Columns().ActivityItemIds,
-		Val:    itemIds,
-		Symbol: ml.FIND_IN_SET,
-	})
-
-	activityBaseList, err = dao.ActivityBase.Find(ctx, queryWrapper)
-	if err != nil {
-		return nil, err
-	}
-
 	for _, activityBase := range activityBaseList {
-		ids := gconv.SliceInt64(activityBase.ActivityItemIds)
+		ids := gconv.SliceUint64(strings.Split(activityBase.ActivityItemIds, ","))
 
 		for _, itemId := range itemIds {
 			if !array.InArray(activityItemIds, itemId) && array.InArray(ids, itemId) {

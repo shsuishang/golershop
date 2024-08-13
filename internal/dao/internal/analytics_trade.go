@@ -29,7 +29,6 @@ import (
 
 // AnalyticsTradeDao is the data access object for table trade_order_info.
 type AnalyticsTradeDao struct {
-	BaseRepository
 	table string // table is the underlying table name of the DAO.
 	group string // group is the database configuration group name of current DAO
 }
@@ -37,10 +36,6 @@ type AnalyticsTradeDao struct {
 // NewAnalyticsTradeDao creates and returns a new DAO object for table data access.
 func NewAnalyticsTradeDao() *AnalyticsTradeDao {
 	return &AnalyticsTradeDao{
-		BaseRepository: BaseRepository{
-			Table: "pay_consume_trade",
-			Group: "pay",
-		},
 		group: "pay",
 		table: "pay_consume_trade",
 	}

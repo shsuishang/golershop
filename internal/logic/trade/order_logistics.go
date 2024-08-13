@@ -22,10 +22,18 @@ package trade
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/base64"
+	"encoding/hex"
+	"fmt"
+	"github.com/gogf/gf/v2/encoding/gjson"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
+	"net/url"
 )
 
 type sOrderLogistics struct{}
@@ -114,4 +122,143 @@ func (s *sOrderLogistics) Remove(ctx context.Context, id any) (affected int64, e
 	}
 
 	return affected, err
+}
+
+var stateMap map[string]string
+
+func init() {
+	stateMap = map[string]string{
+		"0":   "没有记录",
+		"1":   "已揽收",
+		"2":   "运输途中",
+		"201": "到达目的城市",
+		"202": "派件中",
+		"211": "已投放快递柜或驿站",
+		"3":   "已签收",
+		"301": "正常签收",
+		"302": "派件异常后最终签收",
+		"304": "代收签收",
+		"311": "快递柜或驿站签收",
+		"4":   "问题件",
+		"401": "发货无信息",
+		"402": "超时未签收",
+		"403": "超时未更新",
+		"404": "拒收(退件)",
+		"405": "派件异常",
+		"406": "退货签收",
+		"407": "退货未签收",
+		"412": "快递柜或驿站超时未取",
+	}
+}
+
+// OrderOnlineByJson 组装快递查询请求参数，并发送请求
+func (s *sOrderLogistics) OrderOnlineByJson(ctx context.Context, orderTrackingNumber, shipperCode, CustomerName string) (result string, err error) {
+	// 组装应用级参数
+	requestData := fmt.Sprintf(
+		"{'OrderCode': '', 'shipperCode': '%s', 'CustomerName': '%s', 'logisticCode': '%s'}",
+		shipperCode, CustomerName, orderTrackingNumber,
+	)
+
+	// 组装系统级参数
+	params := g.Map{}
+	appId := service.ConfigBase().GetStr(ctx, "kuaidiniao_e_business_id", "")
+	appKey := service.ConfigBase().GetStr(ctx, "kuaidiniao_app_key", "")
+
+	// URL编码函数
+	urlEncoder := func(data, charset string) string {
+		return url.QueryEscape(data)
+	}
+
+	params["RequestData"] = urlEncoder(requestData, "UTF-8")
+	params["EBusinessID"] = appId
+	params["RequestType"] = "8002" // 快递查询接口指令8002/地图版快递查询接口指令8004
+
+	dataSign, err := Encrypt(requestData, appKey, "UTF-8")
+	if err != nil {
+		return "", err
+	}
+	params["DataSign"] = urlEncoder(dataSign, "UTF-8")
+	params["DataType"] = "2"
+
+	requestUrl := "https://api.kdniao.com/Ebusiness/EbusinessOrderHandle.aspx"
+	// 发送POST请求
+	response, err := g.Client().Post(ctx, requestUrl, params)
+	if err != nil {
+		return "", err
+	}
+	defer response.Close()
+
+	// 获取响应内容
+	result = string(response.ReadAll())
+	return result, nil
+}
+
+func Encrypt(content, keyValue, charset string) (string, error) {
+	if keyValue != "" {
+		return base64Encode(md5Hash(content+keyValue, charset), charset)
+	}
+	return base64Encode(md5Hash(content, charset), charset)
+}
+
+func base64Encode(str, charset string) (string, error) {
+	// 将字符串转换为字节数组并进行Base64编码
+	encoded := base64.StdEncoding.EncodeToString([]byte(str))
+	return encoded, nil
+}
+
+func md5Hash(str, charset string) string {
+	md5Ctx := md5.New()
+	strBytes := []byte(str)
+	md5Ctx.Write(strBytes)
+	cipherStr := md5Ctx.Sum(nil)
+	return hex.EncodeToString(cipherStr)
+}
+
+// ReturnLogistics 查询物流信息
+func (s *sOrderLogistics) ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber string) (resultMap g.Map, err error) {
+	// 创建查询条件
+	expressBase, err := dao.ExpressBase.FindOne(ctx, &do.ExpressBaseListInput{
+		Where: do.ExpressBase{
+			ExpressName: returnTrackingName,
+		},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if expressBase == nil {
+		return nil, gerror.New("系统中未配置该物流信息，请检查发货信息是否正确！")
+	}
+
+	// 调用第三方物流查询接口，获取物流信息
+	logisticsInfoStr, err := s.OrderOnlineByJson(ctx, returnTrackingNumber, expressBase.ExpressPinyin, "")
+	if err != nil {
+		return nil, err
+	}
+
+	// 解析物流信息
+	logisticsInfo := gjson.New(logisticsInfoStr)
+	state := logisticsInfo.Get("State").Int()
+	if state == 0 {
+		reason := logisticsInfo.Get("Reason").String()
+		return nil, gerror.New(fmt.Sprintf("非系统错误，请联系管理员检查物流配置项，或检查发货信息是否真实有效！错误信息：{%s}", reason))
+	}
+
+	StateEx := logisticsInfo.Get("StateEx").String()
+	if stateMap[StateEx] == "" {
+		return nil, gerror.New("物流状态异常")
+	}
+
+	// 构建返回结果
+	resultMap = g.Map{
+		"shipperCode":   logisticsInfo.Get("ShipperCode").String(),
+		"logisticCode":  logisticsInfo.Get("LogisticCode").String(),
+		"state":         state,
+		"stateEx":       StateEx,
+		"express_state": stateMap[StateEx],
+		"traces":        logisticsInfo.Get("Traces").String(),
+	}
+
+	return resultMap, nil
 }

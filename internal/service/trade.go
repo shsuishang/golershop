@@ -23,6 +23,7 @@ package service
 import (
 	"context"
 
+	"github.com/gogf/gf/v2/frame/g"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
@@ -45,42 +46,6 @@ type (
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
-	IOrderDeliveryAddress interface {
-		// Get 读取订单
-		Get(ctx context.Context, id any) (out *entity.OrderDeliveryAddress, err error)
-		// Gets 读取多条订单
-		Gets(ctx context.Context, id any) (list []*entity.OrderDeliveryAddress, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderDeliveryAddressListInput) (out []*entity.OrderDeliveryAddress, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.OrderDeliveryAddressListInput) (out *do.OrderDeliveryAddressListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.OrderDeliveryAddress) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderDeliveryAddress) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// Save 报错
-		Save(ctx context.Context, in *do.OrderDeliveryAddress) (affected int64, err error)
-	}
-	IOrderInfo interface {
-		// Get 读取订单
-		Get(ctx context.Context, id any) (out *entity.OrderInfo, err error)
-		// Gets 读取多条订单
-		Gets(ctx context.Context, id any) (list []*entity.OrderInfo, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderInfoListInput) (out []*entity.OrderInfo, err error)
-		// GetList 订单搜索查询列表
-		GetList(ctx context.Context, in *do.OrderInfoListInput) (out *model.OrderListOutput, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.OrderInfoListInput) (out *do.OrderInfoListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.OrderInfo) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderInfo) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
 	IOrderLogistics interface {
 		// Get 读取订单
 		Get(ctx context.Context, id any) (out *entity.OrderLogistics, err error)
@@ -96,82 +61,8 @@ type (
 		Edit(ctx context.Context, in *do.OrderLogistics) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IChainCode interface {
-		// Get 读取兑换码
-		Get(ctx context.Context, id any) (out *entity.ChainCode, err error)
-		// Gets 读取多条兑换码
-		Gets(ctx context.Context, id any) (list []*entity.ChainCode, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.ChainCodeListInput) (out []*entity.ChainCode, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.ChainCodeListInput) (out *do.ChainCodeListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.ChainCode) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.ChainCode) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-	}
-	IDistributionOrder interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.DistributionOrderListInput) (out []*entity.DistributionOrder, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.DistributionOrderListInput) (out *do.DistributionOrderListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.DistributionOrder) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.DistributionOrder) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// InitDistributionUserOrder 删除多条记录模式
-		InitDistributionUserOrder(ctx context.Context, distributionOrderVo *model.DistributionOrderVo, itemRows []*do.OrderItem) (distFlag bool, err error)
-		SettleDistributionUserOrder(ctx context.Context, orderId string) (distFlag bool, err error)
-	}
-	IDistributionOrderItem interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.DistributionOrderItemListInput) (out []*entity.DistributionOrderItem, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.DistributionOrderItemListInput) (out *do.DistributionOrderItemListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.DistributionOrderItem) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.DistributionOrderItem) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		SettleDistributionUserOrder(ctx context.Context, orderId string) (flag bool, err error)
-	}
-	IOrderItem interface {
-		// Get 读取订单
-		Get(ctx context.Context, id any) (out *entity.OrderItem, err error)
-		// Gets 读取多条订单
-		Gets(ctx context.Context, id any) (list []*entity.OrderItem, err error)
-		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderItemListInput) (out []*entity.OrderItem, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.OrderItemListInput) (out *do.OrderItemListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.OrderItem) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderItem) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// Save 保存
-		Save(ctx context.Context, in *do.OrderItem) (affected int64, err error)
-		// Saves 保存
-		Saves(ctx context.Context, in []*do.OrderItem) (affected int64, err error)
-	}
-	IOrderReturnReason interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderReturnReasonListInput) (out []*entity.OrderReturnReason, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.OrderReturnReasonListInput) (out *do.OrderReturnReasonListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.OrderReturnReason) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderReturnReason) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
+		// ReturnLogistics 查询物流信息
+		ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber string) (resultMap g.Map, err error)
 	}
 	IOrderReturn interface {
 		// Get 读取订单
@@ -206,6 +97,7 @@ type (
 		// AddItem 添加订单退货
 		AddItem(ctx context.Context, orderReturnInput *model.OrderReturnInput) (returnId string, err error)
 		AddReturnByItem(ctx context.Context, orderReturn *do.OrderReturn, returnItems []*do.OrderReturnItem) (bool, error)
+		DealWithReturn(ctx context.Context, returnIds []string, storeId uint, stateId uint, orderReturns []*entity.OrderReturn, nextStateId uint) error
 	}
 	IOrderReturnItem interface {
 		// Get 读取订单
@@ -220,6 +112,22 @@ type (
 		Add(ctx context.Context, in *do.OrderReturnItem) (lastInsertId int64, err error)
 		// Edit 编辑
 		Edit(ctx context.Context, in *do.OrderReturnItem) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IOrderStateLog interface {
+		// Get 读取订单
+		Get(ctx context.Context, id any) (out *entity.OrderStateLog, err error)
+		// Gets 读取多条订单
+		Gets(ctx context.Context, id any) (list []*entity.OrderStateLog, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderStateLogListInput) (out []*entity.OrderStateLog, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderStateLogListInput) (out *do.OrderStateLogListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderStateLog) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderStateLog) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
@@ -328,9 +236,6 @@ type (
 		DoReviewShipping(ctx context.Context, in *model.OrderShippingInput) (state uint, err error)
 		// ReviewToState 审核订单到某个状态
 		ReviewToState(ctx context.Context, orderId string, toOrderStateId uint) (flag bool, err error)
-		CancelActivity(ctx context.Context, orderId string) (flag bool, err error)
-		// 判断是否有活动条件限制
-		IfActivity(ctx context.Context, orderId string) bool
 		// GetOrderStatisticsInfo 根据用户id获取用户订单统计信息
 		GetOrderStatisticsInfo(ctx context.Context, userId uint) (*model.OrderNumOutput, error)
 		// GetOrderNum 订单数量
@@ -351,36 +256,64 @@ type (
 		Edit(ctx context.Context, in *do.OrderBase) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+		// GetEvaluationItem
+		GetEvaluationItem(ctx context.Context, evaluationVo *model.EvaluationVo) (comment *model.OrderCommentOutput, err error)
 	}
-	IOrderInvoice interface {
-		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderInvoiceListInput) (out []*entity.OrderInvoice, err error)
-		// List 分页读取
-		List(ctx context.Context, in *do.OrderInvoiceListInput) (out *do.OrderInvoiceListOutput, err error)
-		// Add 新增
-		Add(ctx context.Context, in *do.OrderInvoice) (lastInsertId int64, err error)
-		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderInvoice) (affected int64, err error)
-		// Remove 删除多条记录模式
-		Remove(ctx context.Context, id any) (affected int64, err error)
-		// Remove 删除多条记录模式
-		RemoveWhere(ctx context.Context, where *do.OrderInvoiceListInput) (affected int64, err error)
-	}
-	IOrderStateLog interface {
+	IOrderInfo interface {
 		// Get 读取订单
-		Get(ctx context.Context, id any) (out *entity.OrderStateLog, err error)
+		Get(ctx context.Context, id any) (out *entity.OrderInfo, err error)
 		// Gets 读取多条订单
-		Gets(ctx context.Context, id any) (list []*entity.OrderStateLog, err error)
+		Gets(ctx context.Context, id any) (list []*entity.OrderInfo, err error)
 		// Find 查询数据
-		Find(ctx context.Context, in *do.OrderStateLogListInput) (out []*entity.OrderStateLog, err error)
+		Find(ctx context.Context, in *do.OrderInfoListInput) (out []*entity.OrderInfo, err error)
+		// GetList 订单搜索查询列表
+		GetList(ctx context.Context, in *do.OrderInfoListInput) (out *model.OrderListOutput, err error)
 		// List 分页读取
-		List(ctx context.Context, in *do.OrderStateLogListInput) (out *do.OrderStateLogListOutput, err error)
+		List(ctx context.Context, in *do.OrderInfoListInput) (out *do.OrderInfoListOutput, err error)
 		// Add 新增
-		Add(ctx context.Context, in *do.OrderStateLog) (lastInsertId int64, err error)
+		Add(ctx context.Context, in *do.OrderInfo) (lastInsertId int64, err error)
 		// Edit 编辑
-		Edit(ctx context.Context, in *do.OrderStateLog) (affected int64, err error)
+		Edit(ctx context.Context, in *do.OrderInfo) (affected int64, err error)
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
+	IOrderItem interface {
+		// Get 读取订单
+		Get(ctx context.Context, id any) (out *entity.OrderItem, err error)
+		// Gets 读取多条订单
+		Gets(ctx context.Context, id any) (list []*entity.OrderItem, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderItemListInput) (out []*entity.OrderItem, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderItemListInput) (out *do.OrderItemListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderItem) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderItem) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// Save 保存
+		Save(ctx context.Context, in *do.OrderItem) (affected int64, err error)
+		// Saves 保存
+		Saves(ctx context.Context, in []*do.OrderItem) (affected int64, err error)
+	}
+	IOrderComment interface {
+		// Get 读取订单
+		Get(ctx context.Context, id any) (out *entity.OrderComment, err error)
+		// Gets 读取多条订单
+		Gets(ctx context.Context, id any) (list []*entity.OrderComment, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderCommentListInput) (out []*entity.OrderComment, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderCommentListInput) (out *do.OrderCommentListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderComment) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderComment) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// AddOrderComment
+		AddOrderComment(ctx context.Context, input *model.OrderCommentInput) error
 	}
 	IStockBill interface {
 		// Get 读取订单
@@ -400,48 +333,133 @@ type (
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 	}
+	IOrderDeliveryAddress interface {
+		// Get 读取订单
+		Get(ctx context.Context, id any) (out *entity.OrderDeliveryAddress, err error)
+		// Gets 读取多条订单
+		Gets(ctx context.Context, id any) (list []*entity.OrderDeliveryAddress, err error)
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderDeliveryAddressListInput) (out []*entity.OrderDeliveryAddress, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderDeliveryAddressListInput) (out *do.OrderDeliveryAddressListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderDeliveryAddress) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderDeliveryAddress) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// Save 报错
+		Save(ctx context.Context, in *do.OrderDeliveryAddress) (affected int64, err error)
+	}
+	IOrderInvoice interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderInvoiceListInput) (out []*entity.OrderInvoice, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderInvoiceListInput) (out *do.OrderInvoiceListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderInvoice) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderInvoice) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+		// Remove 删除多条记录模式
+		RemoveWhere(ctx context.Context, where *do.OrderInvoiceListInput) (affected int64, err error)
+	}
+	IOrderReturnReason interface {
+		// Find 查询数据
+		Find(ctx context.Context, in *do.OrderReturnReasonListInput) (out []*entity.OrderReturnReason, err error)
+		// List 分页读取
+		List(ctx context.Context, in *do.OrderReturnReasonListInput) (out *do.OrderReturnReasonListOutput, err error)
+		// Add 新增
+		Add(ctx context.Context, in *do.OrderReturnReason) (lastInsertId int64, err error)
+		// Edit 编辑
+		Edit(ctx context.Context, in *do.OrderReturnReason) (affected int64, err error)
+		// Remove 删除多条记录模式
+		Remove(ctx context.Context, id any) (affected int64, err error)
+	}
 )
 
 var (
-	localOrderBase             IOrderBase
-	localOrderInvoice          IOrderInvoice
-	localOrderStateLog         IOrderStateLog
-	localStockBill             IStockBill
-	localOrder                 IOrder
-	localOrderDeliveryAddress  IOrderDeliveryAddress
-	localOrderInfo             IOrderInfo
-	localOrderLogistics        IOrderLogistics
-	localOrderData             IOrderData
-	localDistributionOrder     IDistributionOrder
-	localDistributionOrderItem IDistributionOrderItem
-	localOrderItem             IOrderItem
-	localOrderReturnReason     IOrderReturnReason
-	localChainCode             IChainCode
-	localOrderReturnItem       IOrderReturnItem
-	localUserCart              IUserCart
-	localOrderReturn           IOrderReturn
+	localOrder                IOrder
+	localOrderBase            IOrderBase
+	localOrderInfo            IOrderInfo
+	localOrderLogistics       IOrderLogistics
+	localOrderReturn          IOrderReturn
+	localOrderReturnItem      IOrderReturnItem
+	localOrderStateLog        IOrderStateLog
+	localUserCart             IUserCart
+	localOrderDeliveryAddress IOrderDeliveryAddress
+	localOrderInvoice         IOrderInvoice
+	localOrderItem            IOrderItem
+	localOrderComment         IOrderComment
+	localStockBill            IStockBill
+	localOrderData            IOrderData
+	localOrderReturnReason    IOrderReturnReason
 )
 
-func OrderReturn() IOrderReturn {
-	if localOrderReturn == nil {
-		panic("implement not found for interface IOrderReturn, forgot register?")
+func OrderDeliveryAddress() IOrderDeliveryAddress {
+	if localOrderDeliveryAddress == nil {
+		panic("implement not found for interface IOrderDeliveryAddress, forgot register?")
 	}
-	return localOrderReturn
+	return localOrderDeliveryAddress
 }
 
-func RegisterOrderReturn(i IOrderReturn) {
-	localOrderReturn = i
+func RegisterOrderDeliveryAddress(i IOrderDeliveryAddress) {
+	localOrderDeliveryAddress = i
 }
 
-func OrderReturnItem() IOrderReturnItem {
-	if localOrderReturnItem == nil {
-		panic("implement not found for interface IOrderReturnItem, forgot register?")
+func OrderInvoice() IOrderInvoice {
+	if localOrderInvoice == nil {
+		panic("implement not found for interface IOrderInvoice, forgot register?")
 	}
-	return localOrderReturnItem
+	return localOrderInvoice
 }
 
-func RegisterOrderReturnItem(i IOrderReturnItem) {
-	localOrderReturnItem = i
+func RegisterOrderInvoice(i IOrderInvoice) {
+	localOrderInvoice = i
+}
+
+func OrderItem() IOrderItem {
+	if localOrderItem == nil {
+		panic("implement not found for interface IOrderItem, forgot register?")
+	}
+	return localOrderItem
+}
+
+func RegisterOrderItem(i IOrderItem) {
+	localOrderItem = i
+}
+func OrderComment() IOrderComment {
+	if localOrderComment == nil {
+		panic("implement not found for interface IOrderComment, forgot register?")
+	}
+	return localOrderComment
+}
+
+func RegisterOrderComment(i IOrderComment) {
+	localOrderComment = i
+}
+
+func StockBill() IStockBill {
+	if localStockBill == nil {
+		panic("implement not found for interface IStockBill, forgot register?")
+	}
+	return localStockBill
+}
+
+func RegisterStockBill(i IStockBill) {
+	localStockBill = i
+}
+
+func OrderData() IOrderData {
+	if localOrderData == nil {
+		panic("implement not found for interface IOrderData, forgot register?")
+	}
+	return localOrderData
+}
+
+func RegisterOrderData(i IOrderData) {
+	localOrderData = i
 }
 
 func UserCart() IUserCart {
@@ -477,61 +495,6 @@ func RegisterOrderBase(i IOrderBase) {
 	localOrderBase = i
 }
 
-func OrderInvoice() IOrderInvoice {
-	if localOrderInvoice == nil {
-		panic("implement not found for interface IOrderInvoice, forgot register?")
-	}
-	return localOrderInvoice
-}
-
-func RegisterOrderInvoice(i IOrderInvoice) {
-	localOrderInvoice = i
-}
-
-func OrderStateLog() IOrderStateLog {
-	if localOrderStateLog == nil {
-		panic("implement not found for interface IOrderStateLog, forgot register?")
-	}
-	return localOrderStateLog
-}
-
-func RegisterOrderStateLog(i IOrderStateLog) {
-	localOrderStateLog = i
-}
-
-func StockBill() IStockBill {
-	if localStockBill == nil {
-		panic("implement not found for interface IStockBill, forgot register?")
-	}
-	return localStockBill
-}
-
-func RegisterStockBill(i IStockBill) {
-	localStockBill = i
-}
-
-func OrderData() IOrderData {
-	if localOrderData == nil {
-		panic("implement not found for interface IOrderData, forgot register?")
-	}
-	return localOrderData
-}
-
-func RegisterOrderData(i IOrderData) {
-	localOrderData = i
-}
-
-func OrderDeliveryAddress() IOrderDeliveryAddress {
-	if localOrderDeliveryAddress == nil {
-		panic("implement not found for interface IOrderDeliveryAddress, forgot register?")
-	}
-	return localOrderDeliveryAddress
-}
-
-func RegisterOrderDeliveryAddress(i IOrderDeliveryAddress) {
-	localOrderDeliveryAddress = i
-}
-
 func OrderInfo() IOrderInfo {
 	if localOrderInfo == nil {
 		panic("implement not found for interface IOrderInfo, forgot register?")
@@ -554,50 +517,38 @@ func RegisterOrderLogistics(i IOrderLogistics) {
 	localOrderLogistics = i
 }
 
-func ChainCode() IChainCode {
-	if localChainCode == nil {
-		panic("implement not found for interface IChainCode, forgot register?")
+func OrderReturn() IOrderReturn {
+	if localOrderReturn == nil {
+		panic("implement not found for interface IOrderReturn, forgot register?")
 	}
-	return localChainCode
+	return localOrderReturn
 }
 
-func RegisterChainCode(i IChainCode) {
-	localChainCode = i
+func RegisterOrderReturn(i IOrderReturn) {
+	localOrderReturn = i
 }
 
-func DistributionOrder() IDistributionOrder {
-	if localDistributionOrder == nil {
-		panic("implement not found for interface IDistributionOrder, forgot register?")
+func OrderReturnItem() IOrderReturnItem {
+	if localOrderReturnItem == nil {
+		panic("implement not found for interface IOrderReturnItem, forgot register?")
 	}
-	return localDistributionOrder
+	return localOrderReturnItem
 }
 
-func RegisterDistributionOrder(i IDistributionOrder) {
-	localDistributionOrder = i
+func RegisterOrderReturnItem(i IOrderReturnItem) {
+	localOrderReturnItem = i
 }
 
-func DistributionOrderItem() IDistributionOrderItem {
-	if localDistributionOrderItem == nil {
-		panic("implement not found for interface IDistributionOrderItem, forgot register?")
+func OrderStateLog() IOrderStateLog {
+	if localOrderStateLog == nil {
+		panic("implement not found for interface IOrderStateLog, forgot register?")
 	}
-	return localDistributionOrderItem
+	return localOrderStateLog
 }
 
-func RegisterDistributionOrderItem(i IDistributionOrderItem) {
-	localDistributionOrderItem = i
+func RegisterOrderStateLog(i IOrderStateLog) {
+	localOrderStateLog = i
 }
-
-func OrderItem() IOrderItem {
-	if localOrderItem == nil {
-		panic("implement not found for interface IOrderItem, forgot register?")
-	}
-	return localOrderItem
-}
-
-func RegisterOrderItem(i IOrderItem) {
-	localOrderItem = i
-}
-
 func OrderReturnReason() IOrderReturnReason {
 	if localOrderReturnReason == nil {
 		panic("implement not found for interface IOrderReturnReason, forgot register?")

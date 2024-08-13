@@ -38,8 +38,8 @@ type OrderComment struct {
 	CommentHelpful             uint        `json:"comment_helpful"               ` // 有帮助
 	CommentNohelpful           uint        `json:"comment_nohelpful"             ` // 无帮助
 	CommentTime                *gtime.Time `json:"comment_time"                  ` // 评价时间
-	CommentIsAnonymous         uint        `json:"comment_is_anonymous"          ` // 匿名评价
-	CommentEnable              uint        `json:"comment_enable"                ` // 评价信息的状态(BOOL): 1-正常显示; 0-禁止显示
+	CommentIsAnonymous         bool        `json:"comment_is_anonymous"          ` // 匿名评价
+	CommentEnable              bool        `json:"comment_enable"                ` // 评价信息的状态(BOOL): 1-正常显示; 0-禁止显示
 	CommentStoreDescCredit     uint        `json:"comment_store_desc_credit"     ` // 描述相符评分 - order_buyer_evaluation_status , 评价状态改变后不需要再次评论，根据订单走
 	CommentStoreServiceCredit  uint        `json:"comment_store_service_credit"  ` // 服务态度评分 - order_buyer_evaluation_status
 	CommentStoreDeliveryCredit uint        `json:"comment_store_delivery_credit" ` // 发货速度评分 - order_buyer_evaluation_status

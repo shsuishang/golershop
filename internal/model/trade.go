@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/gogf/gf/v2/os/gtime"
+	"golershop.cn/internal/model/entity"
 )
 
 type OfflinePayVo struct {
@@ -58,16 +59,21 @@ type ProcessPayOutput struct {
 }
 
 type DistributionOrderVo struct {
-	OrderId            string  `json:"order_id" description:"订单编号"`                  // 订单编号
-	StoreId            uint    `json:"store_id" description:"卖家店铺编号"`                // 卖家店铺编号
-	UserId             uint    `json:"user_id" description:"买家编号"`                   // 买家编号
-	OrderCommissionFee float64 `json:"order_commission_fee" description:"平台交易佣金"`    // 平台交易佣金
-	SalespersonId      uint    `json:"salesperson_id" description:"销售员编号:用户编号"`      // 销售员编号:用户编号
-	DistributorUserId  uint    `json:"distributor_user_id" description:"分销商编号:用户编号"` // 分销商编号:用户编号
 }
 
 type OrderFreightVo struct {
 	CanDelivery    bool    `json:"can_delivery" swagger:"description:是否可配送"`
 	FreightFreeMin float64 `json:"freight_free_min" swagger:"description:免运费额度"`
 	Freight        float64 `json:"freight" swagger:"description:运费"`
+}
+
+// OrderCommentInput 订单评论输入结构体
+type OrderCommentInput struct {
+	OrderId             string              `json:"order_id"            dc:"订单ID"`         // 订单ID
+	OrderBase           *entity.OrderBase   `json:"order_base"          dc:"订单基础信息"`       // 订单基础信息
+	OrderCommentItem    *OrderCommentItemVo `json:"comment_item_req"    dc:"评论项请求"`        // 评论项请求
+	CommentImage        []string            `json:"comment_image"       dc:"评论图片"`         // 评论图片
+	StoreDesccredit     float64             `json:"store_desccredit"    dc:"描述相符"        ` // 描述相符
+	StoreServicecredit  float64             `json:"store_servicecredit" dc:"服务评价"        ` // 服务评价
+	StoreDeliverycredit float64             `json:"store_deliverycredit" dc:"物流评价"       ` // 物流评价
 }

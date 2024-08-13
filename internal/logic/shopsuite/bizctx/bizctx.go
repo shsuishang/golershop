@@ -27,11 +27,9 @@ import (
 	"github.com/gogf/gf/v2/text/gstr"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
-	"golershop.cn/internal/dao/global"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
-	"golershop.cn/utility/log"
 )
 
 type (
@@ -106,55 +104,4 @@ func (s *sBizCtx) GetUserId(ctx context.Context) uint {
 
 func (s *sBizCtx) GetRequest(ctx context.Context) *ghttp.Request {
 	return g.RequestFromCtx(ctx)
-}
-
-func (s *sBizCtx) IncrementTx(ctx context.Context) {
-	if v := s.Get(ctx); v != nil {
-		v.Tx = v.Tx + 1
-	}
-}
-
-func (s *sBizCtx) DecrementTx(ctx context.Context) {
-	if v := s.Get(ctx); v != nil {
-		if v.Tx >= 1 {
-			v.Tx = v.Tx - 1
-		}
-	}
-}
-
-func (s *sBizCtx) GetTx(ctx context.Context) int {
-	if v := s.Get(ctx); v != nil {
-		return v.Tx
-	}
-
-	return 0
-}
-
-func (s *sBizCtx) AddCacheKey(ctx context.Context, keys []string) {
-	if v := s.Get(ctx); v != nil {
-		v.CacheKeys = append(v.CacheKeys, keys...)
-	}
-}
-
-func (s *sBizCtx) GetCacheKeys(ctx context.Context) []string {
-	if v := s.Get(ctx); v != nil {
-		return v.CacheKeys
-	}
-
-	return nil
-}
-
-func (s *sBizCtx) AfterOutput(r *ghttp.Request) {
-	if global.Cache {
-		if v := s.Get(r.GetCtx()); v != nil {
-			keys := v.CacheKeys
-
-			if !g.IsEmpty(keys) {
-				_, err := g.Redis().Del(r.GetCtx(), keys...)
-				if err != nil {
-					log.Error(r.GetCtx(), err)
-				}
-			}
-		}
-	}
 }

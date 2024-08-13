@@ -35,6 +35,9 @@ type UserAdmin struct {
 	UserAdminCtime   *gtime.Time // 创建时间
 	UserAdminUtime   *gtime.Time // 更新时间
 	UserIsSuperadmin interface{} // 是否超管
+	RoleId           interface{} // 角色编号(ENUM):0-用户;2-商家;3-门店;9-平台;
+	ChainId          interface{} // 所属门店
+	StoreId          interface{} // 店铺编号
 }
 
 type UserAdminListInput struct {

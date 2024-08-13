@@ -2,7 +2,6 @@ package admin
 
 import (
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
@@ -37,22 +36,6 @@ func (c *cMenu) Detail(ctx context.Context, req *admin.MenuDetailReq) (res *admi
 }
 
 func (c *cMenu) List(ctx context.Context, req *admin.MenuListReq) (res *admin.MenuListRes, err error) {
-
-	var result1, error1 = service.Menu().FindKey(ctx, &do.MenuBaseListInput{
-		BaseList: ml.BaseList{
-			Page: req.Page,
-			Size: req.Size},
-		Where: do.MenuBase{
-			MenuHidden: 0,
-		},
-	})
-
-	if error1 != nil {
-
-	}
-
-	fmt.Println(result1)
-
 	var result, error = service.Menu().List(ctx, &do.MenuBaseListInput{
 		BaseList: ml.BaseList{
 			Page: req.Page,

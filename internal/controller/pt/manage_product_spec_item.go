@@ -65,6 +65,7 @@ func (c *cProductSpecItem) Add(ctx context.Context, req *pt.ProductSpecItemAddRe
 	input := do.ProductSpecItem{}
 	gconv.Scan(req, &input)
 
+	input.SpecItemEnable = true
 	var result, error = service.ProductSpecItem().Add(ctx, &input)
 	//var result, error = service.ProductSpecItem().Edit(ctx, req)
 

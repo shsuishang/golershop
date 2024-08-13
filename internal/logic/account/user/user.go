@@ -128,6 +128,14 @@ func (s *sUser) GetUserInfo(ctx context.Context) (out *model.UserInfoOutput, err
 
 	out.Permissions = columns
 
+	Voucher, _ := dao.UserVoucher.Count(ctx, &do.UserVoucherListInput{
+		Where: do.UserVoucher{
+			UserId:         loginUser.UserId,
+			VoucherStateId: consts.VOUCHER_STATE_UNUSED,
+		},
+	})
+	out.Voucher = int64(Voucher)
+
 	/*
 		//user admin
 		userAdmin, err := dao.UserAdmin.Get(ctx, loginUser.UserId)
@@ -331,7 +339,7 @@ func (s *sUser) doBindMobile(ctx context.Context, currentUser *model.ContextUser
 			BindActive: true,
 		}
 
-		userId, err = s.doUserBind(ctx, accountUserBindConnectNew, 0, false)
+		userId, err = s.DoUserBind(ctx, accountUserBindConnectNew, 0, false)
 		if err != nil {
 			return 0, err
 		}
@@ -359,7 +367,7 @@ func (s *sUser) doBindMobile(ctx context.Context, currentUser *model.ContextUser
 	return userId, nil
 }
 
-func (s *sUser) doUserBind(ctx context.Context, userInfoRow *do.UserBindConnect, activityId uint, regFlag bool) (uint, error) {
+func (s *sUser) DoUserBind(ctx context.Context, userInfoRow *do.UserBindConnect, activityId uint, regFlag bool) (uint, error) {
 	var userId uint
 
 	bindId := userInfoRow.BindId.(string)
@@ -513,6 +521,19 @@ func (s *sUser) checkBind(ctx context.Context, bindId string, bindType uint, use
 	}
 
 	return true, nil
+}
+
+// CheckBind 检查绑定关系
+func (s *sUser) GetBind(ctx context.Context, userId uint, bindType uint) (*entity.UserBindConnect, error) {
+	bindRow, err := dao.UserBindConnect.FindOne(ctx, &do.UserBindConnectListInput{
+		Where: do.UserBindConnect{UserId: userId, BindActive: true, BindType: bindType},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return bindRow, nil
 }
 
 // SaveCertificate 保存用户认证信息

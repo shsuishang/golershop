@@ -23,10 +23,12 @@ package logic
 import (
 	_ "golershop.cn/internal/logic/account/login"
 	_ "golershop.cn/internal/logic/account/user"
+	_ "golershop.cn/internal/logic/account/wechat"
 	_ "golershop.cn/internal/logic/admin/menu"
 	_ "golershop.cn/internal/logic/admin/role"
 	_ "golershop.cn/internal/logic/analytics"
 	_ "golershop.cn/internal/logic/cms/article"
+	_ "golershop.cn/internal/logic/invoicing"
 	_ "golershop.cn/internal/logic/marketing"
 	_ "golershop.cn/internal/logic/pay"
 	_ "golershop.cn/internal/logic/pt/product"

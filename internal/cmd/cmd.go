@@ -52,8 +52,6 @@ var (
 				group.Hook("/manage/*", ghttp.HookAfterOutput, service.LogAction().OperateLog)
 				group.Hook("/front/*", ghttp.HookAfterOutput, service.AccessHistory().OperateAccess)
 
-				group.Hook("/*", ghttp.HookAfterOutput, service.BizCtx().AfterOutput)
-
 				/*
 					// Group middlewares.
 					group.Middleware(
@@ -65,6 +63,7 @@ var (
 
 				group.Bind(
 					admin.Menu,
+					admin.UserAdmin,
 					admin.UserRole,
 					account.User,
 					account.UserInvoice,
@@ -74,6 +73,7 @@ var (
 					account.UserMessage,
 					account.UserTagGroup,
 					account.UserBindConnect,
+
 					cms.ArticleBase,
 					cms.ArticleTag,
 					cms.ArticleCategory,
@@ -86,6 +86,7 @@ var (
 					pay.ConsumeTrade,
 					pay.ConsumeDeposit,
 					pay.ConsumeRecord,
+					pay.ConsumeWithdraw,
 					pay.UserPointsHistory,
 					pay.PaymentCallback,
 					pay.PaymentIndex,

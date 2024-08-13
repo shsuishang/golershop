@@ -25,10 +25,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gogf/gf/v2/errors/gcode"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
+	"github.com/shopspring/decimal"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
@@ -37,6 +40,7 @@ import (
 	"golershop.cn/internal/service"
 	"golershop.cn/utility/array"
 	"golershop.cn/utility/mtime"
+	"regexp"
 	"sort"
 )
 
@@ -414,7 +418,7 @@ func (s *sUserResource) addPoints(ctx context.Context, history *do.UserPointsHis
 		panic(errors.New("修改积分数据失败！"))
 	}
 
-	history.UserPoints = userResource.UserPoints
+	history.UserPoints = data.UserPoints
 	if _, err = dao.UserPointsHistory.Save(ctx, history); err != nil {
 		panic(errors.New("保存积分日志失败！"))
 	}
@@ -496,6 +500,8 @@ func (s *sUserResource) GetSignInfo(ctx context.Context, userId uint) (res *mode
 	}
 
 	signPointStep := service.ConfigBase().GetStr(ctx, "sign_point_step", "")
+	re := regexp.MustCompile(`"days":"(\d+)"`)
+	signPointStep = re.ReplaceAllString(signPointStep, `"days":$1`)
 	var stepVos []model.PointStepVo
 	if !g.IsEmpty(signPointStep) {
 
@@ -530,7 +536,7 @@ func (s *sUserResource) dealSignPointList(ctx context.Context, stepVos []model.P
 				hasOne = true
 				stepVos[i].ValueStr = fmt.Sprintf("%d.积分", pointsLogin)
 			} else {
-				stepVos[i].ValueStr = fmt.Sprintf("%d.倍", stepVos[i].Multiples)
+				stepVos[i].ValueStr = fmt.Sprintf("%s.倍", stepVos[i].Multiples)
 			}
 		}
 
@@ -554,7 +560,7 @@ func (s *sUserResource) SignIn(ctx context.Context, userId uint) (flag bool, err
 	pointsLogin := service.ConfigBase().GetFloat(ctx, "points_login", 0)
 	//expLogin := service.ConfigBase().GetFloat(ctx, "exp_login", 0)
 
-	desc := fmt.Sprintf("签到获取积分 %d", pointsLogin)
+	desc := fmt.Sprintf("签到获取积分 %.2f", pointsLogin)
 	userPointsVo := &model.UserPointsVo{
 		UserId:        userId,
 		Points:        pointsLogin,
@@ -630,4 +636,165 @@ func (s *sUserResource) GetList(ctx context.Context, in *do.UserResourceListInpu
 	}
 
 	return out, nil
+}
+
+// UpdateUserMoney 更新用户金额
+func (s *sUserResource) UpdateUserMoney(ctx context.Context, moneyVo *model.MoneyVo) (bool, error) {
+	recordTotal := decimal.NewFromFloat(moneyVo.RecordTotal)
+
+	if !g.IsEmpty(recordTotal) && recordTotal.Cmp(decimal.NewFromInt(0)) != 0 {
+		// 设置记录描述
+		moneyVo.RecordDesc = "管理员后台修改"
+		// 设置交易类型为存款
+		moneyVo.TradeTypeDeposit = consts.TRADE_TYPE_DEPOSIT
+		// 调用存钱方法
+		_, err := service.UserResource().Money(ctx, moneyVo)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		return false, gerror.NewCode(gcode.CodeInvalidParameter, "验证失败")
+	}
+
+	return true, nil
+}
+
+// UpdatePoints 更新积分
+func (s *sUserResource) UpdatePoints(ctx context.Context, userPointsVo *model.UserPointsVo) (bool, error) {
+	points := decimal.NewFromFloat(userPointsVo.Points)
+
+	if !g.IsEmpty(points) && points.Cmp(decimal.NewFromFloat(0)) != 0 {
+		userPointsVo.PointsTypeId = consts.POINTS_TYPE_OTHER
+		userPointsVo.PointsLogDesc = "管理员后台修改"
+		_, err := service.UserResource().Points(ctx, userPointsVo)
+		if err != nil {
+			return false, err
+		}
+	} else {
+		return false, gerror.NewCode(gcode.CodeInvalidParameter, "验证失败")
+	}
+
+	return true, nil
+}
+
+// Money 处理资金相关操作
+func (s *sUserResource) Money(ctx context.Context, vo *model.MoneyVo) (bool, error) {
+	money := vo.RecordTotal
+	tradeTypeDeposit := vo.TradeTypeDeposit
+	date := gtime.Now()
+	curTime := gtime.New(date.Format("yyyy-MM-dd"))
+
+	consumeRecordRow := &do.ConsumeRecord{
+		OrderId:      vo.OrderId,
+		UserId:       vo.UserId,
+		UserNickname: "",
+		RecordTime:   date.TimestampMilli(),
+		RecordDate:   curTime,
+		RecordYear:   uint(date.Year()),
+		RecordMonth:  uint(date.Month()),
+		RecordDay:    uint(date.Day()),
+		RecordDesc:   vo.RecordDesc,
+	}
+
+	// 获取用户信息
+	userInfo, err := dao.UserInfo.Get(ctx, vo.UserId)
+	if err != nil {
+		return false, err
+	}
+	if userInfo != nil {
+		consumeRecordRow.UserNickname = userInfo.UserNickname
+	}
+
+	// 设置记录标题
+	if vo.PaymentTypeId == consts.PAYMENT_TYPE_OFFLINE {
+		consumeRecordRow.RecordTitle = "线下"
+	} else {
+		consumeRecordRow.RecordTitle = "线上"
+	}
+
+	// 获取用户资源
+	userResource, err := service.UserResource().Get(ctx, vo.UserId)
+	if err != nil {
+		return false, err
+	}
+	if userResource == nil {
+		userResource = &entity.UserResource{UserId: vo.UserId}
+	}
+
+	// 通用判断
+	TRADE_TYPE_MAP := map[uint]string{1201: "购物", 1202: "转账", 1203: "充值", 1204: "提现", 1205: "销售", 1206: "佣金", 1207: "退货付款", 1208: "退货收款", 1209: "转账收款", 1210: "佣金付款", 1211: "分红", 1212: "购买SP", 1213: "销售SP", 1214: "线下消费", 1215: "其它"}
+	title := fmt.Sprintf("%s %s", vo.RecordDesc, TRADE_TYPE_MAP[tradeTypeDeposit])
+
+	switch tradeTypeDeposit {
+	case consts.TRADE_TYPE_WITHDRAW:
+		userMoneyFrozen := gconv.Float64(userResource.UserMoneyFrozen)
+		if money > 0 && userMoneyFrozen < -money {
+			return false, gerror.New("金额不足！")
+		}
+		userResource.UserMoneyFrozen = userMoneyFrozen + money
+
+	case consts.TRADE_TYPE_SHOPPING_CARD, consts.TRADE_TYPE_DEPOSIT_CARD:
+		userRechargeCard := gconv.Float64(userResource.UserRechargeCard)
+		if money < 0 && userRechargeCard < -money {
+			return false, gerror.New("金额不足！")
+		}
+		userResource.UserRechargeCard = userRechargeCard + money
+
+	case consts.TRADE_TYPE_DEPOSIT, consts.TRADE_TYPE_TRANSFER, consts.TRADE_TYPE_COMMISSION, consts.TRADE_TYPE_RETURN_GROUPBOOKING:
+		fallthrough
+	default:
+		userMoney := gconv.Float64(userResource.UserMoney)
+		if money < 0 && userMoney < -money {
+			return false, gerror.New("金额不足！")
+		}
+		userResource.UserMoney = userMoney + money
+	}
+
+	consumeRecordRow.RecordTitle = title
+
+	if tradeTypeDeposit == consts.TRADE_TYPE_DEPOSIT_CARD || tradeTypeDeposit == consts.TRADE_TYPE_SHOPPING_CARD {
+		consumeRecordRow.PaymentMetId = consts.PAYMENT_MET_RECHARGE_CARD
+	} else {
+		consumeRecordRow.PaymentMetId = consts.PAYMENT_MET_MONEY
+	}
+
+	consumeRecordRow.RecordTotal = money
+	if money > 0 {
+		consumeRecordRow.RecordMoney = money - vo.RecordCommissionFee
+	} else {
+		consumeRecordRow.RecordMoney = money + vo.RecordCommissionFee
+	}
+	consumeRecordRow.RecordCommissionFee = vo.RecordCommissionFee
+	consumeRecordRow.TradeTypeId = tradeTypeDeposit
+
+	// 保存消费记录
+	if _, err := dao.ConsumeRecord.Add(ctx, consumeRecordRow); err != nil {
+		return false, gerror.New("ResultCode.FAILED")
+	}
+
+	// 更新用户资源
+
+	input := &do.UserResource{}
+	gconv.Scan(userResource, input)
+	if _, err := service.UserResource().Edit(ctx, input); err != nil {
+		return false, gerror.New("ResultCode.FAILED")
+	}
+
+	/*	// 发送余额变动通知
+		messageId := "balance-change-reminder"
+		args := map[string]interface{}{
+			"user_money":        userResource.UserMoney,
+			"change_time":       date.Format("yyyy-MM-dd HH:mm:ss"),
+			"des":               vo.RecordDesc,
+			"user_money_freeze": 0,
+		}
+		service.Message().SendNoticeMsg(ctx, vo.UserId, messageId, args)
+	*/
+	return true, nil
+}
+
+// TimeRange 结构体表示时间范围
+type TimeRange struct {
+	Start int64 // 起始时间，Unix时间戳（毫秒）
+	End   int64 // 结束时间，Unix时间戳（毫秒）
 }

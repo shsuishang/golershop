@@ -32,7 +32,7 @@ type OrderReturnVo struct {
 	ReturnNum                uint                 `json:"return_num" description:"退货商品总数量"`               // 退货商品总数量
 	SubmitReturnRefundAmount float64              `json:"submit_return_refund_amount" description:"退款金额"` // 退款金额
 	ReturnReasonName         string               `json:"return_reason_name" description:"售后理由"`          // 售后理由
-	Items                    []*OrderReturnItemVo `json:"items" description:"退货订单商品信息"`                   // 退货订单商品信息
+	ReturnItemList           []*OrderReturnItemVo `json:"return_item_list" description:"退货订单商品信息"`        // 退货订单商品信息
 
 	BuyerUserName string `json:"buyer_user_name" dc:"客户名称"` // 客户名称
 	DaName        string `json:"da_name" dc:"联系人"`          // 联系人

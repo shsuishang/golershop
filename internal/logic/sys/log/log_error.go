@@ -22,10 +22,8 @@ package log
 
 import (
 	"context"
-	"fmt"
 	"github.com/gogf/gf/v2/os/grpool"
 	"github.com/gogf/gf/v2/os/gtime"
-	"github.com/mileusna/useragent"
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -73,17 +71,6 @@ func (s *sLogError) Error(ctx context.Context, msg string, errType uint) {
 	//	userId = user.UserId
 	//} else {
 	//}
-
-	ua := useragent.Parse(r.UserAgent())
-
-	// 获取浏览器名称和版本号
-	browserName := ua.Name
-	browserVersion := ua.Version
-	fmt.Println("Browser:", browserName, browserVersion)
-
-	// 获取操作系统名称
-	osName := ua.OS
-	fmt.Println("Operating System:", osName)
 
 	AccessClientId = r.GetSessionId()
 

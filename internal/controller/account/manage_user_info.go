@@ -3,11 +3,13 @@ package account
 import (
 	"context"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/google/uuid"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/account"
 	"golershop.cn/internal/consts"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
@@ -26,6 +28,7 @@ func (c *cUserInfo) List(ctx context.Context, req *account.UserInfoListReq) (res
 	gconv.Scan(req, &input)
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
 
+	input.Order = []*ml.BaseOrder{{Sidx: dao.UserInfo.Columns().UserId, Sort: ml.ORDER_BY_DESC}}
 	var result, error = service.UserInfo().GetList(ctx, &input)
 
 	if error != nil {
@@ -85,20 +88,12 @@ func (c *cUserInfo) Edit(ctx context.Context, req *account.UserInfoEditReq) (res
 
 // Remove 删除菜单
 func (c *cUserInfo) Remove(ctx context.Context, req *account.UserInfoRemoveReq) (res *account.UserInfoRemoveRes, err error) {
+	for _, userId := range req.UserId {
+		_, error := service.UserInfo().RemoveUser(ctx, userId)
 
-	var _, error = service.UserInfo().Remove(ctx, req.UserId)
-
-	/*
-		input := do.UserInfo{}
-		input.UserInfoTime = gtime.Now()
-		input.UserId = req.UserId[0]
-		input.UserInfoSort = 0
-
-		var _, error = service.UserInfo().Edit(ctx, &input)
-	*/
-
-	if error != nil {
-		err = error
+		if error != nil {
+			err = error
+		}
 	}
 
 	res = &account.UserInfoRemoveRes{}
@@ -151,6 +146,21 @@ func (c *cUserInfo) AddTags(ctx context.Context, req *account.UserInfoAddTagsReq
 	}
 
 	res = &account.UserInfoAddTagsRes{}
+
+	return
+}
+
+func (c *cUserInfo) AddVouchers(ctx context.Context, req *account.UserInfoAddVouchersReq) (res *account.UserInfoAddVouchersRes, err error) {
+
+	userIdList := gconv.SliceUint(gstr.SplitAndTrim(req.UserIds, ","))
+
+	err = service.UserInfo().AddVouchers(ctx, userIdList, req.ActivityId)
+
+	if err != nil {
+		return
+	}
+
+	res = &account.UserInfoAddVouchersRes{}
 
 	return
 }

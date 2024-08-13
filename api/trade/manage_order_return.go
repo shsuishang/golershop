@@ -126,9 +126,10 @@ type OrderReturnCancelRes struct {
 }
 
 type OrderReturnReviewReq struct {
-	g.Meta            `path:"/manage/trade/orderReturn/review" tags:"售后订单" method:"post" summary:"退单审核接口"`
-	ReturnId          string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
-	OrderReviewReason string `json:"order_review_reason"  dc:"原因"`
+	g.Meta           `path:"/manage/trade/orderReturn/review" tags:"售后订单" method:"post" summary:"退单审核接口"`
+	ReturnId         string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
+	ReturnFlag       uint   `json:"return_flag"  dc:"退货类型(ENUM): 0-不用退货;1-需要退货"`
+	ReceivingAddress uint   `json:"receiving_address"  dc:"收货地址"`
 }
 
 type OrderReturnReviewRes struct {
@@ -143,6 +144,60 @@ type ReturnStateLogListReq struct {
 }
 
 type ReturnStateLogListRes struct {
+	Items   interface{} `json:"items"    dc:"分页数据内容"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}
+
+type GetByReturnIdReq struct {
+	g.Meta `path:"/manage/trade/orderReturn/getByReturnId" tags:"退款退货" method:"get" summary:"退款退货详情接口"`
+	ml.BaseList
+
+	ReturnId string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
+}
+
+type GetByReturnIdRes model.OrderReturnVo
+
+type OrderReturnReceiveReq struct {
+	g.Meta `path:"/manage/trade/orderReturn/receive" tags:"退货单审核-确认收货" method:"post" summary:"退货单审核-确认收货接口"`
+	ml.BaseList
+
+	ReturnId string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
+}
+
+type OrderReturnReceiveRes struct {
+	Items   interface{} `json:"items"    dc:"分页数据内容"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}
+
+type OrderReturnRefundReq struct {
+	g.Meta `path:"/manage/trade/orderReturn/refund" tags:"退货单审核-确认收货" method:"post" summary:"退货单审核-确认收货接口"`
+	ml.BaseList
+
+	ReturnId string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
+}
+
+type OrderReturnRefundRes struct {
+	Items   interface{} `json:"items"    dc:"分页数据内容"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}
+
+type OrderReturnRefusedReq struct {
+	g.Meta `path:"/manage/trade/orderReturn/refused" tags:"退货单审核-确认收货" method:"post" summary:"退货单审核-确认收货接口"`
+	ml.BaseList
+
+	ReturnId string `json:"return_id"   v:"required#请输入退单编号"                  ` // 退单号
+}
+
+type OrderReturnRefusedRes struct {
 	Items   interface{} `json:"items"    dc:"分页数据内容"`
 	Page    int         `json:"page"`    // 分页号码
 	Total   int         `json:"total"`   // 总页数

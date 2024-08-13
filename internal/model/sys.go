@@ -55,3 +55,20 @@ type PageCategoryNavVo struct {
 	ProductCategoryTree    interface{} `json:"product_category_tree" ` // 分类树
 	ProductItems           interface{} `json:"product_items" `         // 商品列表
 }
+
+// PageDataVo 活动规则
+type PageDataVo struct {
+	ItemId             uint64  `json:"item_id" dc:"主键"`                 // 主键
+	ItemName           string  `json:"item_name" dc:"标题"`               // 标题
+	ProductImage       string  `json:"product_image" dc:"产品图片"`         // 产品图片
+	GroupSalePrice     float64 `json:"group_sale_price" dc:"销售价"`       // 销售价
+	ItemUnitPrice      float64 `json:"item_unit_price" dc:"市场价"`        // 市场价
+	GroupQuantity      uint    `json:"group_quantity" dc:"开团人数"`        // 开团人数
+	GroupUserAmount    uint    `json:"group_user_amount" dc:"参团人数"`     // 参团人数
+	VoucherImage       string  `json:"voucher_image" dc:"优惠券图片"`        // 优惠券图片
+	VoucherPrice       int     `json:"voucher_price" dc:"优惠券价格"`        // 优惠券价格
+	ActivityStarttime  string  `json:"activity_starttime" dc:"活动开始时间"`  // 活动开始时间
+	ActivityEndtime    string  `json:"activity_endtime" dc:"活动结束时间"`    // 活动结束时间
+	VoucherPreQuantity int     `json:"voucher_pre_quantity" dc:"优惠券数量"` // 优惠券数量
+	ProductSaleNum     int     `json:"product_sale_num" dc:"售出数量"`      // 售出数量
+}

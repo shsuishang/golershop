@@ -211,6 +211,10 @@ func (dao *OrderItemDao) Gets(ctx context.Context, id any) (entitys []*entity.Or
 		err = dao.Ctx(ctx).WherePri(id).Scan(&entitys)
 	}
 
+	for i, entity := range entitys {
+		entitys[i].OrderItemCanRefundAmount = entity.OrderItemPaymentAmount - entity.OrderItemVoucher - entity.OrderItemReduce
+	}
+
 	return entitys, err
 }
 
@@ -234,6 +238,10 @@ func (dao *OrderItemDao) Find(ctx context.Context, in *do.OrderItemListInput) (o
 	// 对象转换
 	if err := query.Scan(&out); err != nil {
 		return out, err
+	}
+
+	for i, entity := range out {
+		out[i].OrderItemCanRefundAmount = entity.OrderItemPaymentAmount - entity.OrderItemVoucher - entity.OrderItemReduce
 	}
 
 	return out, nil
@@ -336,6 +344,10 @@ func (dao *OrderItemDao) List(ctx context.Context, in *do.OrderItemListInput) (o
 	// 对象转换
 	if err := query.Scan(&out.Items); err != nil {
 		return out, err
+	}
+
+	for i, entity := range out.Items {
+		out.Items[i].OrderItemCanRefundAmount = entity.OrderItemPaymentAmount - entity.OrderItemVoucher - entity.OrderItemReduce
 	}
 
 	return out, nil

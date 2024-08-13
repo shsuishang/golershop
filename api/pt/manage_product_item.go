@@ -76,3 +76,30 @@ type ProductItemListRes struct {
 	Records int         `json:"records"` // 数据总数
 	Size    int         `json:"size"`    // 单页数量
 }
+
+type ProductEditStockReq struct {
+	g.Meta `path:"/manage/pt/productItem/editStock" tags:"更改库存" method:"post" summary:"更改库存接口"`
+	ml.BaseList
+
+	ItemId       uint64 `json:"item_id"              ` // 商品编号-SKU编号
+	ItemQuantity int    `json:"item_quantity"        ` // 商品库存
+	BillTypeId   uint   `json:"bill_type_id"         ` // 业务类别(ENUM):2750-入库;2700-出库
+}
+
+type ProductEditStockRes struct {
+}
+
+type StockBillItemListReq struct {
+	g.Meta `path:"/manage/pt/productItem/getStockBillItems" tags:"出入库单据item表" method:"get" summary:"出入库单据item表接口"`
+	ml.BaseList
+
+	ItemId uint64 `json:"item_id"              ` // 商品编号-SKU编号
+}
+
+type StockBillItemListRes struct {
+	Items   interface{} `json:"items"    dc:"分页数据内容"`
+	Page    int         `json:"page"`    // 分页号码
+	Total   int         `json:"total"`   // 总页数
+	Records int         `json:"records"` // 数据总数
+	Size    int         `json:"size"`    // 单页数量
+}

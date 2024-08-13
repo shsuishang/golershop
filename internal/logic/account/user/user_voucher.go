@@ -22,9 +22,12 @@ package user
 
 import (
 	"context"
-	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/os/gtime"
+	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/shop"
 	"golershop.cn/internal/consts"
 	"golershop.cn/internal/dao"
@@ -32,7 +35,7 @@ import (
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/model/entity"
 	"golershop.cn/internal/service"
-	"time"
+	"golershop.cn/utility/array"
 )
 
 type sUserVoucher struct{}
@@ -142,11 +145,9 @@ func (s *sUserVoucher) GetList(ctx context.Context, in *do.UserVoucherListInput)
 		return nil, err
 	}
 
-	gconv.Scan(voucherPage, output)
-
 	if voucherPage != nil && len(voucherPage.Items) > 0 {
 		output.Items = make([]*model.UserVoucherRes, 0, len(voucherPage.Items))
-		currentTime := time.Now().Unix() * 1000
+		currentTime := gtime.Now().TimestampMilli()
 
 		for _, userVoucher := range voucherPage.Items {
 			userVoucherRes := &model.UserVoucherRes{}
@@ -177,52 +178,69 @@ func (s *sUserVoucher) GetLists(ctx context.Context, voucherListReq *shop.UserVo
 	voucherResPage = &model.UserVoucherListOutput{}
 
 	// 创建查询条件
-	voucherQueryWrapper := dao.UserVoucher.Ctx(ctx)
+	voucherQueryWrapper := do.UserVoucherListInput{}
 
 	if !g.IsEmpty(voucherListReq.UserId) {
-		voucherQueryWrapper = voucherQueryWrapper.Where("user_id", voucherListReq.UserId)
+		voucherQueryWrapper.Where.UserId = voucherListReq.UserId
 	}
 
 	if !g.IsEmpty(voucherListReq.ActivityId) {
-		voucherQueryWrapper = voucherQueryWrapper.Where("activity_id", voucherListReq.ActivityId)
+		voucherQueryWrapper.Where.ActivityId = voucherListReq.ActivityId
 	}
 
 	if !g.IsEmpty(voucherListReq.StoreId) {
-		voucherQueryWrapper = voucherQueryWrapper.Where("store_id", voucherListReq.StoreId)
+		voucherQueryWrapper.Where.StoreId = voucherListReq.StoreId
 	}
 
-	// 优惠券是否生效
-	times := time.Now().Unix() * 1000
+	//优惠券是否生效
+	times := gtime.Now().TimestampMilli()
 	if voucherListReq.VoucherEffect {
-		voucherQueryWrapper = voucherQueryWrapper.Where(gdb.Map{
-			"voucher_start_date <=": times,
-			"voucher_end_date >=":   times,
-		})
+		var likes = []*ml.WhereExt{{
+			Column: dao.UserVoucher.Columns().VoucherStartDate,
+			Val:    times,
+			Symbol: ml.LE,
+		}, {
+			Column: dao.UserVoucher.Columns().VoucherEndDate,
+			Val:    times,
+			Symbol: ml.GT,
+		}}
+		voucherQueryWrapper.WhereExt = likes
 	}
 
 	// 处理全部券1、线下券2、线上券3
 	if !g.IsEmpty(voucherListReq) {
 		switch voucherListReq.VoucherUserWay {
 		case 2:
-			voucherQueryWrapper = voucherQueryWrapper.Where("writeoff_code !=", "")
+			var likes = []*ml.WhereExt{{
+				Column: dao.UserVoucher.Columns().WriteoffCode,
+				Val:    times,
+				Symbol: ml.NE,
+			}}
+			voucherQueryWrapper.WhereExt = likes
 		case 3:
-			voucherQueryWrapper = voucherQueryWrapper.Where("writeoff_code =", "")
+			voucherQueryWrapper.Where.WriteoffCode = nil
 		}
 	}
 
 	if !g.IsEmpty(voucherListReq.VoucherStateId) {
-		voucherQueryWrapper = voucherQueryWrapper.Where("voucher_state_id", voucherListReq.VoucherStateId)
+		voucherQueryWrapper.Where.VoucherStateId = voucherListReq.VoucherStateId
 	}
-
-	voucherQueryWrapper = voucherQueryWrapper.OrderDesc("user_voucher_time").OrderAsc("voucher_state_id")
+	var order = []*ml.BaseOrder{{
+		Sort: ml.ORDER_BY_DESC,
+		Sidx: dao.UserVoucher.Columns().UserVoucherTime,
+	}, {
+		Sort: ml.ORDER_BY_ASC,
+		Sidx: dao.UserVoucher.Columns().VoucherStateId,
+	}}
+	voucherQueryWrapper.Order = order
 
 	// 查询分页数据
-	voucherPage, err := voucherQueryWrapper.Page(voucherListReq.Page, voucherListReq.Size).All()
+	voucherPage, err := dao.UserVoucher.Find(ctx, &voucherQueryWrapper)
 	if err != nil {
 		return nil, err
 	}
 
-	if !voucherPage.IsEmpty() {
+	if !g.IsEmpty(voucherPage) {
 		err := gconv.Struct(voucherPage, &voucherResPage.Items)
 		if err != nil {
 			return nil, err
@@ -230,7 +248,7 @@ func (s *sUserVoucher) GetLists(ctx context.Context, voucherListReq *shop.UserVo
 		var userVoucherList []model.UserVoucherRes
 		gconv.Struct(voucherPage, &userVoucherList)
 		userVoucherReList := make([]*model.UserVoucherRes, 0)
-		currentTime := time.Now().Unix() * 1000
+		currentTime := gtime.Now().TimestampMilli()
 
 		for _, userVoucher := range userVoucherList {
 			var userVoucherRes *model.UserVoucherRes
@@ -357,4 +375,162 @@ func (s *sUserVoucher) GetEachVoucherNum(ctx context.Context, voucherStateId, us
 	voucherCountRes.VoucherTimeoutNum = countTimeout
 
 	return voucherCountRes, nil
+}
+
+// AddVoucher 领取代金券
+func (s *sUserVoucher) AddVoucher(ctx context.Context, activityId, userId uint) (*entity.UserVoucher, error) {
+	voucher := &entity.UserVoucher{
+		UserVoucherTime: gtime.Now(),
+		ActivityId:      activityId,
+		VoucherStateId:  consts.VOUCHER_STATE_UNUSED,
+		UserId:          userId,
+	}
+
+	// 获取活动信息
+	activityBase, err := service.ActivityBase().Get(ctx, activityId)
+	if err != nil {
+		return nil, gerror.New("活动不存在！")
+	}
+
+	if activityBase == nil || activityBase.ActivityState != consts.ACTIVITY_STATE_NORMAL {
+		return nil, gerror.New("活动未开启,领取失败！")
+	}
+
+	// 判断优惠券是否有等级限制
+	activityUseLevel := activityBase.ActivityUseLevel
+	if !g.IsEmpty(activityUseLevel) {
+		userLevels := gconv.SliceUint(gstr.SplitAndTrim(activityUseLevel, ","))
+		if len(userLevels) > 0 {
+			userInfo, err := dao.UserInfo.Get(ctx, userId)
+			if err != nil {
+				return nil, gerror.New("用户信息不存在！")
+			}
+
+			if !array.InArray(userLevels, userInfo.UserLevelId) {
+				return nil, gerror.New("不属于该优惠券指定的会员等级，领取失败！")
+			}
+		}
+	}
+	// 判断代金券数量是否足够
+	activityRule := activityBase.ActivityRule
+	var activityRuleVo model.ActivityRuleVo
+	if err := gconv.Struct(activityRule, &activityRuleVo); err != nil {
+		return nil, gerror.New("活动规则为空！")
+	}
+
+	voucherVo := activityRuleVo.Voucher
+	if g.IsEmpty(voucherVo) {
+		return nil, gerror.New("活动优惠券信息为空！")
+	}
+
+	voucherQuantity := voucherVo.VoucherQuantity
+	voucherQuantityFree := voucherVo.VoucherQuantityFree
+	if gconv.Int(voucherQuantity)+gconv.Int(voucherQuantityFree) <= 0 {
+		return nil, gerror.New("代金券已经被抢完,领取失败！")
+	}
+
+	//优惠券限制判断
+	voucherPreQuantity := voucherVo.VoucherPreQuantity
+	voucherSize := 0
+	userVoucherNum, err := dao.UserVoucherNum.FindOne(ctx, &do.UserVoucherNumListInput{
+		Where: do.UserVoucherNum{
+			ActivityId: activityId,
+			UserId:     userId,
+		},
+	})
+	if err != nil {
+		return nil, gerror.New("查询用户优惠券数量失败！")
+	}
+	if userVoucherNum != nil {
+		voucherSize = int(userVoucherNum.UvnNum)
+	}
+
+	if uint(voucherSize) < voucherPreQuantity {
+		requirement := activityRuleVo.Requirement
+		buy := requirement.Buy
+		item := buy.Item
+		subtotal := buy.Subtotal
+		voucherPrice := voucherVo.VoucherPrice
+		voucher.VoucherSubtotal = subtotal
+		voucher.VoucherPrice = voucherPrice
+		voucher.VoucherStartDate = voucherVo.VoucherStartDate
+		voucher.VoucherEndDate = voucherVo.VoucherEndDate
+		voucher.StoreId = activityBase.StoreId
+		voucher.ActivityName = activityBase.ActivityName
+		voucher.ActivityRule = activityBase.ActivityRule
+		if len(item) > 0 {
+			voucher.ItemId = gstr.Join(gconv.Strings(item), ",")
+		}
+
+		activityType := activityBase.ActivityType
+		pointsNeeded := 0
+		if activityType == consts.GET_VOUCHER_BY_POINT {
+			points := requirement.Points
+			pointsNeeded = points.Needed
+			if pointsNeeded <= 0 {
+				return nil, gerror.New("该活动信息错误，积分需大于0！")
+			}
+			// TODO: 积分操作
+		}
+		input := &do.UserVoucher{}
+		gconv.Scan(voucher, input)
+		if _, err := dao.UserVoucher.Save(ctx, input); err != nil {
+			return nil, gerror.New("用户优惠券领取失败！")
+		}
+
+		newUserVoucherNum := do.UserVoucherNum{}
+		gconv.Scan(userVoucherNum, &newUserVoucherNum)
+		if !g.IsEmpty(newUserVoucherNum) {
+			newUserVoucherNum.UvnNum = userVoucherNum.UvnNum + 1
+			if _, err := dao.UserVoucherNum.Edit(ctx, newUserVoucherNum.UvnId, &newUserVoucherNum); err != nil {
+				return nil, gerror.New("优惠券领取失败！")
+			}
+		} else {
+			newUserVoucherNum = do.UserVoucherNum{
+				ActivityId: activityId,
+				UserId:     userId,
+				UvnNum:     1,
+			}
+			if _, err := dao.UserVoucherNum.Add(ctx, &newUserVoucherNum); err != nil {
+				return nil, gerror.New("优惠券领取失败！")
+			}
+		}
+
+		// 更新活动数据
+		voucherQuantityUse := gconv.Int(voucherVo.VoucherQuantityUse) + 1
+		voucherVo.VoucherQuantityUse = gconv.Uint(voucherQuantityUse)
+		voucherVo.VoucherQuantityFree = -voucherQuantityUse
+		activityRuleVo.Voucher = voucherVo
+		activity := &do.ActivityBase{
+			ActivityId:   activityId,
+			ActivityRule: gconv.String(activityRuleVo),
+		}
+
+		// 判断是否领完
+		if gconv.Int(voucherQuantity) <= voucherQuantityUse {
+			activity.ActivityState = consts.ACTIVITY_STATE_FINISHED
+		}
+
+		if _, err := dao.ActivityBase.Edit(ctx, activityId, activity); err != nil {
+			return nil, gerror.New("更新优惠券信息失败！")
+		}
+
+		if activityType == consts.GET_VOUCHER_BY_POINT {
+			// TODO: 积分操作
+		}
+	} else {
+		return nil, gerror.New("领取数量超限！")
+	}
+
+	// 发送消息通知
+	/*	messageId := "coupons-to-the-accounts"
+		args := g.Map{
+			"name":    activityBase.ActivityTitle,
+			"endtime": gtime.New(activityBase.ActivityEndtime).Format("Y-m-d H:i:s"),
+		}
+		if err := service.Message().SendNoticeMsg(ctx, userId, messageId, args); err != nil {
+			return nil, gerror.New("发送消息通知失败！")
+		}*/
+
+	return voucher, nil
 }
