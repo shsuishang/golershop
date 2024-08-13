@@ -542,8 +542,6 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
 	var output []*model.ProductItemVo
 
 	if len(itemIds) > 0 {
-		//todo 参与活动信息，格式化活动数据
-		activityInfoList, _ := service.ActivityItem().GetActivityInfo(ctx, itemIds)
 
 		itemList, _ := dao.ProductItem.Gets(ctx, itemIds)
 
@@ -576,34 +574,11 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
 				userLevelRate = userLevelRateMap[userInfo.UserLevelId]
 			}
 
-			//是否有活动信息
-			var activityInfoVo *model.ActivityInfoVo
-			for _, info := range activityInfoList {
-				if info.ItemId == itVo.ItemId {
-					activityInfoVo = info
-					break
-				}
-			}
-
-			if activityInfoVo != nil && s.checkSingleActivity(ctx, activityInfoVo.ActivityTypeId) {
-				itVo.ActivityInfo = activityInfoVo
-
-				//判断是否执行活动信息
-				if true {
-					itVo.ActivityId = activityInfoVo.ActivityId
-				}
-
-					itVo.ItemSalePrice = activityInfoVo.ActivityItemPrice
-					itVo.ItemSavePrice = itVo.ItemUnitPrice - activityInfoVo.ActivityItemPrice
-					itVo.ItemDiscountAmount = itVo.ItemSavePrice * float64(itVo.CartQuantity)
-
-			} else {
-				//用户等级判断
-				if userLevelRate != 100 {
-					itVo.ItemSalePrice = itVo.ItemUnitPrice * float64(userLevelRate) / 100
-					itVo.ItemSavePrice = itVo.ItemUnitPrice - itVo.ItemSalePrice
-					itVo.ItemDiscountAmount = itVo.ItemSavePrice * float64(itVo.CartQuantity)
-				}
+			//用户等级判断
+			if userLevelRate != 100 {
+				itVo.ItemSalePrice = itVo.ItemUnitPrice * float64(userLevelRate) / 100
+				itVo.ItemSavePrice = itVo.ItemUnitPrice - itVo.ItemSalePrice
+				itVo.ItemDiscountAmount = itVo.ItemSavePrice * float64(itVo.CartQuantity)
 			}
 
 			output = append(output, itVo)
@@ -682,10 +657,6 @@ func (s *sProductBase) GetItems(ctx context.Context, itemIds []uint64, userId ui
  * @param activityTypeId
  * @return
  */
-func (s *sProductBase) checkSingleActivity(ctx context.Context, activityTypeId uint) bool {
-
-	return true
-}
 
 // BatchEditState 批量编辑商品状态
 func (s *sProductBase) BatchEditState(ctx context.Context, productIds []uint64, productStateId uint) (result bool, err error) {
