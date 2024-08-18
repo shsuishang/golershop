@@ -47,6 +47,7 @@ type OrderBaseEditStateRes struct {
 type OrderBaseAddReq struct {
 	g.Meta `path:"/manage/trade/orderBase/add" tags:"交易订单" method:"post" summary:"订单新增接口"`
 
+	ProductItems string `json:"product_items"    dc:"商品信息"`
 	OrderBaseAdd
 }
 

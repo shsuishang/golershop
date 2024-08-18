@@ -2,7 +2,10 @@ package trade
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"github.com/gogf/gf/v2/errors/gerror"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/trade"
@@ -57,21 +60,37 @@ func (c *cOrderBase) List(ctx context.Context, req *trade.OrderListReq) (res *tr
 // Add 新增订单
 func (c *cOrderBase) Add(ctx context.Context, req *trade.OrderBaseAddReq) (res *trade.OrderBaseEditRes, err error) {
 
-	input := do.OrderBase{}
-	gconv.Scan(req, &input)
+	input := &model.CheckoutInput{}
+	gconv.Scan(req, input)
 
-	var result, error = service.OrderBase().Add(ctx, &input)
-	//var result, error = service.OrderBase().Edit(ctx, req)
-
-	if error != nil {
-		err = error
+	// 如果商品数据为空，抛出业务异常
+	if g.IsEmpty(req.ProductItems) {
+		return nil, gerror.New("商品数据为空！")
 	}
 
-	res = &trade.OrderBaseEditRes{
-		OrderId: result,
+	var checkoutItemVos []*model.CheckoutItemVo
+	err = json.Unmarshal([]byte(req.ProductItems), &checkoutItemVos)
+	if err != nil || len(checkoutItemVos) == 0 {
+		return nil, gerror.New("商品数据错误！")
 	}
 
-	return
+	// 设置商品项
+	input.Items = checkoutItemVos
+
+	// 调用服务替换添加
+	output, err := service.Order().Add(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 如果订单 ID 不为空，则表示成功
+	if len(output.OrderIds) > 0 {
+		res.OrderId = output.OrderIds
+		return res, nil
+	}
+
+	// 返回失败
+	return nil, gerror.New("下单失败")
 }
 
 // Edit 编辑订单

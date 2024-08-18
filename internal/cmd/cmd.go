@@ -68,6 +68,7 @@ var (
 					account.User,
 					account.UserInvoice,
 					account.UserDeliveryAddress,
+					account.DeliveryAddress,
 					account.UserLevel,
 					account.UserInfo,
 					account.UserMessage,

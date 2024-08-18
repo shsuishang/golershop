@@ -7,6 +7,7 @@ import (
 	"github.com/go-pay/gopay/wechat/v3"
 	"github.com/go-pay/xlog"
 	"github.com/gogf/gf/v2/crypto/gmd5"
+	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -16,6 +17,7 @@ import (
 	"golershop.cn/internal/dao"
 	"golershop.cn/internal/dao/global"
 	"golershop.cn/internal/model"
+	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 	"golershop.cn/utility"
 	"time"
@@ -441,4 +443,49 @@ func (c *cPaymentIndex) AlipayH5Pay(ctx context.Context, req *pay.AlipayH5PayReq
 	xlog.Debug("payUrl:", payUrl)
 
 	return
+}
+
+// OfflinePay 处理线下支付请求
+func (c *cPaymentIndex) OfflinePay(ctx context.Context, req *pay.OfflinePayReq) (res *pay.OfflinePayRes, err error) {
+
+	// 设置支付渠道和支付类型为线下支付
+	req.PaymentChannelId = consts.PAYMENT_MET_OFFLINE
+	req.DepositPaymentType = consts.PAYMENT_TYPE_OFFLINE
+
+	// 初始化返回结果
+	res = &pay.OfflinePayRes{
+		OrderId: req.OrderId,
+	}
+
+	if !g.IsEmpty(req.OrderId) {
+		// 线下支付，修改线下支付状态
+		orderIds := gconv.Strings(gstr.Split(req.OrderId, ","))
+
+		// 更新支付类型为线下支付
+		for _, orderId := range orderIds {
+			orderInfo := &do.OrderInfo{
+				OrderId:       orderId,
+				PaymentTypeId: consts.PAYMENT_TYPE_OFFLINE,
+			}
+
+			if _, err := service.OrderInfo().Edit(ctx, orderInfo); err != nil {
+				return nil, gerror.New("修改线下支付状态失败！")
+			}
+		}
+
+		// 修改订单为待发货状态
+		for _, orderId := range orderIds {
+			if _, err := service.Order().EditNextState(ctx, orderId, consts.ORDER_STATE_WAIT_PAY, consts.ORDER_STATE_PICKING, "线下支付"); err != nil {
+				return nil, gerror.New("修改订单为待发货状态失败！")
+			}
+		}
+
+		res.Paid = true
+		return res, nil
+	} else {
+		res.Paid = false
+		res.StatusCode = 250
+
+		return nil, gerror.New("订单ID不能为空")
+	}
 }

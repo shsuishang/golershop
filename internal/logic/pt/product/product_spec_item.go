@@ -83,7 +83,7 @@ func (s *sProductSpecItem) Remove(ctx context.Context, id any) (affected int64, 
 	input.WhereExt = []*ml.WhereExt{{
 		Column: dao.ProductItem.Columns().SpecItemIds,
 		Val:    id,
-		Symbol: ml.IN,
+		Symbol: ml.FIND_IN_SET_STR,
 	}}
 
 	count, err := dao.ProductItem.Count(ctx, input)

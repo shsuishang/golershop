@@ -171,3 +171,12 @@ type ProductDateOutput struct {
 	ProductItem  []*entity.ProductItem  `json:"product_item"    dc:"商品SKU"`
 	ProductImage []*entity.ProductImage `json:"product_image"    dc:"商品图片表"`
 }
+
+type ProductItemInput struct {
+	ProductName  string `json:"product_name"   ` // 产品名称
+	ProductId    uint64 `json:"product_id"     ` // 产品编号
+	ItemId       string `json:"item_id"        ` // 商品编号-SKU编号
+	StockWarning int    `json:"stock_warning"  ` // 库存预警
+	Page         int    `json:"page"           ` // 分页号码
+	Size         int    `json:"size"`            // 单页数量
+}

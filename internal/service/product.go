@@ -130,6 +130,7 @@ type (
 		ListItemKey(ctx context.Context, req *pt.ItemListReq) (out *do.ItemListKeyOutput, err error)
 		IfOnSale(ctx context.Context, item *model.ProductItemVo) bool
 		BatchEditStock(ctx context.Context, inputs []*model.ProductEditStockInput) (err error)
+		GetStockWarningItems(ctx context.Context, input *model.ProductItemInput) (*model.ItemListOutput, error)
 	}
 	IProductSpec interface {
 		// Get 读取规格

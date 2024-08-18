@@ -66,12 +66,13 @@ func (c *cOrder) Detail(ctx context.Context, req *trade.UserOrderDetailReq) (res
 // Add 添加订单
 func (c *cOrder) Add(ctx context.Context, req *trade.UserOrderAddReq) (res *trade.UserOrderAddRes, err error) {
 	user := service.BizCtx().GetUser(ctx)
+	input := &model.CheckoutInput{}
 
-	input := &model.CheckoutInput{
-		UserId:       user.UserId,
-		UserNickname: user.UserNickname,
-		Items:        []*model.CheckoutItemVo{},
-	}
+	gconv.Scan(req, &input)
+
+	input.UserId = user.UserId
+	input.UserNickname = user.UserNickname
+	input.Items = make([]*model.CheckoutItemVo, 0)
 
 	if !g.IsEmpty(req.UserVoucherIds) {
 		input.UserVoucherIds = gconv.SliceUint(gstr.Split(req.UserVoucherIds, ","))

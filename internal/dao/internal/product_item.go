@@ -23,6 +23,8 @@ package internal
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"golershop.cn/internal/model"
 	"math"
 
 	"github.com/mallsuite/gocore/core/ml"
@@ -443,4 +445,72 @@ func (dao *ProductItemDao) Count(ctx context.Context, in *do.ProductItemListInpu
 	}
 
 	return count, nil
+}
+
+func (dao *ProductItemDao) GetStockWarningItems(ctx context.Context, params *model.ProductItemInput) (*model.ItemListOutput, error) {
+	// 构建查询条件
+	whereSet := fmt.Sprintf("ppi.item_quantity - ppi.item_quantity_frozen <= %d", params.StockWarning)
+
+	if !g.IsEmpty(params.ProductId) {
+		whereSet += fmt.Sprintf(" AND ppi.product_id = %d", params.ProductId)
+	}
+
+	if !g.IsEmpty(params.ItemId) {
+
+		whereSet += fmt.Sprintf(" AND ppi.item_id IN (%s)", params.ItemId)
+	}
+
+	if !g.IsEmpty(params.ProductName) && params.ProductName != "" {
+		whereSet += fmt.Sprintf(" AND ppb.product_name LIKE '%%%s%%' ", params.ProductName)
+	}
+	params.Page = (params.Page - 1) * params.Size
+	// SQL查询语句
+	sql := fmt.Sprintf(`
+        SELECT 
+            ppi.*, ppb.product_name, ppg.item_image_default AS product_image
+        FROM 
+            pt_product_item ppi
+        INNER JOIN 
+            pt_product_base ppb ON ppi.product_id = ppb.product_id
+        INNER JOIN 
+            pt_product_image ppg ON ppi.product_id = ppg.product_id AND ppi.color_id = ppg.color_id
+        WHERE 
+            %s
+        ORDER BY 
+            ppi.item_id DESC 
+        LIMIT 
+        	%d, %d
+    `, whereSet, params.Page, params.Size)
+
+	// 执行查询
+	out := &model.ItemListOutput{}
+	out.Page = params.Page
+	out.Size = params.Size
+
+	item, err := dao.DB().GetAll(ctx, sql)
+	gconv.Struct(item, &out.Items)
+
+	countSql := fmt.Sprintf(`
+        SELECT 
+            ppi.*, ppb.product_name, ppg.item_image_default AS product_image
+        FROM 
+            pt_product_item ppi
+        INNER JOIN 
+            pt_product_base ppb ON ppi.product_id = ppb.product_id
+        INNER JOIN 
+            pt_product_image ppg ON ppi.product_id = ppg.product_id AND ppi.color_id = ppg.color_id
+        WHERE 
+            %s
+        ORDER BY 
+            ppi.item_id DESC 
+    `, whereSet)
+	count, err := dao.DB().GetAll(ctx, countSql)
+	out.Records = len(count)
+	out.Total = int(math.Ceil(float64(out.Records / out.Size)))
+
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
 }

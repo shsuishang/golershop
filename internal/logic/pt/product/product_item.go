@@ -357,3 +357,18 @@ func (s *sProductItem) BatchEditStock(ctx context.Context, inputs []*model.Produ
 
 	return nil
 }
+
+// GetStockWarningItems 获取库存预警商品
+func (s *sProductItem) GetStockWarningItems(ctx context.Context, input *model.ProductItemInput) (*model.ItemListOutput, error) {
+	// 获取库存预警值
+	stockWarning := service.ConfigBase().GetInt(ctx, "stock_warning", 5)
+	input.StockWarning = stockWarning
+
+	// 调用 DAO 层方法获取库存预警商品
+	out, err := dao.ProductItem.GetStockWarningItems(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	return out, nil
+}

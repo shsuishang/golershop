@@ -174,7 +174,7 @@ func (s *sConsumeTrade) ProcessPay(ctx context.Context, ids string, deposit mode
 					//$paid_order_id_service_row[] = $order_id;
 					//}
 
-					depositTotalFee.Sub(depositTotalFee, tradePaymentAmount)
+					depositTotalFee = depositTotalFee.Sub(depositTotalFee, tradePaymentAmount)
 				} else {
 					tradePaymentAmount = depositTotalFee
 
@@ -277,24 +277,39 @@ func (s *sConsumeTrade) ProcessPay(ctx context.Context, ids string, deposit mode
 				//$flag_row[] = $this->notifyDeposit($order_id, $trade_row);
 			}
 
-			if consts.ORDER_PAID_STATE_YES == tradeData.TradeIsPaid {
-				//判断是否线下支付
-				if consts.PAYMENT_TYPE_OFFLINE == deposit.PaymentTypeId {
-					//直接处理订单支付状态， 不处理订单状态
-					_, err = dao.OrderInfo.Edit(ctx, orderId, &do.OrderInfo{OrderIsPaid: consts.ORDER_PAID_STATE_YES})
-					if err != nil {
-						return out, err
-					}
+			if consts.ORDER_PAID_STATE_YES == tradeData.TradeIsPaid.(uint) {
+				orderInfo, _ := dao.OrderInfo.Get(ctx, orderId)
 
-					out.Paid = true
-				} else {
+				if orderInfo.OrderStateId == consts.ORDER_STATE_WAIT_PAY {
 					_, err = service.Order().SetPaidYes(ctx, orderId)
 					if err != nil {
 						return out, err
 					}
 					out.Paid = true
+				} else {
+					if orderInfo.PaymentTypeId == consts.PAYMENT_TYPE_OFFLINE {
+
+					}
+
+					//判断是否线下支付
+					if consts.PAYMENT_TYPE_OFFLINE == deposit.PaymentTypeId {
+                        //直接处理订单支付状态， 不处理订单状态
+						_, err = dao.OrderInfo.Edit(ctx, orderId, &do.OrderInfo{OrderIsPaid: consts.ORDER_PAID_STATE_YES})
+
+						if err != nil {
+							return out, err
+						}
+
+						out.Paid = true
+					} else {
+						_, err = service.Order().SetPaidYes(ctx, orderId)
+						if err != nil {
+							return out, err
+						}
+						out.Paid = true
+					}
 				}
-			} else if consts.ORDER_PAID_STATE_PART == tradeData.TradeIsPaid {
+			} else if consts.ORDER_PAID_STATE_PART == tradeData.TradeIsPaid.(uint) {
 				_, err = dao.OrderInfo.Edit(ctx, orderId, &do.OrderInfo{OrderIsPaid: consts.ORDER_PAID_STATE_PART})
 				if err != nil {
 					return out, err
@@ -303,8 +318,6 @@ func (s *sConsumeTrade) ProcessPay(ctx context.Context, ids string, deposit mode
 				out.Paid = false
 			}
 		}
-
-		out.Paid = true
 	}
 
 	return

@@ -26,6 +26,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/database/gdb"
+	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/shopspring/decimal"
@@ -416,6 +417,12 @@ func (s *sConsumeDeposit) WechatJSAPI(ctx context.Context, in *do.ConsumeDeposit
 
 // OfflinePay 离线支付
 func (s *sConsumeDeposit) OfflinePay(ctx context.Context, in *do.ConsumeDeposit) (lastInsertId int64, err error) {
+	if g.IsEmpty(in.DepositSubject) {
+		orderInfo, _ := dao.OrderInfo.Get(ctx, in.OrderId)
+		//in.DepositSubject = in.DepositNo
+		in.DepositSubject = orderInfo.OrderTitle
+	}
+
 	lastInsertId, err = s.ProcessDeposit(ctx, in)
 
 	if err != nil {

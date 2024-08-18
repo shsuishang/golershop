@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/pt"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -22,7 +23,7 @@ func (c *cProductTag) List(ctx context.Context, req *pt.ProductTagListReq) (res 
 	gconv.Scan(req, &input)
 
 	ml.ConvertReqToInputWhere(req, &input.Where, &input.WhereExt)
-
+	input.Order = []*ml.BaseOrder{{Sidx: dao.ProductTag.Columns().ProductTagSort, Sort: ml.ORDER_BY_ASC}}
 	var result, error = service.ProductTag().List(ctx, &input)
 
 	if error != nil {

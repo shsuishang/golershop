@@ -89,7 +89,7 @@ func (s *sUserDeliveryAddress) Add(ctx context.Context, in *do.UserDeliveryAddre
 
 	if in.UdIsDefault.(bool) {
 		var ext = []*ml.WhereExt{{
-			Column: dao.UserDeliveryAddress.Columns().UdId, Val: in.UdId, Symbol: ml.NE,
+			Column: dao.UserDeliveryAddress.Columns().UdId, Val: lastInsertId, Symbol: ml.NE,
 		}}
 
 		input := &do.UserDeliveryAddressListInput{

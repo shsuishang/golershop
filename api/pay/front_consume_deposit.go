@@ -109,3 +109,24 @@ type AlipayH5PayRes struct {
 	MwebUrl  string               `json:"mweb_url"` //支付跳转链接
 
 }
+
+type OfflinePayReq struct {
+	g.Meta `path:"/front/pay/consumeDeposit/offlinePay" tags:"支付" method:"post" summary:"在线支付接口"`
+
+	OrderId            string  `json:"order_id"         v:"required#请输入订单编号"           dc:"订单编号(DOT)"`                                       // 订单编号(DOT)
+	PaymentChannelId   uint    `json:"payment_channel_id" dc:"支付渠道"                      d:"1302"`                                           // 支付渠道
+	Openid             string  `json:"openid"             dc:"openid"`                                                                       // openid
+	DepositPaymentType uint    `json:"deposit_payment_type" dc:"支付方式(ENUM):1301-货到付款; 1302-在线支付; 1303-白条支付; 1304-现金支付; 1305-线下支付;" d:"1302"` // 支付方式
+	Password           string  `json:"password"           dc:"支付密码"`                                                                         // 支付密码
+	PmMoney            float64 `json:"pm_money"           dc:"余额支付"`                                                                         // 余额支付
+	PmRechargeCard     float64 `json:"pm_recharge_card"   dc:"充值卡支付"`                                                                        // 充值卡支付
+	PmPoints           float64 `json:"pm_points"          dc:"积分支付"`                                                                         // 积分支付
+	PmCredit           float64 `json:"pm_credit"          dc:"积分支付"`
+}
+
+type OfflinePayRes struct {
+	OrderId    string `json:"order_id"    dc:"订单编号(DOT)"`         // 订单编号(DOT)
+	StatusCode int    `json:"status_code" dc:"状态码" d:"200"`       // 状态码
+	Paid       bool   `json:"paid"        dc:"订单已支付完成" d:"false"` // 订单已支付完成
+	Code       int    `json:"code"        dc:"101：需要支付密码" d:"0"`  // 101：需要支付密码
+}

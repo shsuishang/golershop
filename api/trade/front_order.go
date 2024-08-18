@@ -55,19 +55,19 @@ type UserOrderListRes struct {
 // UserOrderAddReq 订单添加请求结构体
 type UserOrderAddReq struct {
 	g.Meta         `path:"/front/trade/order/add" tags:"交易订单" method:"post" summary:"用户订单添加"`
-	UdId           int    `json:"ud_id"`            // 收货地址编号
-	CartId         string `json:"cart_id"`          // 下单商品数据:商品编号|数量,商品编号|数量...
-	ChainId        int    `json:"chain_id"`         // 门店编号
-	ActivityId     int    `json:"activity_id"`      // 活动编号
-	GbId           int    `json:"gb_id"`            // 拼团编号
-	DeliveryTypeId int    `json:"delivery_type_id"` // 配送方式
-	ChannelType    int    `json:"channel_type"`     // 来源渠道 0:正常下单;1:直播渠道
-	PaymentTypeId  int    `json:"payment_type_id"`  // 付款方式
-	OrderMessage   string `json:"order_message"`    // 消息
-	UserVoucherIds string `json:"user_voucher_ids"` // 优惠券
-	UserInvoiceId  int    `json:"user_invoice_id"`  // 发票
-	UserId         int    `json:"user_id"`          // 买家编号
-	ProductItems   string `json:"product_items"`    // SKU信息
+	UdId           int    `json:"ud_id"`                   // 收货地址编号
+	CartId         string `json:"cart_id"`                 // 下单商品数据:商品编号|数量,商品编号|数量...
+	ChainId        int    `json:"chain_id"`                // 门店编号
+	ActivityId     int    `json:"activity_id"`             // 活动编号
+	GbId           int    `json:"gb_id"`                   // 拼团编号
+	DeliveryTypeId int    `json:"delivery_type_id" d:"10"` // 配送方式
+	ChannelType    int    `json:"channel_type"`            // 来源渠道 0:正常下单;1:直播渠道
+	PaymentTypeId  int    `json:"payment_type_id"`         // 付款方式
+	OrderMessage   string `json:"order_message"`           // 消息
+	UserVoucherIds string `json:"user_voucher_ids"`        // 优惠券
+	UserInvoiceId  int    `json:"user_invoice_id"`         // 发票
+	UserId         int    `json:"user_id"`                 // 买家编号
+	ProductItems   string `json:"product_items"`           // SKU信息
 }
 
 type UserOrderAddRes model.OrderAddOutput
@@ -131,12 +131,12 @@ type UserOrderShippingReq struct {
 	g.Meta  `path:"/front/trade/order/shipping" tags:"交易订单" method:"post" summary:"订单发货审核接口"`
 	OrderId []string `json:"order_id" v:"required#请输入订单编号"   dc:"订单编号"`
 
-	StockBillId         string      `json:"stock_bill_id"     dc:"出库单编号"           `            // 出库单编号
-	SsId                uint        `json:"ss_id"        dc:"发货地址"           `                  // 发货地址
-	LogisticsId         uint        `json:"logistics_id"        dc:"发货物流编号"           `         // 发货物流编号
-	LogisticsTime       *gtime.Time `json:"logistics_time"        dc:"发货时间"           `         // 发货时间
+	StockBillId         string      `json:"stock_bill_id"     dc:"出库单编号"           `          // 出库单编号
+	SsId                uint        `json:"ss_id"        dc:"发货地址"           `                 // 发货地址
+	LogisticsId         uint        `json:"logistics_id"        dc:"发货物流编号"           `      // 发货物流编号
+	LogisticsTime       *gtime.Time `json:"logistics_time"        dc:"发货时间"           `        // 发货时间
 	OrderTrackingNumber string      `json:"order_tracking_number"          dc:"运单号"           ` // 运单号
-	LogisticsExplain    string      `json:"logistics_explain"   dc:"备注"        `                //
+	LogisticsExplain    string      `json:"logistics_explain"   dc:"备注"        `                 //
 
 	ShippingFlag bool `json:"shipping_flag" d:"false"  dc:"发货标记:true-默认全发， false-指定发货"        ` //
 }
@@ -233,13 +233,13 @@ type StoreEvaluationWithContentRes struct {
 type OrderCommentReq struct {
 	g.Meta `path:"/front/trade/order/addOrderComment" tags:"订单评价" method:"post" summary:"订单评价接口"`
 
-	OrderId             string  `json:"order_id"           dc:"订单编号"`                          // 订单编号
+	OrderId             string  `json:"order_id"           dc:"订单编号"`                            // 订单编号
 	Item                string  `json:"item"               dc:"评论详细 -> 对应OrderCommentItemReq"` // 评论详细 -> 对应OrderCommentItemReq
-	CommentContent      string  `json:"comment_content"    dc:"评论内容"`                          // 评论内容
-	StoreDesccredit     float64 `json:"store_desccredit"   dc:"描述相符"`                          // 描述相符
-	StoreServicecredit  float64 `json:"store_servicecredit" dc:"服务评价"`                         // 服务评价
-	StoreDeliverycredit float64 `json:"store_deliverycredit" dc:"物流评价"`                        // 物流评价
-	CommentIsAnonymous  bool    `json:"comment_is_anonymous" dc:"匿名评价"`                        // 匿名评价
+	CommentContent      string  `json:"comment_content"    dc:"评论内容"`                            // 评论内容
+	StoreDesccredit     float64 `json:"store_desccredit"   dc:"描述相符"`                            // 描述相符
+	StoreServicecredit  float64 `json:"store_servicecredit" dc:"服务评价"`                           // 服务评价
+	StoreDeliverycredit float64 `json:"store_deliverycredit" dc:"物流评价"`                          // 物流评价
+	CommentIsAnonymous  bool    `json:"comment_is_anonymous" dc:"匿名评价"`                          // 匿名评价
 }
 
 type OrderCommentRes struct {

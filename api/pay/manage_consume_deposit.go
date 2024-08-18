@@ -2,19 +2,18 @@ package pay
 
 import (
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/os/gtime"
 	"github.com/mallsuite/gocore/core/ml"
 )
 
 type ConsumeDepositOfflinePayReq struct {
 	g.Meta `path:"/manage/pay/consumeDeposit/offline" tags:"交易单" method:"post" summary:"线下支付接口"`
 
-	OrderId            string      `json:"order_id" v:"required#请输入订单编号"  dc:"订单编号"` //商城支付编号
-	PaymentChannelId   uint        `json:"payment_channel_id"  d:"1422"`             //支付渠道
-	DepositPaymentType uint        `json:"deposit_payment_type"  d:"1305"`           //支付方式(ENUM):1301-货到付款; 1302-在线支付; 1303-白条支付; 1304-现金支付; 1305-线下支付;
-	DepositTradeNo     string      `json:"deposit_trade_no"  v:"required#请输入交易凭证号" ` // 交易号:支付宝etc
-	DepositNotifyTime  *gtime.Time `json:"deposit_notify_time" `                     //时间
-	DepositTotalFee    float64     `json:"deposit_total_fee"           `             // 交易金额
+	OrderId            string  `json:"order_id" v:"required#请输入订单编号"  dc:"订单编号"` //商城支付编号
+	PaymentChannelId   uint    `json:"payment_channel_id"  d:"1422"`             //支付渠道
+	DepositPaymentType uint    `json:"deposit_payment_type"  d:"1305"`           //支付方式(ENUM):1301-货到付款; 1302-在线支付; 1303-白条支付; 1304-现金支付; 1305-线下支付;
+	DepositTradeNo     string  `json:"deposit_trade_no"  v:"required#请输入交易凭证号" ` // 交易号:支付宝etc
+	DepositTime        int64   `json:"deposit_time" `                            //时间
+	DepositTotalFee    float64 `json:"deposit_total_fee"           `             // 交易金额
 
 	PmMoney        float64 `json:"pm_money" `         //余额
 	PmRechargeCard float64 `json:"pm_recharge_card" ` //充值卡

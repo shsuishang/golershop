@@ -192,3 +192,23 @@ func (c *cProductBase) BatchEditState(ctx context.Context, req *pt.BatchEditStat
 		return
 	}
 }
+
+// GetStockWarningItems 库存警告商品item-分页列表查询
+func (c *cProductBase) GetStockWarningItems(ctx context.Context, req *pt.GetStockWarningItemsReq) (res *pt.GetStockWarningItemsRes, err error) {
+	// 创建输入参数的实例
+	input := &model.ProductItemInput{}
+	// 将请求参数转换为输入参数
+	gconv.Scan(req, input)
+
+	// 调用服务层获取库存警告商品的分页列表
+	result, err := service.ProductItem().GetStockWarningItems(ctx, input)
+	if err != nil {
+		return nil, err
+	}
+
+	// 将结果转换为响应参数
+	res = &pt.GetStockWarningItemsRes{}
+	gconv.Scan(result, &res)
+
+	return res, nil
+}
