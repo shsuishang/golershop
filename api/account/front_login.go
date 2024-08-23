@@ -28,7 +28,7 @@ type RegisterReq struct {
 	Encrypt       bool   `json:"encrypt"`                       // 密码是否加密
 	BindType      int    `json:"bind_type" p:"bind_type" d:"3"` // 注册方式=>BindConnectCode
 	ActivityId    int    `json:"activity_id"`                   // 活动编号
-	SourceUserId  int    `json:"source_user_id"`                // 来源用户编号
+	SourceUserId  uint   `json:"source_user_id"`                // 来源用户编号
 	SourceUccCode string `json:"source_ucc_code"`               // 渠道码
 }
 

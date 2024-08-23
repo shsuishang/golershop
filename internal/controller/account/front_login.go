@@ -88,7 +88,7 @@ func (c *cLogin) Register(ctx context.Context, req *account.RegisterReq) (out ac
 	*/
 	input := &model.RegisterInput{}
 	gconv.Struct(req, input)
-
+	input.UserParentId = req.SourceUserId
 	// 系统登录
 	userId, err := service.Login().DoRegister(ctx, input)
 

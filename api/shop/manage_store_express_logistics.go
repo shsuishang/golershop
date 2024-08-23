@@ -86,6 +86,7 @@ type ReturnLogisticsReq struct {
 
 	ReturnTrackingName   string `json:"return_tracking_name"  `   // 物流名称
 	ReturnTrackingNumber string `json:"return_tracking_number"  ` // 物流公司编号
+	OrderId              string `json:"order_id"             `    // 订单编号
 }
 
 type ReturnLogisticsRes map[string]interface{}

@@ -38,7 +38,6 @@ import (
 	"golershop.cn/internal/model"
 	"golershop.cn/internal/service"
 	"golershop.cn/utility"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -128,16 +127,14 @@ func (s *sUpload) upload(ctx context.Context, fileExt string, fileSize string, m
 	fileTmp, err := os.Open(filePath)
 
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		return model.FileInfo{}, err
 	}
 
 	buff := make([]byte, 512)
 	_, err = fileTmp.Read(buff)
 
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		return model.FileInfo{}, err
 	}
 
 	filetype := http.DetectContentType(buff)
@@ -160,20 +157,20 @@ func (s *sUpload) UpdImg(ctx context.Context) (model.FileInfo, error) {
 	// 允许上传文件后缀
 	fileExt := "jpg,gif,png,bmp,jpeg"
 	// 允许文件上传最大值
-	fileSize := "50M"
+	fileSize := "5M"
 
 	// 返回结果
-	return s.upload(ctx, fileExt, fileSize, "video")
+	return s.upload(ctx, fileExt, fileSize, "image")
 }
 
 func (s *sUpload) UpdVideo(ctx context.Context) (model.FileInfo, error) {
 	// 允许上传文件后缀
 	fileExt := "flv,swf,mkv,avi,rm,rmvb,mpeg,mpg,ogg,ogv,mov,wmv,mp4,webm,mp3,wav,mid"
 	// 允许文件上传最大值
-	fileSize := "4M"
+	fileSize := "50M"
 
 	// 返回结果
-	return s.upload(ctx, fileExt, fileSize, "image")
+	return s.upload(ctx, fileExt, fileSize, "video")
 }
 
 func (s *sUpload) UpdFile(ctx context.Context) (model.FileInfo, error) {

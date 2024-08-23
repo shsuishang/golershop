@@ -62,7 +62,7 @@ type (
 		// Remove 删除多条记录模式
 		Remove(ctx context.Context, id any) (affected int64, err error)
 		// ReturnLogistics 查询物流信息
-		ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber string) (resultMap g.Map, err error)
+		ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber, orderId string) (resultMap g.Map, err error)
 	}
 	IOrderReturn interface {
 		// Get 读取订单
@@ -380,21 +380,21 @@ type (
 )
 
 var (
-	localOrder                IOrder
-	localOrderBase            IOrderBase
-	localOrderInfo            IOrderInfo
-	localOrderLogistics       IOrderLogistics
-	localOrderReturn          IOrderReturn
-	localOrderReturnItem      IOrderReturnItem
-	localOrderStateLog        IOrderStateLog
-	localUserCart             IUserCart
-	localOrderDeliveryAddress IOrderDeliveryAddress
-	localOrderInvoice         IOrderInvoice
-	localOrderItem            IOrderItem
-	localOrderComment         IOrderComment
-	localStockBill            IStockBill
-	localOrderData            IOrderData
-	localOrderReturnReason    IOrderReturnReason
+	localOrder                 IOrder
+	localOrderBase             IOrderBase
+	localOrderInfo             IOrderInfo
+	localOrderLogistics        IOrderLogistics
+	localOrderReturn           IOrderReturn
+	localOrderReturnItem       IOrderReturnItem
+	localOrderStateLog         IOrderStateLog
+	localUserCart              IUserCart
+	localOrderDeliveryAddress  IOrderDeliveryAddress
+	localOrderInvoice          IOrderInvoice
+	localOrderItem             IOrderItem
+	localOrderComment          IOrderComment
+	localStockBill             IStockBill
+	localOrderData             IOrderData
+	localOrderReturnReason     IOrderReturnReason
 )
 
 func OrderDeliveryAddress() IOrderDeliveryAddress {

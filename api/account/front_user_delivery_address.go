@@ -36,8 +36,12 @@ type UserDeliveryAddressAddRes entity.UserDeliveryAddress
 type UserDeliveryAddressEditReq struct {
 	g.Meta `path:"/front/account/userDeliveryAddress/save" tags:"user" method:"post" summary:"用户地址接口"`
 
-	UdId uint `json:"ud_id"   v:"required#请输入地址编号"    dc:"地址编号"          ` // 地址编号
-	UserDeliveryAddressAdd
+	UdId        interface{} `json:"ud_id"   v:"required#请输入地址编号"    dc:"地址编号"          ` // 地址编号
+	UdName      interface{} `json:"ud_name" type:"LIKE"        `                         // 联系人
+	UdMobile    interface{} `json:"ud_mobile"      `                                     // 手机号码
+	UdIntl      interface{} `json:"ud_intl"        `                                     // 国家编码
+	UdAddress   interface{} `json:"ud_address"     `                                     // 详细地址
+	UdIsDefault bool        `json:"ud_is_default"  `                                     // 是否默认(BOOL):0-非默认;1-默认
 }
 
 type UserDeliveryAddressEditRes struct {

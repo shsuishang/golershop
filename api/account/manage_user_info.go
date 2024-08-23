@@ -60,11 +60,13 @@ type UserInfoListReq struct {
 	g.Meta `path:"/manage/account/userInfo/list" tags:"会员管理" method:"get" summary:"用户列表接口"`
 	ml.BaseList
 
-	UserId       uint   `json:"user_id"                `            // 用户编号
-	UserAccount  string `json:"user_account"   type:"LIKE"        ` // 用户账号
-	UserNickname string `json:"user_nickname"  type:"LIKE"        ` // 用户昵称
-	UserMobile   string `json:"user_mobile"    type:"LIKE"        ` //用户号码
-	TagIds       string `json:"tag_ids"        type:"FIND_IN_SET_STR"`
+	UserId               uint        `json:"user_id"                `            // 用户编号
+	UserAccount          string      `json:"user_account"   type:"LIKE"        ` // 用户账号
+	UserNickname         string      `json:"user_nickname"  type:"LIKE"        ` // 用户昵称
+	UserMobile           string      `json:"user_mobile"    type:"LIKE"        ` //用户号码
+	TagIds               string      `json:"tag_ids"        type:"FIND_IN_SET_STR"`
+	UserIsAuthentication interface{} `json:"user_is_authentication" ` // 0-未认证 1-待审核 2-认证通过 3-认证失败
+	UserLevelId          uint        `json:"user_level_id"       `    // 用户等级ID
 }
 
 type UserInfoListRes struct {

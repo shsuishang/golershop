@@ -215,7 +215,7 @@ func md5Hash(str, charset string) string {
 }
 
 // ReturnLogistics 查询物流信息
-func (s *sOrderLogistics) ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber string) (resultMap g.Map, err error) {
+func (s *sOrderLogistics) ReturnLogistics(ctx context.Context, returnTrackingName, returnTrackingNumber, orderId string) (resultMap g.Map, err error) {
 	// 创建查询条件
 	expressBase, err := dao.ExpressBase.FindOne(ctx, &do.ExpressBaseListInput{
 		Where: do.ExpressBase{
@@ -231,8 +231,20 @@ func (s *sOrderLogistics) ReturnLogistics(ctx context.Context, returnTrackingNam
 		return nil, gerror.New("系统中未配置该物流信息，请检查发货信息是否正确！")
 	}
 
+	result, err := dao.OrderDeliveryAddress.Get(ctx, orderId)
+	if err != nil {
+		return nil, err
+	}
+
+	phoneNumber := ""
+	if len(result.DaMobile) >= 11 {
+		phoneNumber = result.DaMobile[7:11]
+	} else {
+		return nil, gerror.New("收货信息中手机号填写错误")
+	}
+
 	// 调用第三方物流查询接口，获取物流信息
-	logisticsInfoStr, err := s.OrderOnlineByJson(ctx, returnTrackingNumber, expressBase.ExpressPinyin, "")
+	logisticsInfoStr, err := s.OrderOnlineByJson(ctx, returnTrackingNumber, expressBase.ExpressPinyin, phoneNumber)
 	if err != nil {
 		return nil, err
 	}

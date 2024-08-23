@@ -5,6 +5,7 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/mallsuite/gocore/core/ml"
 	"golershop.cn/api/account"
+	"golershop.cn/internal/dao"
 	"golershop.cn/internal/model/do"
 	"golershop.cn/internal/service"
 )
@@ -23,8 +24,9 @@ func (c *cUserDeliveryAddress) List(ctx context.Context, req *account.UserDelive
 		Where: do.UserDeliveryAddress{
 			UserId: userId,
 		},
-		BaseList: ml.BaseList{Sidx: "ud_time", Sort: "DESC"},
 	}
+
+	input.Order = []*ml.BaseOrder{{Sidx: dao.UserDeliveryAddress.Columns().UdIsDefault, Sort: ml.ORDER_BY_DESC}, {Sidx: dao.UserDeliveryAddress.Columns().UdTime, Sort: ml.ORDER_BY_DESC}}
 
 	result, err := service.UserDeliveryAddress().List(ctx, input)
 
@@ -78,8 +80,9 @@ func (c *cUserDeliveryAddress) Add(ctx context.Context, req *account.UserDeliver
 func (c *cUserDeliveryAddress) Edit(ctx context.Context, req *account.UserDeliveryAddressEditReq) (*account.UserDeliveryAddressEditRes, error) {
 	userId := service.BizCtx().GetUserId(ctx)
 	userDeliveryAddress := &do.UserDeliveryAddress{}
-	gconv.Struct(req, userDeliveryAddress)
+	gconv.Scan(req, userDeliveryAddress)
 	userDeliveryAddress.UserId = userId
+
 	address, err := service.UserDeliveryAddress().Get(ctx, req.UdId)
 	if address == nil || err != nil {
 		return nil, err
