@@ -312,7 +312,7 @@ layui.define(['layer', 'laytpl', 'upload'], function(exports){
   ,'</div>'].join('');
 
   //聊天内容列表模版
-  var elemChatMain = ['<li {{ d.mine ? "class=layim-chat-mine" : "" }} {{# if(d.cid){ }}data-cid="{{d.cid}}"{{# } }}>'
+  var elemChatMain = ['<li data-message_id="{{d.message_id}}" {{ d.mine ? "class=layim-chat-mine" : "" }} {{# if(d.cid){ }}data-cid="{{d.cid}}"{{# } }}>'
     ,'<div class="layim-chat-user"><img src="{{ d.avatar }}"><cite>'
     ,'{{# if(d.mine){ }}'
       ,'<i>{{ layui.data.date(d.timestamp) }}</i>{{ d.username||__("佚名") }}'
@@ -1158,13 +1158,19 @@ layui.define(['layer', 'laytpl', 'upload'], function(exports){
   };
 
   //渲染本地最新聊天记录到相应面板
-  var viewChatlog = function(){
+  var viewChatlog = function () {
     var local = layui.data('layim')[cache.mine.id] || {}
-    ,thatChat = thisChat(), chatlog = local.chatlog || {}
-    ,ul = thatChat.elem.find('.layim-chat-main ul');
+      , thatChat = thisChat(), chatlog = local.chatlog || {}
+      , ul = thatChat.elem.find('.layim-chat-main ul');
+
+    var tmp_message_id = 0;
     layui.each(chatlog[thatChat.data.type + thatChat.data.id], function(index, item){
-      ul.append(laytpl(elemChatMain).render(item));
+      if( tmp_message_id != item.message_id){
+        tmp_message_id = item.message_id;
+        ul.append(laytpl(elemChatMain).render(item));
+      }
     });
+
     chatListMore();
   };
 

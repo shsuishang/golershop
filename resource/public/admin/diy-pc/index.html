@@ -2389,6 +2389,76 @@
   </div>
 </script>
 
+<script type="text/x-template" id="module_id_3002-template">
+
+  <div class="lyrow ui-draggable" style="display: block;" data-pm_id="%d">
+    <a href="#close" class="remove label label-danger"><i class="glyphicon-remove glyphicon"></i>删除</a>
+    <span class="drag label label-default"><i class="glyphicon glyphicon-move"></i>拖动</span>
+    <!--<a class="modify  label label-info" data-target="#editorConponentModal" data-key="setting" data-pm_id="%d" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i> 编辑</a>-->
+    <a style="right: 125px;" class="modify enable label label-warning JS_pm_enable" data-key="$data" data-pm_id="%d"><i class="glyphicon glyphicon-edit"></i> %s</a>
+    <div class="view">
+      <div class="row clearfix">
+        <div class="col-md-12 column ">
+          <div class="box box-element" style="display: block;">
+            <!-- 内容开始 -->
+            <div class="box-products special-products" id="pm_id_%d"  :style="(pm_enable=='1' ? 'opacity:1' : 'opacity:0.3') ">
+              <div class="container">
+                <div class="module-header clearfix">
+                  <div class="module-title">
+                    <h3><span data-target="#editorConponentModal" data-key="floor" :data-pm_id="pmId" data-toggle="modal" class="modify item_modify_l label label-info"><i class="glyphicon glyphicon-edit"></i>编辑</span>
+                      <span class="box-title title">{{ floor.name }}</span></h3>
+                  </div>
+                  <div class="module-more">
+                    <ul class="more-link">
+                      <li v-for="(tab, index) in tabs" :class="{ active: index === 0 }" style="position: relative">
+                        <span  class="modify item_modify label label-info" data-target="#editorConponentModal" :data-key="'tabs[' + index + ']'"  :data-pm_id="pm_id" data-toggle="modal"><i class="glyphicon glyphicon-edit"></i></span>
+                        <span  class="modify item_remove label label-danger"  :data-key="'tabs'"  :data-index="index"   :data-pm_id="pm_id" ><i class="glyphicon glyphicon-remove"></i></span>
+                        <a data-toggle="tab" :href="getTabId(index, true)">{{ tab.name }}</a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="recommend-goods clearfix">
+                  <div class="tab-container">
+                    <!-- tab下对应的商品列表 -->
+                    <div v-for="(tab, index) in tabs" :id="getTabId(index)" class="tab-panel" :class="{  active: index === 0 }">
+                      <!-- 商品列表 -->
+                      <ul>
+                        <li class="items" v-for="productItem in tab.items">
+                          <div class="p-img">
+                            <a href=""><img :alt="productItem.name" :src="productItem.picimg" /></a>
+                          </div>
+                          <div class="product-star" style="margin-top:20px;">
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star"></i>
+                            <i class="fa fa-star-half-o"></i>
+                          </div>
+                          <div class="p-name">{{productItem.name}}</div>
+                          <div class="p-price">
+                            <span class="unit-price"><?=__('¥')?>1000</span>&nbsp;
+                            <span class="market-price"><?=__('¥')?>1000</span>
+                          </div>
+                        </li>
+                        <!-- 商品列表 -->
+                      </ul>
+                    </div>
+                  </div>
+                  <!-- tab下对应的商品列表 -->
+                </div>
+
+              </div>
+            </div>
+            <!-- 内容结束 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+<!-- Bottom Scripts -->
 <style>
 
 </style>

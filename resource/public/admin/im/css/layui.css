@@ -3862,7 +3862,7 @@ code, kbd, pre, samp {
 
 button, input, optgroup, select, textarea {
   color: inherit;
-  font: inherit;
+  /*font: inherit;*/
   margin: 0
 }
 
