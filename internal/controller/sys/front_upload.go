@@ -43,6 +43,7 @@ type cUpload struct{}
 func (c *cUpload) Upload(ctx context.Context, req *sys.UploadReq) (out sys.UploadRes, err error) {
 	// 上传上传
 	var info model.FileInfo
+	info.Type = ".jpg"
 
 	switch req.MaterialType {
 	case "image":

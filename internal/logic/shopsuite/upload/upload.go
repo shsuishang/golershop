@@ -138,16 +138,20 @@ func (s *sUpload) upload(ctx context.Context, fileExt string, fileSize string, m
 	}
 
 	filetype := http.DetectContentType(buff)
+	materialDuration := "" //VideoUtil.getFormatDuration(absolutePath);
 
 	// 返回结果
 	result := model.FileInfo{
-		FileName: file.Filename,
-		FileSize: file.Size,
-		FileType: fileType,
-		FilePath: filePath,
-		FileUrl:  utility.GetWebUrl(ctx, fileUrl),
-		MimeType: filetype,
-		UserId:   userId,
+		FileName:         file.Filename,
+		FileSize:         file.Size,
+		Type:             fileType,
+		FileType:         fileType,
+		FilePath:         filePath,
+		FileUrl:          utility.GetWebUrl(ctx, fileUrl),
+		Url:              utility.GetWebUrl(ctx, fileUrl),
+		MimeType:         filetype,
+		UserId:           userId,
+		MaterialDuration: materialDuration,
 	}
 
 	return result, nil
