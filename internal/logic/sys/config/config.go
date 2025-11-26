@@ -650,8 +650,10 @@ func (s *sConfigBase) Init(ctx context.Context) (res bool, err error) {
 	global.UrlH5 = utility.UrlH5(ctx)
 	global.UrlPc = utility.UrlPc(ctx)
 
-	fmt.Println("初始化清理缓存....")
-	s.CleanCache(ctx)
+	if global.Cache {
+		fmt.Println("初始化清理缓存....")
+		s.CleanCache(ctx)
+	}
 
 	//初始化  initOrderProcess
 	_, err = s.initOrderProcess(ctx)

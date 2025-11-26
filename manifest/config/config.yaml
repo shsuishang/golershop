@@ -1,4 +1,7 @@
 server:
+  # 应用名称
+  name: "golershop-server"
+  
   #address:     ":8000"
   #openapiPath: "/api.json"
   #swaggerPath: "/swagger"
@@ -72,6 +75,26 @@ server:
     dumpRouterMap: true               # 是否在Server启动时打印所有的路由列表。默认为true
     graceful: false              # 是否开启平滑重启特性，开启时将会在本地增加10000的本地TCP端口用于进程间通信。默认false
     gracefulTimeout: 2                  # 父进程在平滑重启后多少秒退出，默认2秒。若请求耗时大于该值，可能会导致请求中断
+
+# Nacos 配置
+nacos:
+  # Nacos 服务器配置
+  server:
+    ip: "192.168.0.159"     # Nacos 服务器 IP 地址
+    port: 8848              # Nacos 服务器端口
+  # Nacos 客户端配置
+  client:
+    cacheDir: "/tmp/nacos"  # 本地缓存目录
+    logDir: "/tmp/nacos"    # 日志文件目录
+    timeoutMs: 5000         # 连接超时时间（毫秒）
+  # Nacos 配置参数
+  config:
+    dataId: "golershop.yaml"     # 配置文件标识
+    group: "GOLERSHOP_GROUP"     # 配置组名称
+  # Nacos 服务注册配置
+  registry:
+    group: "GOLERSHOP_GROUP"     # 服务注册组名称
+
 
 # 数据库连接配置
 database:
@@ -201,14 +224,18 @@ secure:
     - "/front/sys/config/info"
     - "/front/sys/config/publicKey"
     - "/front/sys/upload/index"
+    - "/front/sys/captcha/mobile"
     - "/front/account/login/login"
     - "/front/account/login/register"
+    - "/front/account/login/protocol"
+    - "/front/account/login/setNewPassword"
     - "/front/account/wechat/checkAppLogin"
     - "/front/account/wechat/jsCode2Session"
     - "/front/account/wechat/getOpenIdByCode"
     - "/front/account/wechat/callbackMp"
     - "/front/sys/district/tree"
     - "/front/pay/callback/wechatNotify"
+    - "/front/pay/callback/wechatRefundNotify"
     - "/front/pay/callback/alipayNotify"
     - "/front/pay/callback/alipayReturn"
     - "/front/pay/callback/returnUrl"
@@ -227,6 +254,7 @@ secure:
 
     - "/front/shop/mobile/getSearchInfo"
     - "/front/marketing/activityBase/listVoucher"
+    - "/front/marketing/activityBase/listGroupbooking"
 
     - "/front/cms/articleBase/listCategory"
     - "/front/cms/articleBase/list"
@@ -256,6 +284,7 @@ shopSuite:
   cacheEnable: "false"
 
   cacheNamespace: "gs:1001:"
+  cacheSeparator: ":"
 
 
 licence:

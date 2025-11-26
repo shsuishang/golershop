@@ -2,8 +2,8 @@ package phone
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"github.com/nyaruka/phonenumbers"
+	"google.golang.org/protobuf/proto"
 	"log"
 	"strconv"
 	"strings"

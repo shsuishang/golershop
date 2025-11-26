@@ -491,7 +491,7 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 		}
 	*/
 
-	content, _ := gjson.LoadContent(pageCode)
+	content, _ := gjson.LoadContent([]byte(pageCode))
 	pageCodeRows = content.Array()
 
 	itemIdRow := make([]uint64, 0)
