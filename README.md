@@ -27,11 +27,11 @@ ShopSuite开源商城基于Go/PHP/Java + uniapp + Vue3 + ElementUI Plus框架开
 ### 📖 简介：
 
 ShopSuite 开源商城系统Go版，基于Go + Goframe + Vue + Uniapp + Element
-Plus开发，在微信公众号、小程序、H5移动端都能使用，代码全开源无加密，独立部署，二开很方便，还支持免费商用，能满足企业新零售、分销推广、拼团、砍价、秒杀等多种经营需求，自用、做二开项目都很合适。
+Plus开发，在微信公众号、小程序、H5移动端都能使用，独立部署，二开很方便，能满足企业新零售、分销推广、拼团、砍价、秒杀等多种经营需求，自用、做二开项目都很合适。
 
-ShopSuite开源商城Go版本：https://gitee.com/suisung/golershop
+ShopSuite开源商城Go版本：https://www.shopsuite.cn/golershop
 
-系统代码全开源无加密，独立部署、二开方便，适用于企业新零售、分销、拼团、砍价，秒杀等各种业务需求。
+系统支持独立部署、二开方便，方便扩展微服务版本，适用于企业新零售、分销、拼团、砍价，秒杀等各种业务需求。
 
 ---
 
@@ -108,14 +108,84 @@ ShopSuite开源商城Go版本：https://gitee.com/suisung/golershop
 
 ![](https://docs.shopsuite.cn/modulithshop/demo_qrcode.png "ShopSuite 扫描体验")
 
+账号：demo <br />
+密码：shopsuite.cn
 
+Java 版本演示站：
 - 移动端： https://demo.modulithshop.cn/h5
 - PC端： https://demo.modulithshop.cn/
 - 后台：https://demo.modulithshop.cn/admin
 
-账号：demo
+Golang 版本演示站：
+- 移动端： https://demo.golershop.cn/h5
+- PC端： https://demo.golershop.cn/
+- 后台：https://demo.golershop.cn/admin
 
-密码：shopsuite.cn
+
+PHP 版本演示站：
+- 移动端： https://demo.kuteshop.cn/h5
+- PC端： https://demo.kuteshop.cn/
+- 后台：https://demo.kuteshop.cn/admin
+
+
+
+Java SpringCloud 微服务版本演示站：
+- 移动端： https://demo.mallsuite.cn/h5
+- PC端： https://demo.mallsuite.cn/
+- 平台后台：https://demo.mallsuite.cn/admin
+- 商户后台：https://demo.mallsuite.cn/admin
+
+~~~
+    PC端（请在电脑端访问）： https://demo.mallsuite.cn
+    H5端(微商城)：  https://demo.mallsuite.cn/h5
+    小程序：Mallsuite（微信搜索小程序）
+    
+    
+    (请在电脑端访问后台管理系统)
+    平台后台： https://demo.mallsuite.cn/admin
+    账号：demoadmin
+    密码：111111
+    
+    商户后台： https://demo.mallsuite.cn/admin
+    账号：seller
+    密码：111111
+    
+    
+    供应商后台： https://demo.mallsuite.cn/admin
+    账号：gys2
+    密码：111111
+~~~
+
+
+
+PHP 多商户版本演示站：
+- 移动端： https://test.suteshop.com/h5
+- PC端： https://test.suteshop.com
+- 管理后台：https://test.suteshop.com/admin
+- 商户后台：https://test.suteshop.com/admin
+
+
+~~~
+    演示站：
+    PC端（请在电脑端访问）： https://test.suteshop.com
+    H5端(微商城)：  https://test.suteshop.com/h5
+    小程序：随商商城系统（微信搜索小程序）
+    
+    
+    (请在电脑端访问后台管理系统)
+    平台后台： https://test.suteshop.com/admin.php
+    账号：demoadmin
+    密码：111111
+    
+    商户后台： https://test.suteshop.com/admin.php
+    账号：seller
+    密码：111111
+    
+    
+    供应商后台： https://test.suteshop.com/admin.php
+    账号：供应商
+    密码：111111
+~~~
 
 [想了解ShopSuite开源商城系统Go版整体框架，你可以戳这里快速掌握！](https://docs.shopsuite.cn/golershop/)
 
