@@ -104,9 +104,15 @@ func (s *sUserCart) Checkout(ctx context.Context, in *model.CheckoutInput) (out 
  * @param in 购物车数据
  */
 func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput) (out *model.CheckoutOutput, err error) {
+	if in == nil {
+		return nil, errors.New("结算参数无效")
+	}
 	out = &model.CheckoutOutput{}
 	out.UserId = in.UserId
 	userInfo, err := dao.UserInfo.Get(ctx, in.UserId)
+	if err != nil {
+		return nil, err
+	}
 
 	if userInfo == nil {
 		return nil, errors.New("用户信息不存在！")
@@ -147,11 +153,17 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 	storeIds := gconv.SliceUint(array.Column(in.Items, "StoreId"))
 
 	productItemList, err := service.ProductBase().GetItems(ctx, itemIds, in.UserId)
+	if err != nil {
+		return nil, err
+	}
 
 	// 店铺分组
 	storeItemsMap := make(map[uint][]*model.ProductItemVo)
 
 	for _, it := range productItemList {
+		if it == nil {
+			continue
+		}
 		// 根据店铺分组数据
 		storeItemsList := storeItemsMap[it.StoreId]
 		if storeItemsList == nil {
@@ -161,10 +173,16 @@ func (s *sUserCart) FormatCartRows(ctx context.Context, in *model.CheckoutInput)
 		// 设置购物车商品数量
 		var checkoutItemVo *model.CheckoutItemVo
 		for _, s := range in.Items {
+			if s == nil {
+				continue
+			}
 			if s.ItemId == it.ItemId {
 				checkoutItemVo = s
 				break
 			}
+		}
+		if checkoutItemVo == nil {
+			return nil, errors.New("购物车数据与商品列表不一致，请刷新后重试")
 		}
 
 		// 处理商品购买信息

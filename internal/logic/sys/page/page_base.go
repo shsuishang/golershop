@@ -491,7 +491,10 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 		}
 	*/
 
-	content, _ := gjson.LoadContent([]byte(pageCode))
+	content, err := gjson.LoadContent([]byte(pageCode))
+	if err != nil || content == nil {
+		return
+	}
 	pageCodeRows = content.Array()
 
 	itemIdRow := make([]uint64, 0)
@@ -504,30 +507,30 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 			return
 		}
 
-		eltmType, _ := pageCodeMap["eltmType"].(int)
+		eltmType := gconv.Int(pageCodeMap["eltmType"])
 
 		if eltmType == 4 {
-			eltm4 := pageCodeMap["eltm4"].(map[string]interface{})
+			eltm4 := gconv.Map(pageCodeMap["eltm4"])
 			if eltm4 == nil {
 				continue
 			}
 
-			data := eltm4["data"].([]map[string]interface{})
+			data := gconv.SliceMap(eltm4["data"])
 			for _, datum := range data {
-				did := datum["did"].(uint64)
+				did := gconv.Uint64(datum["did"])
 				if !g.IsEmpty(did) {
 					itemIdRow = append(itemIdRow, did)
 				}
 			}
 		} else if eltmType == 16 {
-			eltm16 := pageCodeMap["eltm16"].(map[string]interface{})
+			eltm16 := gconv.Map(pageCodeMap["eltm16"])
 			if eltm16 == nil {
 				continue
 			}
 
-			data := eltm16["data"].([]map[string]interface{})
+			data := gconv.SliceMap(eltm16["data"])
 			for _, item := range data {
-				did := item["did"].(uint64)
+				did := gconv.Uint64(item["did"])
 				if !g.IsEmpty(did) {
 					itemIdRow = append(itemIdRow, did)
 				}
@@ -546,9 +549,15 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 		}
 
 		itemOutputList, _ := service.ProductIndex().ListItem(ctx, productItemInput)
-		itemIdss := make([]uint64, len(itemOutputList.Items))
-		for i, v := range itemOutputList.Items {
-			itemIdss[i] = v.ItemId
+		if itemOutputList == nil {
+			itemOutputList = &model.ItemListOutput{}
+		}
+		itemIdss := make([]uint64, 0, len(itemOutputList.Items))
+		for _, v := range itemOutputList.Items {
+			if v == nil {
+				continue
+			}
+			itemIdss = append(itemIdss, v.ItemId)
 		}
 
 		// 获取活动数据
@@ -570,7 +579,7 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 				return
 			}
 
-			eltmType, _ := pageCodeMap["eltmType"].(int)
+			eltmType := gconv.Int(pageCodeMap["eltmType"])
 
 			if eltmType == 4 {
 				eltm4 := gconv.Map(pageCodeMap["eltm4"])
@@ -578,7 +587,7 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 					continue
 				}
 				//data := gconv.SliceAny(eltm4["data"])
-				data := eltm4["data"].([]map[string]interface{})
+				data := gconv.SliceMap(eltm4["data"])
 
 				// 将 JSON 字符串解析为 PageDataItemVo 列表
 				as := make([]*model.PageDataItemVo, 0)
@@ -590,6 +599,9 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 
 				filtered := make([]*model.PageDataItemVo, 0)
 				for _, item := range as {
+					if item == nil {
+						continue
+					}
 					if array.InArray(itemIdss, item.Did) {
 						filtered = append(filtered, item)
 					}
@@ -604,9 +616,12 @@ func fixData(ctx context.Context, pageBaseRes *model.PageDetail) {
 				//pageCodeRow.Set("eltm4", eltm4)
 
 				for _, item := range data {
-					did := item["did"]
+					did := gconv.Uint64(item["did"])
 
 					for _, productItemRow := range itemOutputList.Items {
+						if productItemRow == nil {
+							continue
+						}
 						if productItemRow.ItemId == did {
 							itemSalePrice := gconv.Float64(item["ItemSalePrice"])
 							item_unit_price := productItemRow.ItemUnitPrice

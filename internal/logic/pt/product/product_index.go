@@ -284,6 +284,9 @@ func (s *sProductIndex) ListItem(ctx context.Context, req *pt.ItemListReq) (out 
 
 // Detail 商品详情
 func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailInput) (*model.ProductDetailOutput, error) {
+	if input == nil {
+		return nil, gerror.New("请求参数无效")
+	}
 	itemId := input.ItemId
 	districtId := input.DistrictId
 	//gbId := input.GbId
@@ -312,11 +315,13 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 	}
 	if len(activityInfoVoList) > 0 {
 		activityInfoVo := activityInfoVoList[0]
-		productItem.ActivityId = activityInfoVo.ActivityId
-		productItem.ActivityInfo = activityInfoVo
+		if activityInfoVo != nil {
+			productItem.ActivityId = activityInfoVo.ActivityId
+			productItem.ActivityInfo = activityInfoVo
 
-		if g.IsEmpty(activityInfoVo.ActivityItemPrice) {
-			productItem.ItemSalePrice = activityInfoVo.ActivityItemPrice
+			if g.IsEmpty(activityInfoVo.ActivityItemPrice) {
+				productItem.ItemSalePrice = activityInfoVo.ActivityItemPrice
+			}
 		}
 	}
 
@@ -333,6 +338,15 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 	productInfo, err := dao.ProductInfo.Get(ctx, productId)
 	if err != nil {
 		return nil, err
+	}
+	if productIndex == nil {
+		return nil, gerror.New("商品索引不存在!")
+	}
+	if productBase == nil {
+		return nil, gerror.New("商品信息不存在!")
+	}
+	if productInfo == nil {
+		return nil, gerror.New("商品详情不存在!")
 	}
 
 	gconv.Struct(productIndex, out)
@@ -351,7 +365,9 @@ func (s *sProductIndex) Detail(ctx context.Context, input *model.ProductDetailIn
 		return nil, err
 	}
 	out.Image = image
-	out.ProductImage = image.ItemImageDefault
+	if image != nil {
+		out.ProductImage = image.ItemImageDefault
+	}
 
 	itemName := productItem.ItemName
 	itemSpecName := gstr.Replace(itemName, ",", " ")
