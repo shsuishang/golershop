@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"github.com/gogf/gf/v2/errors/gerror"
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/gogf/gf/v2/text/gregex"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
 	"golershop.cn/api/pt"
@@ -251,7 +252,9 @@ func (d *sProductItem) ListItemKey(ctx context.Context, req *pt.ItemListReq) (ou
 	orm = orm.Distinct().FieldsPrefix(rTable, rCls.ItemId)
 
 	if !g.IsEmpty(req.Sidx) && !g.IsEmpty(req.Sort) {
-		orm = orm.Order(req.Sidx, req.Sort)
+		if gregex.IsMatchString(`^[A-Za-z0-9_]+$`, req.Sidx) && (gstr.Equal(req.Sort, "asc") || gstr.Equal(req.Sort, "desc")) {
+			orm = orm.Order(req.Sidx, req.Sort)
+		}
 	}
 
 	// Resource items..
